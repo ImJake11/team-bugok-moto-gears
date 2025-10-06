@@ -34,6 +34,21 @@ class _InventoryActionButtonsState extends State<InventoryActionButtons> {
         decoration: BoxDecoration(
           border: BoxBorder.all(color: theme.primary),
           borderRadius: BorderRadius.circular(10),
+          color: theme.surface,
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    blurRadius: 3,
+                    color: theme.primary,
+                    offset: Offset(2, 2),
+                  ),
+                  BoxShadow(
+                    blurRadius: 3,
+                    color: theme.primary,
+                    offset: Offset(-2, -2),
+                  ),
+                ]
+              : [],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

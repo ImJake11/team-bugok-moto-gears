@@ -36,6 +36,14 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_fonts: ^6.3.2
   lucide_icons_flutter: ^3.1.1
+  timeline_tile: ^2.0.0
+  flutter_bloc: ^9.1.1
+  sqflite: ^2.4.2
+  path: ^1.9.1
+  sqflite_common_ffi: ^2.3.6
+  intl: ^0.20.2
+  go_router: ^16.2.4
+  lottie: ^3.3.2
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +75,7 @@ flutter:
     - assets/images/expenses.png
     - assets/images/sales.png
     - assets/images/box.png
+    - assets/animations/motor-cycle-animation.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

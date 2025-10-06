@@ -8,7 +8,11 @@ class CustomAppbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 70,
-      child: Padding(padding: EdgeInsets.all(10), child: child),
+      width: double.infinity,
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: child,
+      ),
     );
   }
 }

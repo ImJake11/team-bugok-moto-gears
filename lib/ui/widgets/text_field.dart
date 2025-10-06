@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextfield extends StatefulWidget {
-  const CustomTextfield({super.key});
+  final double width;
+  final String placeholder;
+  final IconData? suffixIcon;
+  final List<TextInputFormatter>? formatter;
+  final ValueChanged<String>? onChange;
+
+  const CustomTextfield({
+    super.key,
+    this.width = 500,
+    this.placeholder = "Search Product",
+    this.suffixIcon,
+    this.formatter,
+    this.onChange,
+  });
 
   @override
   State<CustomTextfield> createState() => _CustomTextfieldState();
 }
 
 class _CustomTextfieldState extends State<CustomTextfield> {
-  double? width = 500;
-  String? placeholder = "Search Product";
-  IconData? suffixIcon = LucideIcons.search;
-
   bool _isHovered = false;
 
   @override
@@ -32,11 +41,33 @@ class _CustomTextfieldState extends State<CustomTextfield> {
             style: BorderStyle.solid,
             color: theme.primary,
           ),
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    blurRadius: 3,
+                    color: theme.primary,
+                    offset: Offset(2, 2),
+                  ),
+                  BoxShadow(
+                    blurRadius: 3,
+                    color: theme.primary,
+                    offset: Offset(-2, -2),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    blurRadius: 2,
+                    color: Colors.black,
+                    offset: Offset(2, 2),
+                  ),
+                ],
         ),
-        width: width,
+        width: widget.width,
         height: 50,
         child: TextField(
+          onChanged: widget.onChange,
           autofocus: true,
+          inputFormatters: widget.formatter ?? [],
           decoration: InputDecoration(
             contentPadding: EdgeInsets.all(5),
             enabledBorder: OutlineInputBorder(
@@ -45,9 +76,11 @@ class _CustomTextfieldState extends State<CustomTextfield> {
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(style: BorderStyle.none),
             ),
-            hintText: placeholder,
+            hintText: widget.placeholder,
             hintStyle: TextStyle(color: Colors.grey.shade700),
-            prefixIcon: Icon(suffixIcon, color: theme.primary, size: 20),
+            prefixIcon: widget.suffixIcon != null
+                ? Icon(widget.suffixIcon, color: theme.primary, size: 20)
+                : null,
           ),
         ),
       ),
