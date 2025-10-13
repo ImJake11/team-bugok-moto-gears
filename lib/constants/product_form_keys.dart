@@ -1,8 +1,7 @@
 class ProductFormKeys {
-  static const String productName = "productName";
+  static const String brand = "brand";
   static const String category = "category";
-  static const String color = "color";
-  static const String size = "size";
+  static const String model = "model";
   static const String costPrice = "costPrice";
   static const String sellingPrice = "sellingPrice";
   static const String stock = "stock";

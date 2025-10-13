@@ -44,10 +44,19 @@ dependencies:
   intl: ^0.20.2
   go_router: ^16.2.4
   lottie: ^3.3.2
+  drift: ^2.28.2
+  drift_flutter: ^0.2.7
+  sqlite3_flutter_libs: ^0.5.18
+  provider: ^6.1.5+1
+  fl_chart: ^1.1.1
+  loading_animation_widget: ^1.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  drift_dev: ^2.28.3
+  build_runner: ^2.7.1
+  
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -74,8 +83,12 @@ flutter:
     - assets/images/dashboard.png
     - assets/images/expenses.png
     - assets/images/sales.png
+    - assets/images/shopping-cart.png
     - assets/images/box.png
     - assets/animations/motor-cycle-animation.json
+    - assets/images/pos-terminal.png
+    - assets/images/settings.png
+    - assets/images/palette.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

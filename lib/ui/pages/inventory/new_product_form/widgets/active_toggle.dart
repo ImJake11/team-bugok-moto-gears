@@ -17,13 +17,13 @@ class ActiveToggle extends StatelessWidget {
             spacing: 10,
             children: [
               Text(
-                state.isActive ? "Active" : "Inactive",
+                state.productData.isActive == 1 ? "Active" : "Inactive",
                 style: TextStyle(
                   fontSize: 17,
                 ),
               ),
               Switch(
-                value: state.isActive,
+                value: state.productData.isActive == 1,
                 onChanged: (value) => context.read<ProductFormBloc>().add(
                   ProductFormUpdateData(
                     key: ProductFormKeys.isActive,

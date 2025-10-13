@@ -5,6 +5,7 @@ class FormWrapper extends StatelessWidget {
   final Widget child;
   final double bottomBorderRadius;
   final double topBorderRadius;
+  final Widget? suffixWidget;
 
   const FormWrapper({
     super.key,
@@ -12,6 +13,7 @@ class FormWrapper extends StatelessWidget {
     required this.child,
     this.bottomBorderRadius = 0,
     this.topBorderRadius = 0,
+    this.suffixWidget,
   });
 
   @override
@@ -24,7 +26,7 @@ class FormWrapper extends StatelessWidget {
           topLeft: Radius.circular(topBorderRadius),
           topRight: Radius.circular(topBorderRadius),
         ),
-        color: Color(0xFF121212),
+        color: Theme.of(context).colorScheme.surfaceDim,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -35,13 +37,24 @@ class FormWrapper extends StatelessWidget {
           spacing: 30,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-              ),
+            Row(
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+                Expanded(child: SizedBox()),
+                if (suffixWidget != null) suffixWidget!,
+              ],
             ),
-            child,
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 30,
+              ),
+              child: child,
+            ),
           ],
         ),
       ),

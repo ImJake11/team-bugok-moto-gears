@@ -7,6 +7,9 @@ class CustomTextfield extends StatefulWidget {
   final IconData? suffixIcon;
   final List<TextInputFormatter>? formatter;
   final ValueChanged<String>? onChange;
+  final TextEditingController? textEditingController;
+  final bool? showShadow;
+  final Color? fillColor;
 
   const CustomTextfield({
     super.key,
@@ -15,6 +18,9 @@ class CustomTextfield extends StatefulWidget {
     this.suffixIcon,
     this.formatter,
     this.onChange,
+    this.textEditingController,
+    this.showShadow = true,
+    this.fillColor = const Color(0xFF282828),
   });
 
   @override
@@ -22,7 +28,23 @@ class CustomTextfield extends StatefulWidget {
 }
 
 class _CustomTextfieldState extends State<CustomTextfield> {
+  late TextEditingController _textEditingController;
   bool _isHovered = false;
+
+  @override
+  void initState() {
+    _textEditingController =
+        widget.textEditingController ?? TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    if (widget.textEditingController == null) {
+      _textEditingController.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,50 +53,50 @@ class _CustomTextfieldState extends State<CustomTextfield> {
     return MouseRegion(
       onEnter: (event) => setState(() => _isHovered = true),
       onExit: (event) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+      child: Container(
         decoration: BoxDecoration(
-          color: _isHovered ? Colors.grey.shade900 : theme.surface,
           borderRadius: BorderRadius.circular(10),
-          border: BoxBorder.all(
-            width: _isHovered ? 2 : 1,
-            style: BorderStyle.solid,
-            color: theme.primary,
-          ),
-          boxShadow: _isHovered
+          boxShadow: widget.showShadow ?? false
               ? [
                   BoxShadow(
-                    blurRadius: 3,
-                    color: theme.primary,
-                    offset: Offset(2, 2),
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                    offset: Offset(3, 3),
+                    color: Colors.black54,
                   ),
                   BoxShadow(
-                    blurRadius: 3,
-                    color: theme.primary,
-                    offset: Offset(-2, -2),
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                    offset: Offset(-3, -3),
+                    color: Colors.grey.shade800.withAlpha(120),
                   ),
                 ]
-              : [
-                  BoxShadow(
-                    blurRadius: 2,
-                    color: Colors.black,
-                    offset: Offset(2, 2),
-                  ),
-                ],
+              : [],
         ),
         width: widget.width,
         height: 50,
         child: TextField(
+          controller: _textEditingController,
+          style: TextStyle(
+            fontSize: 13,
+          ),
           onChanged: widget.onChange,
-          autofocus: true,
           inputFormatters: widget.formatter ?? [],
           decoration: InputDecoration(
+            fillColor: widget.fillColor,
+            filled: true,
             contentPadding: EdgeInsets.all(5),
             enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(style: BorderStyle.none),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary.withAlpha(200),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(style: BorderStyle.none),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
             hintText: widget.placeholder,
             hintStyle: TextStyle(color: Colors.grey.shade700),

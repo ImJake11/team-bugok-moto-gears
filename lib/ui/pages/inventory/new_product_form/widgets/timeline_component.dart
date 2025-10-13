@@ -21,32 +21,41 @@ class TimelineComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
 
-    return TimelineTile(
-      alignment: TimelineAlign.start,
-      lineXY: 1.5,
-      isFirst: isFirst,
-      isLast: isLast,
-      indicatorStyle: IndicatorStyle(
-        padding: EdgeInsets.only(right: 40),
-        height: 30,
-        width: 30,
-        indicator: AnimatedContainer(
-          duration: Duration(milliseconds: 250),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isPast ? theme.primary : Colors.grey.shade800,
-          ),
-          child: Icon(
-            isPast ? Icons.done : Icons.close,
-            size: 15,
+    return TweenAnimationBuilder<Color?>(
+      tween: ColorTween(
+        begin: Colors.grey.shade800,
+        end: isPast
+            ? Theme.of(context).colorScheme.tertiary
+            : Colors.grey.shade800,
+      ),
+      duration: Duration(milliseconds: 200),
+      builder: (_, color, _) => TimelineTile(
+        alignment: TimelineAlign.start,
+        lineXY: 1.5,
+        isFirst: isFirst,
+        isLast: isLast,
+        indicatorStyle: IndicatorStyle(
+          padding: EdgeInsets.only(right: 40),
+          height: 30,
+          width: 30,
+          indicator: AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isPast ? theme.primary : Colors.grey.shade800,
+            ),
+            child: Icon(
+              isPast ? Icons.done : Icons.close,
+              size: 15,
+            ),
           ),
         ),
+        hasIndicator: true,
+        beforeLineStyle: LineStyle(
+          color: color!,
+        ),
+        endChild: child,
       ),
-      hasIndicator: true,
-      beforeLineStyle: LineStyle(
-        color: isPast ? theme.tertiary : Colors.grey.shade800,
-      ),
-      endChild: child,
     );
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/cancel_button.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
-import 'package:team_bugok_business/utils/databases/inventory_database.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 
 class NewProductFormActions extends StatelessWidget {
@@ -11,63 +10,45 @@ class NewProductFormActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      spacing: 10,
-      children: [
-        CancelButton(),
-        CustomButton(
-          width: 200,
-          child: Center(
-            child: Text(
-              "Save & Create Another",
+    return BlocSelector<ProductFormBloc, ProductFormState, ProductModel?>(
+      selector: (state) {
+        if (state is ProductFormInitial) {
+          return state.productData;
+        }
+        return null;
+      },
+      builder: (context, value) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 20,
+          children: [
+            CancelButton(),
+            if (value?.id == 0)
+              CustomButton(
+                width: 200,
+                child: Center(
+                  child: Text(
+                    "Save & Create Another",
+                  ),
+                ),
+              ),
+            CustomButton(
+              onTap: () => value?.id == 0
+                  ? context.read<ProductFormBloc>().add(
+                      ProductFormInsertProduct(isSaveOnly: true),
+                    )
+                  : context.read<ProductFormBloc>().add(
+                      ProductFormSaveUpdateProduct(productModel: value!),
+                    ),
+              child: Center(
+                child: Text(
+                  value?.id == 0 ? "Save" : "Save Update",
+                ),
+              ),
             ),
-          ),
-        ),
-        CustomButton(
-          onTap: () {
-            final state = context.read<ProductFormBloc>().state;
-
-            if (state is ProductFormInitial) {
-              final productName = state.productName;
-              final category = state.category;
-              final color = state.color;
-              final size = state.size;
-              final sellingPrice = state.sellingPrice;
-              final costPrice = state.costPrice;
-              final isActive = state.isActive;
-              final stock = state.stock;
-
-              if (productName == "" ||
-                  category == "" ||
-                  color == "" ||
-                  size == "" ||
-                  stock == 0) {
-                return;
-              }
-
-              ProductModel data = ProductModel(
-                productName: productName!,
-                category: category!,
-                color: color!,
-                size: size!,
-                stock: stock!,
-                costPrice: costPrice!,
-                sellingPrice: sellingPrice!,
-                isActive: isActive ? 1 : 0,
-                dateAdded: DateTime.now().toString(),
-              );
-
-              InventoryDB().insertProduct(data);
-            }
-          },
-          child: Center(
-            child: Text(
-              "Save",
-            ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

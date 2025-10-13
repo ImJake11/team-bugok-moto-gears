@@ -5,6 +5,7 @@ class CustomDropdown extends StatelessWidget {
   final String label;
   final double? width;
   final ValueChanged<String?>? onSelected;
+  final String? selectedValue;
 
   const CustomDropdown({
     super.key,
@@ -12,17 +13,32 @@ class CustomDropdown extends StatelessWidget {
     required this.label,
     this.width = 400,
     this.onSelected,
+    this.selectedValue,
   });
 
   @override
   Widget build(BuildContext context) {
     return DropdownMenu(
+      textStyle: TextStyle(
+        fontSize: 13,
+      ),
+      menuStyle: MenuStyle(
+        side: WidgetStatePropertyAll(
+          BorderSide(
+            color: Color(0xFF555555),
+          ),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Color(0xFF555555),
+          ),
           borderRadius: BorderRadius.circular(10),
         ),
       ),
       onSelected: onSelected,
+      initialSelection: selectedValue,
       hintText: label,
       width: width,
       enableSearch: true,

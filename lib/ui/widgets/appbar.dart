@@ -7,7 +7,6 @@ class CustomAppbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 70,
       width: double.infinity,
       child: Padding(
         padding: EdgeInsets.all(10),

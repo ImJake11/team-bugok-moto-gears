@@ -31,9 +31,11 @@ class _NavBackButtonState extends State<NavBackButton> {
             color: _isHovered ? Colors.grey.shade900 : theme.surface,
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            size: 20,
+          child: Center(
+            child: Icon(
+              Icons.arrow_back_ios_new,
+              size: 20,
+            ),
           ),
         ),
       ),

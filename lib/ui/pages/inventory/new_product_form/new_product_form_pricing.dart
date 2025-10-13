@@ -8,7 +8,14 @@ import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
 
 class NewProductFormPricing extends StatelessWidget {
-  const NewProductFormPricing({super.key});
+  final TextEditingController costPriceController;
+  final TextEditingController sellingPriceController;
+
+  const NewProductFormPricing({
+    super.key,
+    required this.costPriceController,
+    required this.sellingPriceController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +24,10 @@ class NewProductFormPricing extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         CustomTextfield(
+          fillColor: Theme.of(context).colorScheme.surface,
+          showShadow: false,
           width: 400,
+          textEditingController: costPriceController,
           placeholder: "Cost Price",
           onChange: (value) => context.read<ProductFormBloc>().add(
             ProductFormUpdateData(key: ProductFormKeys.costPrice, value: value),
@@ -28,7 +38,10 @@ class NewProductFormPricing extends StatelessWidget {
           ],
         ),
         CustomTextfield(
+          fillColor: Theme.of(context).colorScheme.surface,
+          showShadow: false,
           width: 400,
+          textEditingController: sellingPriceController,
           onChange: (value) => context.read<ProductFormBloc>().add(
             ProductFormUpdateData(
               key: ProductFormKeys.sellingPrice,
@@ -44,6 +57,10 @@ class NewProductFormPricing extends StatelessWidget {
       ],
     );
 
-    return FormWrapper(title: "Pricing", child: child);
+    return FormWrapper(
+      bottomBorderRadius: 10,
+      title: "Pricing",
+      child: child,
+    );
   }
 }

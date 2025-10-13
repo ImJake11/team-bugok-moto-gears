@@ -1,0 +1,126 @@
+import 'package:flutter/material.dart';
+
+class ProductViewRelatedButton extends StatefulWidget {
+  final String brand;
+  final String model;
+  const ProductViewRelatedButton({
+    super.key,
+    required this.brand,
+    required this.model,
+  });
+
+  @override
+  State<ProductViewRelatedButton> createState() =>
+      _ProductViewRelatedButtonState();
+}
+
+class _ProductViewRelatedButtonState extends State<ProductViewRelatedButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final shadowColor = Theme.of(context).colorScheme.primary.withAlpha(60);
+
+    return MouseRegion(
+      onEnter: (event) => setState(() => _isHovered = true),
+      onExit: (event) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 250),
+        width: double.infinity,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceDim,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    blurRadius: 3,
+                    color: shadowColor,
+                    offset: Offset(3, 3),
+                  ),
+                  BoxShadow(
+                    blurRadius: 3,
+                    spreadRadius: 2,
+                    color: shadowColor,
+                    offset: Offset(-3, -3),
+                  ),
+                  BoxShadow(
+                    blurRadius: 3,
+                    spreadRadius: 2,
+                    color: shadowColor,
+                    offset: Offset(3, -4),
+                  ),
+                  BoxShadow(
+                    blurRadius: 3,
+                    spreadRadius: 2,
+                    color: shadowColor,
+                    offset: Offset(-5, 4),
+                  ),
+                ]
+              : [],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 30,
+            vertical: 20,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.model,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Row(
+                children: [
+                  TweenAnimationBuilder<Color?>(
+                    tween: ColorTween(
+                      begin: Colors.grey.shade700,
+                      end: _isHovered
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey.shade700, // 🎨 target color
+                    ),
+                    duration: const Duration(milliseconds: 200),
+                    builder: (context, color, child) {
+                      return Text(
+                        widget.brand,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: color,
+                        ),
+                      );
+                    },
+                  ),
+                  Spacer(),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(
+                      begin: 0,
+                      end: _isHovered ? 0 : 100,
+                    ),
+                    curve: Curves.ease,
+                    duration: const Duration(milliseconds: 300),
+                    builder: (context, offset, child) {
+                      return Transform(
+                        transform: Matrix4.translationValues(0, offset, 0),
+                        child: Text(
+                          "View",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

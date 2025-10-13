@@ -4,45 +4,44 @@ part of 'product_form_bloc.dart';
 sealed class ProductFormState {}
 
 final class ProductFormInitial extends ProductFormState {
-  final String? productName;
-  final String? category;
-  final String? color;
-  final String? size;
-  final double? costPrice;
-  final double? sellingPrice;
-  final int? stock;
-  final bool isActive;
+  final ProductModel productData;
 
-  ProductFormInitial({
-    this.isActive = true,
-    this.productName = "",
-    this.category = "",
-    this.color = "",
-    this.size = "",
-    this.costPrice = 0,
-    this.sellingPrice = 0,
-    this.stock = 0,
-  });
+  ProductFormInitial({ProductModel? productData})
+    : productData =
+          productData ??
+          ProductModel(
+            brand: '',
+            category: '',
+            model: '',
+            costPrice: 0,
+            sellingPrice: 0,
+            isActive: 1,
+            createdAt: DateTime.now(),
+            variants: [],
+          );
 
   ProductFormInitial copyWith({
-    String? productName,
-    String? category,
-    String? color,
-    String? size,
-    double? costPrice,
-    double? sellingPrice,
-    int? stock,
-    bool? isActive,
+    ProductModel? productData,
   }) {
     return ProductFormInitial(
-      isActive: isActive ?? this.isActive,
-      productName: productName ?? this.productName,
-      category: category ?? this.category,
-      color: color ?? this.color,
-      size: size ?? this.size,
-      costPrice: costPrice ?? this.costPrice,
-      sellingPrice: sellingPrice ?? this.sellingPrice,
-      stock: stock ?? this.stock,
+      productData: productData ?? this.productData,
     );
   }
+}
+
+class ProductFormLoadingState extends ProductFormState {}
+
+class ProductFormSuccessAndSaveOnly extends ProductFormState {}
+
+class ProductFormShowSnackbar extends ProductFormState {
+  final String message;
+  final Duration duration;
+
+  ProductFormShowSnackbar({required this.message, required this.duration});
+}
+
+class ProductFormValidtionError extends ProductFormState {
+  final String message;
+
+  ProductFormValidtionError({required this.message});
 }

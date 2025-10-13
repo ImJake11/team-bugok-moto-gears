@@ -1,21 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final double sidebarWidth = 300;
+    final routeName = GoRouter.of(context).state.name;
+
+    final double sidebarWidth = 270;
 
     List<ButtonProp> buttonsData = [
-      ButtonProp(name: "Overview", icon: "assets/images/dashboard.png"),
-      ButtonProp(name: "Inventory", icon: "assets/images/box.png"),
-      ButtonProp(name: "Sales History", icon: "assets/images/sales.png"),
-      ButtonProp(name: "Expenses", icon: "assets/images/expenses.png"),
+       ButtonProp(
+        routeName: "dashboard",
+        name: "Dashboard",
+        icon: "assets/images/dashboard.png",
+      ),
+      ButtonProp(
+        routeName: "inventory",
+        name: "Inventory",
+        icon: "assets/images/box.png",
+      ),
+      ButtonProp(
+        routeName: "pos",
+        name: "Point Of Sale",
+        icon: "assets/images/pos-terminal.png",
+      ),
+      ButtonProp(
+        name: "Sales",
+        icon: "assets/images/sales.png",
+        routeName: 'sales',
+      ),
+      ButtonProp(
+        name: "Settings",
+        icon: "assets/images/settings.png",
+        routeName: 'settings',
+      ),
     ];
 
     return Container(
-      color: Colors.black,
+      color: Theme.of(context).colorScheme.surfaceDim,
       width: sidebarWidth,
       height: MediaQuery.of(context).size.height,
       child: Column(
@@ -31,8 +55,15 @@ class Sidebar extends StatelessWidget {
           ),
           ...List.generate(
             buttonsData.length,
-            (index) =>
-                SidebarButton(data: buttonsData[index], isSelected: index == 1),
+            (index) => GestureDetector(
+              onTap: () => GoRouter.of(context).goNamed(
+                buttonsData[index].routeName,
+              ),
+              child: SidebarButton(
+                data: buttonsData[index],
+                isSelected: buttonsData[index].routeName == routeName,
+              ),
+            ),
           ),
         ],
       ),
@@ -66,9 +97,9 @@ class _SidebarButtonState extends State<SidebarButton> {
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 250),
-          curve: Curves.easeIn,
-          height: 60,
+          duration: Duration(milliseconds: 200),
+          curve: Curves.easeInCirc,
+          height: 50,
           decoration: widget.isSelected
               ? BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
@@ -82,12 +113,13 @@ class _SidebarButtonState extends State<SidebarButton> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
+                    stops: _isHovered ? [0.0, 0.5, 1.0] : [0.1, 0.3, 0.6],
                     colors: [theme.tertiary, theme.secondary, theme.primary],
                   ),
                 )
               : BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: _isHovered ? theme.surface : Colors.black,
+                  color: _isHovered ? theme.surface : theme.surfaceDim,
                 ),
           child: Padding(
             padding: const EdgeInsets.all(10),
@@ -101,7 +133,12 @@ class _SidebarButtonState extends State<SidebarButton> {
                   height: 20,
                   colorBlendMode: BlendMode.srcIn,
                 ),
-                Text(widget.data.name, style: TextStyle(fontSize: 15)),
+                Text(
+                  widget.data.name,
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
               ],
             ),
           ),
@@ -114,6 +151,7 @@ class _SidebarButtonState extends State<SidebarButton> {
 class ButtonProp {
   final String name;
   final String icon;
+  final String routeName;
 
-  ButtonProp({required this.name, required this.icon});
+  ButtonProp({required this.name, required this.icon, required this.routeName});
 }
