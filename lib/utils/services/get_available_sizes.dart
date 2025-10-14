@@ -23,6 +23,9 @@ List<String> availableSizes(
       .map((e) => e.sizeValue)
       .toList();
 
+
+      usedSizes.removeWhere((element) => element == selectedSize);
+
   return availableSizes
       .where(
         (element) => !usedSizes.contains(element),

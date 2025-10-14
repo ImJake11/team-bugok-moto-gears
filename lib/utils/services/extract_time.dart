@@ -1,7 +1,9 @@
 import 'package:intl/intl.dart';
 
-String extractTime(DateTime timestamp) {
-  final formattedTime = DateFormat("hh:mm:ss a").format(timestamp);
+String extractTime(DateTime timestamp, {bool? showSeconds = false}) {
+  if (showSeconds ?? false) {
+    return DateFormat("h:mm:ss a").format(timestamp);
+  }
 
-  return formattedTime;
+  return DateFormat("h:mm a").format(timestamp);
 }

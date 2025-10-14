@@ -10,14 +10,10 @@ import 'package:team_bugok_business/utils/services/get_available_colors.dart';
 
 class NewProductFormVariant extends StatefulWidget {
   final int variantIndex;
-  final bool isActive;
-  final int? id;
 
   const NewProductFormVariant({
     super.key,
     required this.variantIndex,
-    required this.isActive,
-    this.id,
   });
 
   @override
@@ -47,46 +43,45 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
     super.dispose();
   }
 
+  Widget addSizeBtn() => MouseRegion(
+    onEnter: (event) => setState(() => isNewSizeButtonHovered = true),
+    onExit: (event) => setState(() => isNewSizeButtonHovered = false),
+    child: GestureDetector(
+      onTap: () => context.read<ProductFormBloc>().add(
+        ProductFormCreateSize(
+          variantIndex: widget.variantIndex,
+        ),
+      ),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isNewSizeButtonHovered
+                ? Theme.of(context).colorScheme.primary
+                : Colors.transparent,
+          ),
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.black,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: 15,
+          ),
+          child: Text('New Size'),
+        ),
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     // add size button
-    Widget addSizeBtn() {
-      return MouseRegion(
-        onEnter: (event) => setState(() => isNewSizeButtonHovered = true),
-        onExit: (event) => setState(() => isNewSizeButtonHovered = false),
-        child: GestureDetector(
-          onTap: () => context.read<ProductFormBloc>().add(
-            ProductFormCreateSize(
-              variantIndex: widget.variantIndex,
-            ),
-          ),
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: isNewSizeButtonHovered
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.transparent,
-              ),
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.black,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 15,
-              ),
-              child: Text('New Size'),
-            ),
-          ),
-        ),
-      );
-    }
 
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(10)
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -103,15 +98,14 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
                 BlocSelector<ProductFormBloc, ProductFormState, String>(
                   selector: (state) {
                     if (state is ProductFormInitial) {
-                      final variants = state.productData.variants;
+                      final selectedColor =
+                          state.productData.variants[widget.variantIndex].color;
 
-                      if (variants.length > widget.variantIndex) {
-                        return variants[widget.variantIndex].color;
-                      }
+                      return selectedColor;
                     }
                     return '';
                   },
-                  builder: (context, selectedColor) {
+                  builder: (_, selectedColor) {
                     return CustomDropdown(
                       width: 250,
                       selectedValue: selectedColor,
@@ -130,23 +124,32 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
                 Spacer(),
                 addSizeBtn(),
 
-                widget.id == null
-                    ? CustomErrorButton(
+                BlocSelector<ProductFormBloc, ProductFormState, VariantModel?>(
+                  selector: (state) => (state is ProductFormInitial)
+                      ? state.productData.variants[widget.variantIndex]
+                      : null,
+                  builder: (context, variant) {
+                    if (variant == null || variant.id == null) {
+                      return CustomErrorButton(
                         ontap: () => context.read<ProductFormBloc>().add(
                           ProductFormDeleteVariant(
                             variantIndex: widget.variantIndex,
                           ),
                         ),
                         child: Center(child: Text('Delete')),
-                      )
-                    : CustomToggleSwitch(
-                        onChange: (_) => context.read<ProductFormBloc>().add(
-                          ProductFormDeleteVariant(
-                            variantIndex: widget.variantIndex,
-                          ),
+                      );
+                    }
+
+                    return CustomToggleSwitch(
+                      onChange: (_) => context.read<ProductFormBloc>().add(
+                        ProductFormDeleteVariant(
+                          variantIndex: widget.variantIndex,
                         ),
-                        isActive: widget.isActive,
                       ),
+                      isActive: variant.isActive == 1,
+                    );
+                  },
+                ),
               ],
             ),
 
@@ -186,6 +189,9 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
                           sizes.length,
                           (index) {
                             return NewProductFormSizes(
+                              key: ValueKey(
+                                'variant_${widget.variantIndex}_size_${index}',
+                              ),
                               selectedSize: sizes[index].sizeValue,
                               stockController: _stockControllers[index],
                               index: index,

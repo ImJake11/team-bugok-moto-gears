@@ -1,15 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:team_bugok_business/bloc/inventory_bloc/inventory_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/inventoryTable.dart';
 import 'package:team_bugok_business/ui/widgets/appbar.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
-import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
-import 'package:team_bugok_business/utils/model/product_model.dart';
 
 class InventoryPage extends StatefulWidget {
   const InventoryPage({super.key});
@@ -19,42 +19,20 @@ class InventoryPage extends StatefulWidget {
 }
 
 class _InventoryPageState extends State<InventoryPage> {
-  late final List<ProductModel> _products;
-  List<ProductModel> _searchResult = [];
-
   final _searchController = TextEditingController();
   Timer? _debounce;
-
-  bool _isInitialized = false;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _fetchProduct();
-  }
-
-  Future<void> _fetchProduct() async {
-    _products = await ProductRepository().retrieveAllProduct();
-    setState(() {
-      _isInitialized = true;
-    });
-  }
 
   void _searchQuery() {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
 
-    _debounce = Timer.periodic(
-      Duration(milliseconds: 200),
-      (_) {
+    _debounce = Timer(
+      Duration(milliseconds: 500),
+      () {
         final query = _searchController.text.trim().toLowerCase();
 
-        _searchResult = _products
-            .where(
-              (element) => element.model.toLowerCase().contains(query),
-            )
-            .toList();
-        setState(() {});
+        context.read<InventoryBloc>().add(
+          InventoryFilteringList(query: query),
+        );
       },
     );
   }
@@ -102,9 +80,11 @@ class _InventoryPageState extends State<InventoryPage> {
             textEditingController: _searchController,
             suffixIcon: LucideIcons.search,
             placeholder: "Search Model",
-            onChange: (value) => _searchQuery(),
+            onChange: (value) {
+              _searchQuery();
+            },
           ),
-          Expanded(child: SizedBox()),
+          const Spacer(),
           newGearButton,
         ],
       ),
@@ -115,18 +95,32 @@ class _InventoryPageState extends State<InventoryPage> {
         padding: const EdgeInsets.symmetric(
           horizontal: 20,
         ),
-        child: _isInitialized
-            ? InventoryTable(
-                products: _searchController.text.isEmpty
-                    ? _products
-                    : _searchResult,
-              )
-            : Center(
-                child: Transform(
-                  transform: Matrix4.translationValues(-80, 0, 0),
-                  child: LoadingWidget(),
-                ),
+        child: BlocBuilder<InventoryBloc, InventoryState>(
+          builder: (context, state) {
+            if (state is InventoryInitial) {
+              final isFiltering = state.isFiltering;
+              final searchResults = state.searchResults;
+              final products = state.products;
+
+              return InventoryTable(
+                products: isFiltering ? searchResults : products,
+              );
+            }
+
+            if (state is InventoryErrorState) {
+              return Center(
+                child: Text('Something went wrong'),
+              );
+            }
+
+            return Center(
+              child: Transform(
+                transform: Matrix4.translationValues(-80, 0, 0),
+                child: LoadingWidget(),
               ),
+            );
+          },
+        ),
       ),
     );
 

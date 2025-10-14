@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:team_bugok_business/bloc/inventory_bloc/inventory_bloc.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/sales_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/size_repository.dart';
@@ -34,7 +35,6 @@ class PosBloc extends Bloc<PosEvent, PosState> {
     emit(PosLoadingState());
     List<ProductModel> products = await ProductRepository()
         .retrieveAllProduct();
-    await Future.delayed(Duration(seconds: 20));
     emit(PosProductInitialized(products: products));
   }
 
@@ -151,6 +151,7 @@ class PosBloc extends Bloc<PosEvent, PosState> {
 
       emit(PosCheckOutSuccessful());
       add(PosLoadProducts());
+    
     } catch (e) {
       emit(PosErrorState());
     }

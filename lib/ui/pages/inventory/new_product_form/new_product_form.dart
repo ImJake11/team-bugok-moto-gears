@@ -10,10 +10,8 @@ import 'package:team_bugok_business/ui/pages/inventory/new_product_form/new_prod
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/active_toggle.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/timeline_component.dart';
 import 'package:team_bugok_business/ui/widgets/appbar.dart';
-import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
 import 'package:team_bugok_business/ui/widgets/nav_back_button.dart';
 import 'package:team_bugok_business/ui/widgets/snackbar.dart';
-import 'package:team_bugok_business/utils/model/variant_model.dart';
 
 class NewProductForm extends StatefulWidget {
   const NewProductForm({super.key});
@@ -102,119 +100,100 @@ class _NewProductFormState extends State<NewProductForm> {
                   context.goNamed("inventory");
                 }
               },
-              child: BlocBuilder<ProductFormBloc, ProductFormState>(
-                builder: (context, state) {
-                  if (state is ProductFormLoadingState) {
-                    return const Center(child: LoadingWidget());
-                  }
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    BlocSelector<ProductFormBloc, ProductFormState, String>(
+                      selector: (state) => state is ProductFormInitial
+                          ? state.productData.category
+                          : '',
+                      builder: (context, category) {
+                        return TimelineComponent(
+                          isLast: false,
+                          isPast: category.isNotEmpty,
+                          isFirst: true,
+                          child: NewProductFormCategory(
+                            selectedCategory: category,
+                          ),
+                        );
+                      },
+                    ),
 
-                  if (state is! ProductFormInitial) return const SizedBox();
-
-                  // Keep layout structure outside rebuilds
-                  return ListView(
-                    shrinkWrap: false,
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    children: [
-                      // 🟢 Category Section — only rebuilds when category changes
-                      BlocSelector<ProductFormBloc, ProductFormState, String>(
-                        selector: (state) => state is ProductFormInitial
-                            ? state.productData.category
-                            : '',
-                        builder: (context, category) {
-                          return TimelineComponent(
-                            isLast: false,
-                            isPast: category.isNotEmpty,
-                            isFirst: true,
-                            child: NewProductFormCategory(
-                              selectedCategory: category,
-                            ),
+                    BlocSelector<
+                      ProductFormBloc,
+                      ProductFormState,
+                      (String, String)
+                    >(
+                      selector: (state) {
+                        if (state is ProductFormInitial) {
+                          return (
+                            state.productData.brand,
+                            state.productData.model,
                           );
-                        },
-                      ),
+                        }
+                        return ('', '');
+                      },
+                      builder: (context, brandModel) {
+                        final (brand, model) = brandModel;
+                        return TimelineComponent(
+                          isLast: false,
+                          isPast: brand.isNotEmpty && model.isNotEmpty,
+                          isFirst: false,
+                          child: NewProductFormName(
+                            selectedBrand: brand,
+                            modelController: _modelController,
+                          ),
+                        );
+                      },
+                    ),
 
-                      // 🟣 Brand & Model Section — rebuilds only when brand/model changes
-                      BlocSelector<
-                        ProductFormBloc,
-                        ProductFormState,
-                        (String, String)
-                      >(
-                        selector: (state) {
-                          if (state is ProductFormInitial) {
-                            return (
-                              state.productData.brand,
-                              state.productData.model,
-                            );
-                          }
-                          return ('', '');
-                        },
-                        builder: (context, brandModel) {
-                          final (brand, model) = brandModel;
-                          return TimelineComponent(
-                            isLast: false,
-                            isPast: brand.isNotEmpty && model.isNotEmpty,
-                            isFirst: false,
-                            child: NewProductFormName(
-                              selectedBrand: brand,
-                              modelController: _modelController,
-                            ),
+                    BlocSelector<ProductFormBloc, ProductFormState, bool>(
+                      selector: (state) => state is ProductFormInitial
+                          ? state.productData.variants.isNotEmpty
+                          : false,
+                      builder: (context, isNotEmpty) {
+                        return TimelineComponent(
+                          isLast: false,
+                          isPast: isNotEmpty,
+                          isFirst: false,
+                          child: const NewProductFormDetails(),
+                        );
+                      },
+                    ),
+
+                    BlocSelector<
+                      ProductFormBloc,
+                      ProductFormState,
+                      (double, double)
+                    >(
+                      selector: (state) {
+                        if (state is ProductFormInitial) {
+                          return (
+                            state.productData.costPrice,
+                            state.productData.sellingPrice,
                           );
-                        },
-                      ),
+                        }
+                        return (0.0, 0.0);
+                      },
+                      builder: (context, priceData) {
+                        final (costPrice, sellingPrice) = priceData;
+                        return TimelineComponent(
+                          isLast: false,
+                          isPast: costPrice != 0 && sellingPrice != 0,
+                          isFirst: false,
+                          child: NewProductFormPricing(
+                            costPriceController: _costPriceController,
+                            sellingPriceController: _sellingPriceController,
+                          ),
+                        );
+                      },
+                    ),
 
-                      // 🟡 Variants Section — rebuilds only when variants list changes
-                      BlocSelector<
-                        ProductFormBloc,
-                        ProductFormState,
-                        List<VariantModel>
-                      >(
-                        selector: (state) => state is ProductFormInitial
-                            ? state.productData.variants
-                            : const [],
-                        builder: (context, variants) {
-                          return TimelineComponent(
-                            isLast: false,
-                            isPast: variants.isNotEmpty,
-                            isFirst: false,
-                            child: const NewProductFormDetails(),
-                          );
-                        },
-                      ),
-
-                      // 🟠 Pricing Section — rebuilds only when price fields change
-                      BlocSelector<
-                        ProductFormBloc,
-                        ProductFormState,
-                        (double, double)
-                      >(
-                        selector: (state) {
-                          if (state is ProductFormInitial) {
-                            return (
-                              state.productData.costPrice,
-                              state.productData.sellingPrice,
-                            );
-                          }
-                          return (0.0, 0.0);
-                        },
-                        builder: (context, priceData) {
-                          final (costPrice, sellingPrice) = priceData;
-                          return TimelineComponent(
-                            isLast: false,
-                            isPast: costPrice != 0 && sellingPrice != 0,
-                            isFirst: false,
-                            child: NewProductFormPricing(
-                              costPriceController: _costPriceController,
-                              sellingPriceController: _sellingPriceController,
-                            ),
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 60),
-                      const NewProductFormActions(),
-                      const SizedBox(height: 20),
-                    ],
-                  );
-                },
+                    const SizedBox(height: 60),
+                    const NewProductFormActions(),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ),

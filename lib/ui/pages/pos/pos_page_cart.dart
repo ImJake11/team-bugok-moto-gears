@@ -101,6 +101,7 @@ class PosPageCart extends StatelessWidget {
                           cart.length,
                           (index) {
                             CartModel data = cart[index];
+                            
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

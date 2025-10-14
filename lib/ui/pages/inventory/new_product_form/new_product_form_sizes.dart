@@ -23,9 +23,10 @@ class NewProductFormSizes extends StatelessWidget {
     required this.index,
     required this.size,
   });
-
+  
   @override
   Widget build(BuildContext context) {
+
     return Padding(
       padding: const EdgeInsets.only(left: 100),
       child: Row(

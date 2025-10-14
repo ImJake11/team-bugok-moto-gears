@@ -31,6 +31,7 @@ class _SalesPageTableRowState extends State<SalesPageTableRow> {
 
   @override
   Widget build(BuildContext context) {
+
     final viewBtn = Flexible(
       child: GestureDetector(
         onTap: () => widget.isOnView ? widget.onHide() : widget.onView(),

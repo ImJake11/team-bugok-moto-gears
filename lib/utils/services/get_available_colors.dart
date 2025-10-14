@@ -11,6 +11,9 @@ List<String> availableColors(
   if (s is! ProductFormInitial) return [];
 
   final List<String> colors = [
+    "Matte Metalic Red",
+    "Red/Gray",
+    "Gloss Black",
     "Matte Black",
     "Moss Green",
     "Pearl White",
@@ -26,6 +29,9 @@ List<String> availableColors(
       )
       .toList();
 
+  // remove the current color from the main list 
+  usedColors.removeWhere((element) => element == currentColor);
+  
   return colors
       .where(
         (color) => !usedColors.contains(color),

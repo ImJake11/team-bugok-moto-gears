@@ -5,16 +5,25 @@ class DashboardComponentWrapper extends StatelessWidget {
   final double? height;
   final double? width;
   final Widget child;
+  final List<Color>? gradientColors;
+
   const DashboardComponentWrapper({
     super.key,
     required this.title,
     this.height = 400,
     this.width = 300,
     required this.child,
+    this.gradientColors,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
+
+    List<Color> colors = gradientColors?.isEmpty ?? true
+        ? [theme.surfaceDim, theme.surfaceDim]
+        : gradientColors!;
+
     return Container(
       height: height,
       width: width,
@@ -23,6 +32,11 @@ class DashboardComponentWrapper extends StatelessWidget {
         color: Theme.of(context).colorScheme.surfaceDim,
         border: Border.all(
           color: Color(0xFF555555),
+        ),
+        gradient: LinearGradient(
+          colors: colors,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
         boxShadow: [
           BoxShadow(
@@ -47,11 +61,13 @@ class DashboardComponentWrapper extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            child,
+            Expanded(
+              child: child,
+            ),
           ],
         ),
       ),

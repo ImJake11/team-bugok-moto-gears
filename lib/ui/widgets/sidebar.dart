@@ -11,23 +11,23 @@ class Sidebar extends StatelessWidget {
     final double sidebarWidth = 270;
 
     List<ButtonProp> buttonsData = [
-       ButtonProp(
+      ButtonProp(
         routeName: "dashboard",
         name: "Dashboard",
         icon: "assets/images/dashboard.png",
       ),
       ButtonProp(
         routeName: "inventory",
-        name: "Inventory",
+        name: "Inventory Management",
         icon: "assets/images/box.png",
       ),
       ButtonProp(
         routeName: "pos",
-        name: "Point Of Sale",
+        name: "New Sale",
         icon: "assets/images/pos-terminal.png",
       ),
       ButtonProp(
-        name: "Sales",
+        name: "Sales History",
         icon: "assets/images/sales.png",
         routeName: 'sales',
       ),
@@ -136,7 +136,8 @@ class _SidebarButtonState extends State<SidebarButton> {
                 Text(
                   widget.data.name,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
+                    overflow: TextOverflow.fade,
                   ),
                 ),
               ],

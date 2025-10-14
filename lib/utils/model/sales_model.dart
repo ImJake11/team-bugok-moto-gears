@@ -1,4 +1,4 @@
-import 'package:team_bugok_business/utils/model/cart_model.dart';
+  import 'package:team_bugok_business/utils/model/cart_model.dart';
 
 class SalesModel {
   final int id;

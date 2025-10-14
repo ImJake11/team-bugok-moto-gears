@@ -62,10 +62,14 @@ Future<void> _upsertVariant(
 
     if (existing == null) {
       final id = await _insertVariant(v, db, productId);
-      await SizeRepository().upsertSize(v.sizes, id);
+      await SizeRepository().upsertSize(v.sizes, id, productId);
     } else {
       await _updateVariant(db, v, v.id!);
-      await SizeRepository().upsertSize(v.sizes, existing.id);
+      await SizeRepository().upsertSize(
+        v.sizes,
+        existing.id,
+        productId,
+      );
     }
   }
 }

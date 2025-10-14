@@ -16,7 +16,7 @@ class DashboardPageAppbar extends StatelessWidget {
               style: TextStyle(fontSize: 20),
             ),
             Text(
-              "Hellow, Welcome back!",
+              "Hello, Welcome back!",
               style: TextStyle(
                 fontSize: 14,
                 color: Theme.of(context).colorScheme.primary,

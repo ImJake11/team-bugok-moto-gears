@@ -1,8 +1,6 @@
 import "dart:io";
-import 'dart:math' as math;
 import "package:drift/drift.dart";
 import "package:drift/native.dart";
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
@@ -37,6 +35,7 @@ class Variants extends Table {
 class Sizes extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get variantId => integer().references(Variants, #id)();
+  IntColumn get productId => integer().references(Variants, #productId)();
   IntColumn get stock => integer()();
   TextColumn get sizeValues => text()();
   IntColumn get isActive => integer().withDefault(const Constant(1))();
@@ -52,7 +51,7 @@ class Sales extends Table {
 @DataClassName('SaleItem')
 class SaleItems extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get saleId => integer().references(Sale, #id)();
+  IntColumn get saleId => integer().references(Sales, #id)();
   RealColumn get price => real()();
   IntColumn get quantity => integer()();
   TextColumn get brand => text()();
@@ -75,7 +74,7 @@ class AppDatabase extends _$AppDatabase {
 
   // Increment this when you change your schema
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

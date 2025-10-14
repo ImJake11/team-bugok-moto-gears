@@ -48,6 +48,7 @@ class ProductRepository {
               .into(db.sizes)
               .insert(
                 SizesCompanion.insert(
+                  productId: productId,
                   variantId: variantId,
                   stock: s.stock,
                   sizeValues: s.sizeValue,

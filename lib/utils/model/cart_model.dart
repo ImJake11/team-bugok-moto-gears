@@ -6,10 +6,12 @@ class CartModel {
   final String color;
   final String size;
   final String brand;
+  final int? saleId;
 
   CartModel({
     required this.id,
     this.quantity = 1,
+    this.saleId,
     required this.price,
     required this.model,
     required this.size,

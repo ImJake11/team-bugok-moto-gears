@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:team_bugok_business/ui/pages/dashboard/dashbard_page_no_stock.dart';
+import 'package:team_bugok_business/ui/pages/dashboard/dashboard_page_no_transactions.dart';
+import 'package:team_bugok_business/ui/pages/dashboard/dashboard_page_sales.dart';
+import 'package:team_bugok_business/ui/pages/dashboard/dashboard_page_today_sales.dart';
+import 'package:team_bugok_business/ui/pages/dashboard/dashboard_top_products.dart';
 import 'package:team_bugok_business/ui/pages/dashboard/widgets/dashboard_page_component_wrapper.dart';
 import 'package:team_bugok_business/ui/pages/dashboard/widgets/dashboard_page_appbar.dart';
 
@@ -9,8 +14,9 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
     return Container(
-      color: Theme.of(context).colorScheme.surface,
+      color: theme.surface,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 50,
@@ -33,25 +39,25 @@ class DashboardPage extends StatelessWidget {
                         title: "Today Sales",
                         height: constraints.maxHeight,
                         width: maxWidth,
-                        child: SizedBox(),
+                        child: DashboardPageTodaySales(),
                       ),
                       DashboardComponentWrapper(
                         height: constraints.maxHeight,
-                        title: "Transactions",
+                        title: "No. Transactions",
                         width: maxWidth,
-                        child: SizedBox(),
+                        child: DashboardPageNoTransactions(),
                       ),
                       DashboardComponentWrapper(
-                        title: "Sales",
+                        title: "Recent Sales",
                         height: constraints.maxHeight,
                         width: maxWidth,
-                        child: SizedBox(),
+                        child: DashboardPageSales(),
                       ),
                       DashboardComponentWrapper(
                         height: constraints.maxHeight,
                         title: "On Low Stocks",
                         width: 300,
-                        child: SizedBox(),
+                        child: DashbardPageNoStock(),
                       ),
                     ],
                   );
@@ -63,8 +69,8 @@ class DashboardPage extends StatelessWidget {
               children: [
                 Expanded(child: DashboardPageChart()),
                 DashboardComponentWrapper(
-                  title: "Top Products",
-                  child: SizedBox(),
+                  title: "This Month Top Products",
+                  child: DashboardTopProducts(),
                 ),
               ],
             ),

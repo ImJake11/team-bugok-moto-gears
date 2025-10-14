@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
+import 'package:team_bugok_business/bloc/inventory_bloc/inventory_bloc.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,6 +33,16 @@ class MyApp extends StatelessWidget {
           providers: [
             BlocProvider(create: (_) => ProductFormBloc()),
             BlocProvider(create: (_) => PosBloc()),
+            BlocProvider(
+              create: (context) =>
+                  DashboardBloc(posBloc: context.read<PosBloc>()),
+            ),
+            BlocProvider(
+              create: (context) => InventoryBloc(
+                formBloc: context.read<ProductFormBloc>(),
+                posBloc: context.read<PosBloc>(),
+              ),
+            ),
           ],
           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
@@ -52,7 +64,7 @@ class MyApp extends StatelessWidget {
                 onError: Colors.red,
                 surface: Color(0xFF1e1e1e),
                 onSurface: Colors.white,
-                surfaceDim: Color(0xFF121212)
+                surfaceDim: Color(0xFF121212),
               ),
             ),
             themeMode: ThemeMode.dark,

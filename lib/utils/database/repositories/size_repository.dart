@@ -5,8 +5,15 @@ import 'package:team_bugok_business/utils/model/variant_model.dart';
 class SizeRepository {
   final db = appDatabase;
 
-  Future<void> upsertSize(List<VariantSizeModel> sizes, int variantId) async =>
-      _upsertSize(sizes, variantId);
+  Future<void> upsertSize(
+    List<VariantSizeModel> sizes,
+    int variantId,
+    productId,
+  ) async => _upsertSize(
+    sizes,
+    variantId,
+    productId,
+  );
 
   Future<VariantSizeModel> querySize(int id) async => _querySize(id);
 
@@ -16,12 +23,14 @@ class SizeRepository {
   /// PRIVATE FUNCTIONS ///
   Future<void> _insertSize(
     int variantId,
+    int productId,
     VariantSizeModel size,
   ) async {
     await db
         .into(db.sizes)
         .insert(
           SizesCompanion.insert(
+            productId: productId,
             variantId: variantId,
             stock: size.stock,
             sizeValues: size.sizeValue,
@@ -47,6 +56,7 @@ class SizeRepository {
   Future<void> _upsertSize(
     List<VariantSizeModel> sizes,
     int variantId,
+    int productId,
   ) async {
     for (final s in sizes) {
       final existing =
@@ -56,7 +66,7 @@ class SizeRepository {
               .getSingleOrNull();
 
       if (existing == null) {
-        await _insertSize(variantId, s);
+        await _insertSize(variantId, productId, s);
       } else {
         await _updateSize(s);
       }
