@@ -77,3 +77,4 @@ class ProductFormSaveUpdateProduct extends ProductFormEvent {
 
   ProductFormSaveUpdateProduct({required this.productModel});
 }
+

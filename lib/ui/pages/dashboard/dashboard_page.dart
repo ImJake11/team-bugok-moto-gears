@@ -14,68 +14,65 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
-    return Container(
-      color: theme.surface,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 50,
-          vertical: 20,
-        ),
-        child: Column(
-          spacing: 30,
-          children: [
-            DashboardPageAppbar(),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  // deducted by 90 because  spacing is applied
-                  final maxWidth = (constraints.maxWidth - 390) / 3;
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 50,
+        vertical: 20,
+      ),
+      child: Column(
+        spacing: 30,
+        children: [
+          DashboardPageAppbar(),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // deducted by 90 because  spacing is applied
+                final maxWidth = (constraints.maxWidth - 390) / 3;
 
-                  return Row(
-                    spacing: 30,
-                    children: [
-                      DashboardComponentWrapper(
-                        title: "Today Sales",
-                        height: constraints.maxHeight,
-                        width: maxWidth,
-                        child: DashboardPageTodaySales(),
-                      ),
-                      DashboardComponentWrapper(
-                        height: constraints.maxHeight,
-                        title: "No. Transactions",
-                        width: maxWidth,
-                        child: DashboardPageNoTransactions(),
-                      ),
-                      DashboardComponentWrapper(
-                        title: "Recent Sales",
-                        height: constraints.maxHeight,
-                        width: maxWidth,
-                        child: DashboardPageSales(),
-                      ),
-                      DashboardComponentWrapper(
-                        height: constraints.maxHeight,
-                        title: "On Low Stocks",
-                        width: 300,
-                        child: DashbardPageNoStock(),
-                      ),
-                    ],
-                  );
-                },
+                return Row(
+                  spacing: 30,
+                  children: [
+                    DashboardComponentWrapper(
+                      title: "Today Sales",
+                      height: constraints.maxHeight,
+                      width: maxWidth,
+                      child: DashboardPageTodaySales(),
+                    ),
+                    DashboardComponentWrapper(
+                      height: constraints.maxHeight,
+                      title: "No. Transactions",
+                      width: maxWidth,
+                      child: DashboardPageNoTransactions(),
+                    ),
+                    DashboardComponentWrapper(
+                      title: "Recent Sales",
+                      height: constraints.maxHeight,
+                      width: maxWidth,
+                      child: DashboardPageSales(),
+                    ),
+                    DashboardComponentWrapper(
+                      height: constraints.maxHeight,
+                      title: "On Low Stocks",
+                      width: 300,
+                      child: DashbardPageNoStock(),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          Row(
+            spacing: 30,
+            children: [
+              Expanded(child: DashboardPageChart()),
+              DashboardComponentWrapper(
+                title: "This Month Top Products",
+                child: DashboardTopProducts(),
               ),
-            ),
-            Row(
-              spacing: 30,
-              children: [
-                Expanded(child: DashboardPageChart()),
-                DashboardComponentWrapper(
-                  title: "This Month Top Products",
-                  child: DashboardTopProducts(),
-                ),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

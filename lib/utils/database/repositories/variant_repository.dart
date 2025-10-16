@@ -7,69 +7,86 @@ class VariantRepository {
   final db = appDatabase;
 
   Future<void> updateVariant(VariantModel variant, int id) async =>
-      _updateVariant(db, variant, id);
+      _updateVariant(variant, id);
 
-  Future<void> upservariant(List<VariantModel> variants, int productId) async =>
-      _upsertVariant(productId, variants, db);
-}
+  Future<void> upservariant(
+    List<VariantModel> variants,
+    int productId,
+    int expenseId,
+    double costPrice,
+  ) async => _upsertVariant(
+    productId,
+    variants,
+    expenseId,
+    costPrice,
+  );
 
-Future<void> _updateVariant(
-  AppDatabase db,
-  VariantModel variant,
-  int id,
-) async {
-  await (db.update(db.variants)..where(
-        (tbl) => tbl.id.equals(id),
-      ))
-      .write(
-        VariantsCompanion(
-          color: Value(variant.color),
-          id: Value(variant.id!),
-          isActive: Value(variant.isActive),
-          productId: Value(variant.productId!),
-        ),
-      );
-}
+  // =======================  Private Functions ============================ //
+  Future<void> _updateVariant(
+    VariantModel variant,
+    int id,
+  ) async {
+    await (db.update(db.variants)..where(
+          (tbl) => tbl.id.equals(id),
+        ))
+        .write(
+          VariantsCompanion(
+            color: Value(variant.color),
+            id: Value(variant.id!),
+            isActive: Value(variant.isActive),
+            productId: Value(variant.productId!),
+          ),
+        );
+  }
 
-Future<int> _insertVariant(
-  VariantModel variant,
-  AppDatabase db,
-  int productId,
-) async {
-  final id = await db
-      .into(db.variants)
-      .insert(
-        VariantsCompanion.insert(
-          productId: productId,
-          color: variant.color,
-        ),
-      );
+  Future<int> _insertVariant(
+    VariantModel variant,
+    int productId,
+  ) async {
+    final id = await db
+        .into(db.variants)
+        .insert(
+          VariantsCompanion.insert(
+            productId: productId,
+            color: variant.color,
+          ),
+        );
 
-  return id;
-}
+    return id;
+  }
 
-Future<void> _upsertVariant(
-  int productId,
-  List<VariantModel> variants,
-  AppDatabase db,
-) async {
-  for (final v in variants) {
-    final existing =
-        await (db.select(db.variants)..where(
-              (tbl) => tbl.id.equals(v.id ?? 0),
-            ))
-            .getSingleOrNull();
+  Future<void> _upsertVariant(
+    int productId,
+    List<VariantModel> variants,
+    int expenseId,
+    double costPrice,
+  ) async {
+    for (final v in variants) {
+      final existing =
+          await (db.select(db.variants)..where(
+                (tbl) => tbl.id.equals(v.id ?? 0),
+              ))
+              .getSingleOrNull();
 
-    if (existing == null) {
-      final id = await _insertVariant(v, db, productId);
-      await SizeRepository().upsertSize(v.sizes, id, productId);
-    } else {
-      await _updateVariant(db, v, v.id!);
-      await SizeRepository().upsertSize(
-        v.sizes,
-        existing.id,
-        productId,
-      );
+      if (existing == null) {
+        final id = await _insertVariant(v, productId);
+        await SizeRepository().upsertSize(
+          v.sizes,
+          id,
+          productId,
+          expenseId,
+          costPrice,
+        );
+      } else {
+        await _updateVariant(v, v.id!);
+        await SizeRepository().upsertSize(
+          v.sizes,
+          existing.id,
+          productId,
+          expenseId,
+          costPrice,
+        );
+      }
     }
   }
 }

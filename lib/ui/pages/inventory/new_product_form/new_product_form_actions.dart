@@ -33,13 +33,17 @@ class NewProductFormActions extends StatelessWidget {
                 ),
               ),
             CustomButton(
-              onTap: () => value?.id == 0
-                  ? context.read<ProductFormBloc>().add(
-                      ProductFormInsertProduct(isSaveOnly: true),
-                    )
-                  : context.read<ProductFormBloc>().add(
-                      ProductFormSaveUpdateProduct(productModel: value!),
-                    ),
+              onTap: () {
+                if (value?.id == 0) {
+                  context.read<ProductFormBloc>().add(
+                    ProductFormInsertProduct(isSaveOnly: true),
+                  );
+                } else {
+                  context.read<ProductFormBloc>().add(
+                    ProductFormSaveUpdateProduct(productModel: value!),
+                  );
+                }
+              },
               child: Center(
                 child: Text(
                   value?.id == 0 ? "Save" : "Save Update",

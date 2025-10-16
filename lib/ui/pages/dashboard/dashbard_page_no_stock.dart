@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
+import 'package:team_bugok_business/utils/model/low_stock_product_model.dart';
 
 class DashbardPageNoStock extends StatelessWidget {
   const DashbardPageNoStock({super.key});
@@ -10,47 +13,124 @@ class DashbardPageNoStock extends StatelessWidget {
 
       child: Padding(
         padding: const EdgeInsets.only(top: 10),
-        child: SingleChildScrollView(
-          child: Column(
-            spacing: 10,
-            children: List.generate(
-              10,
-              (index) {
-                return Row(
-                  children: [
-                    Text(
-                      "Brand Model",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade400,
+        child:
+            BlocSelector<
+              DashboardBloc,
+              DashboardState,
+              List<LowStockProductModel>
+            >(
+              selector: (state) {
+                if (state is! DashboardInitial) return [];
+
+                final int threshold = 5;
+                final products = state.products;
+                final sizes = state.sizes;
+
+                List<LowStockProductModel> lowStockProducts = [];
+
+                for (final product in products) {
+                  final sizesRelatedToProduct = sizes.where(
+                    (size) => size.productId == product.id,
+                  );
+
+                  final totalStock = sizesRelatedToProduct.fold<int>(
+                    0,
+                    (acc, size) => acc + size.stock,
+                  );
+
+                  if (totalStock <= threshold) {
+                    lowStockProducts.add(
+                      LowStockProductModel(
+                        id: product.id!,
+                        brand: product.brand,
+                        model: product.model,
+                        totalStock: totalStock,
                       ),
+                    );
+                  }
+                }
+                lowStockProducts.sort(
+                  (a, b) => b.totalStock.compareTo(a.totalStock),
+                );
+
+                return lowStockProducts;
+              },
+              builder: (context, products) {
+                return SingleChildScrollView(
+                  child: Column(
+                    spacing: 10,
+                    children: List.generate(
+                      products.length,
+                      (index) {
+                        final product = products[index];
+
+                        return Row(
+                          spacing: 10,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              child: Center(
+                                child: Text('5'),
+                              ),
+                            ),
+                            Text(
+                              "${product.brand} ${product.model}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              height: 30,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey.shade800,
+                                ),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.surfaceDim,
+                                borderRadius: BorderRadius.circular(40),
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 2,
+                                    spreadRadius: 2,
+                                    color: Colors.black,
+                                    offset: Offset(2, 2),
+                                  ),
+                                  BoxShadow(
+                                    blurRadius: 2,
+                                    spreadRadius: 2,
+                                    color: Colors.grey.shade900,
+                                    offset: Offset(-2, -2),
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Restock",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                    const Spacer(),
-                    Container(
-                      width: 100,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withAlpha(20),
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Restock",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 );
               },
             ),
-          ),
-        ),
       ),
     );
   }

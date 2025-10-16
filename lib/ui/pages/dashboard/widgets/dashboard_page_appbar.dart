@@ -26,6 +26,7 @@ class DashboardPageAppbar extends StatelessWidget {
         ),
         const Spacer(),
         CustomTextfield(
+          fillColor: Theme.of(context).colorScheme.surfaceDim,
           suffixIcon: Icons.search_rounded,
         ),
       ],

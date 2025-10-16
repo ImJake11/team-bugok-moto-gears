@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
-import 'package:team_bugok_business/utils/services/currency_formetter.dart';
+import 'package:team_bugok_business/ui/widgets/animated_text_value_change.dart';
 
 class DashboardPageTodaySales extends StatelessWidget {
   const DashboardPageTodaySales({super.key});
@@ -48,10 +48,12 @@ class DashboardPageTodaySales extends StatelessWidget {
             children: [
               Expanded(
                 child: Center(
-                  child: Text(
-                    currencyFormatter(total),
-                    style: TextStyle(
-                      fontSize: 27,
+                  child: AnimatedTextValueChange(
+                    isCurrency: true,
+                    duration: Duration(seconds: 1),
+                    value: total,
+                    textStyle: TextStyle(
+                      fontSize: 30,
                       shadows: [
                         Shadow(
                           blurRadius: 5,

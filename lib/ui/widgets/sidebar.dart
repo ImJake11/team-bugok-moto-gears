@@ -32,6 +32,11 @@ class Sidebar extends StatelessWidget {
         routeName: 'sales',
       ),
       ButtonProp(
+        name: "Expense Summary",
+        icon: "assets/images/expenses.png",
+        routeName: 'expenses',
+      ),
+      ButtonProp(
         name: "Settings",
         icon: "assets/images/settings.png",
         routeName: 'settings',
@@ -42,28 +47,42 @@ class Sidebar extends StatelessWidget {
       color: Theme.of(context).colorScheme.surfaceDim,
       width: sidebarWidth,
       height: MediaQuery.of(context).size.height,
-      child: Column(
-        spacing: 10,
+      child: Stack(
         children: [
-          SizedBox(
-            height: 150,
-            child: Image.asset(
-              width: sidebarWidth * .65,
-              "assets/images/moto-gears-icon-no-bg.png",
-              fit: BoxFit.cover,
-            ),
+          Image.asset(
+            "assets/images/carbon.png",
+            height: double.infinity,
+            fit: BoxFit.cover,
           ),
-          ...List.generate(
-            buttonsData.length,
-            (index) => GestureDetector(
-              onTap: () => GoRouter.of(context).goNamed(
-                buttonsData[index].routeName,
+          Container(
+            width: sidebarWidth,
+            height: double.infinity,
+           color: Theme.of(context).colorScheme.surfaceDim.withAlpha(230),
+          ),
+          Column(
+            spacing: 10,
+            children: [
+              SizedBox(
+                height: 150,
+                child: Image.asset(
+                  width: sidebarWidth * .65,
+                  "assets/images/moto-gears-icon-no-bg.png",
+                  fit: BoxFit.cover,
+                ),
               ),
-              child: SidebarButton(
-                data: buttonsData[index],
-                isSelected: buttonsData[index].routeName == routeName,
+              ...List.generate(
+                buttonsData.length,
+                (index) => GestureDetector(
+                  onTap: () => GoRouter.of(context).goNamed(
+                    buttonsData[index].routeName,
+                  ),
+                  child: SidebarButton(
+                    data: buttonsData[index],
+                    isSelected: buttonsData[index].routeName == routeName,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -119,7 +138,7 @@ class _SidebarButtonState extends State<SidebarButton> {
                 )
               : BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: _isHovered ? theme.surface : theme.surfaceDim,
+                  color: _isHovered ? theme.surface : Colors.transparent,
                 ),
           child: Padding(
             padding: const EdgeInsets.all(10),

@@ -42,6 +42,7 @@ class VariantSizeModel {
   final int stock;
   int isActive;
   int? variantId;
+  int? productId;
 
   VariantSizeModel({
     required this.sizeValue,
@@ -49,6 +50,7 @@ class VariantSizeModel {
     this.isActive = 1,
     this.variantId,
     this.id,
+    this.productId,
   });
 
   VariantSizeModel copyWith({
@@ -56,6 +58,7 @@ class VariantSizeModel {
     int? stock,
     int? id,
     int? variantId,
+    int? productId,
     int? isActive,
   }) {
     return VariantSizeModel(
@@ -64,6 +67,7 @@ class VariantSizeModel {
       isActive: isActive ?? this.isActive,
       variantId: variantId ?? this.variantId,
       id: id ?? this.id,
+      productId: productId ?? this.productId,
     );
   }
 

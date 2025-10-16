@@ -2028,6 +2028,749 @@ class SaleItemsCompanion extends UpdateCompanion<SaleItem> {
   }
 }
 
+class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExpensesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _relatedIdMeta = const VerificationMeta(
+    'relatedId',
+  );
+  @override
+  late final GeneratedColumn<int> relatedId = GeneratedColumn<int>(
+    'related_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _totalMeta = const VerificationMeta('total');
+  @override
+  late final GeneratedColumn<double> total = GeneratedColumn<double>(
+    'total',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, createdAt, note, relatedId, total];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'expenses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Expense> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('related_id')) {
+      context.handle(
+        _relatedIdMeta,
+        relatedId.isAcceptableOrUnknown(data['related_id']!, _relatedIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_relatedIdMeta);
+    }
+    if (data.containsKey('total')) {
+      context.handle(
+        _totalMeta,
+        total.isAcceptableOrUnknown(data['total']!, _totalMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_totalMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Expense map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Expense(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      relatedId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}related_id'],
+      )!,
+      total: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}total'],
+      )!,
+    );
+  }
+
+  @override
+  $ExpensesTable createAlias(String alias) {
+    return $ExpensesTable(attachedDatabase, alias);
+  }
+}
+
+class Expense extends DataClass implements Insertable<Expense> {
+  final int id;
+  final DateTime createdAt;
+  final String? note;
+  final int relatedId;
+  final double total;
+  const Expense({
+    required this.id,
+    required this.createdAt,
+    this.note,
+    required this.relatedId,
+    required this.total,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['related_id'] = Variable<int>(relatedId);
+    map['total'] = Variable<double>(total);
+    return map;
+  }
+
+  ExpensesCompanion toCompanion(bool nullToAbsent) {
+    return ExpensesCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      relatedId: Value(relatedId),
+      total: Value(total),
+    );
+  }
+
+  factory Expense.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Expense(
+      id: serializer.fromJson<int>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      note: serializer.fromJson<String?>(json['note']),
+      relatedId: serializer.fromJson<int>(json['relatedId']),
+      total: serializer.fromJson<double>(json['total']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'note': serializer.toJson<String?>(note),
+      'relatedId': serializer.toJson<int>(relatedId),
+      'total': serializer.toJson<double>(total),
+    };
+  }
+
+  Expense copyWith({
+    int? id,
+    DateTime? createdAt,
+    Value<String?> note = const Value.absent(),
+    int? relatedId,
+    double? total,
+  }) => Expense(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    note: note.present ? note.value : this.note,
+    relatedId: relatedId ?? this.relatedId,
+    total: total ?? this.total,
+  );
+  Expense copyWithCompanion(ExpensesCompanion data) {
+    return Expense(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      note: data.note.present ? data.note.value : this.note,
+      relatedId: data.relatedId.present ? data.relatedId.value : this.relatedId,
+      total: data.total.present ? data.total.value : this.total,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Expense(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('note: $note, ')
+          ..write('relatedId: $relatedId, ')
+          ..write('total: $total')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, createdAt, note, relatedId, total);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Expense &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.note == this.note &&
+          other.relatedId == this.relatedId &&
+          other.total == this.total);
+}
+
+class ExpensesCompanion extends UpdateCompanion<Expense> {
+  final Value<int> id;
+  final Value<DateTime> createdAt;
+  final Value<String?> note;
+  final Value<int> relatedId;
+  final Value<double> total;
+  const ExpensesCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.note = const Value.absent(),
+    this.relatedId = const Value.absent(),
+    this.total = const Value.absent(),
+  });
+  ExpensesCompanion.insert({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.note = const Value.absent(),
+    required int relatedId,
+    required double total,
+  }) : relatedId = Value(relatedId),
+       total = Value(total);
+  static Insertable<Expense> custom({
+    Expression<int>? id,
+    Expression<DateTime>? createdAt,
+    Expression<String>? note,
+    Expression<int>? relatedId,
+    Expression<double>? total,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (note != null) 'note': note,
+      if (relatedId != null) 'related_id': relatedId,
+      if (total != null) 'total': total,
+    });
+  }
+
+  ExpensesCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? createdAt,
+    Value<String?>? note,
+    Value<int>? relatedId,
+    Value<double>? total,
+  }) {
+    return ExpensesCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      note: note ?? this.note,
+      relatedId: relatedId ?? this.relatedId,
+      total: total ?? this.total,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (relatedId.present) {
+      map['related_id'] = Variable<int>(relatedId.value);
+    }
+    if (total.present) {
+      map['total'] = Variable<double>(total.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExpensesCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('note: $note, ')
+          ..write('relatedId: $relatedId, ')
+          ..write('total: $total')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ExpensesItemsTable extends ExpensesItems
+    with TableInfo<$ExpensesItemsTable, ExpenseItem> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExpensesItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _expenseIdMeta = const VerificationMeta(
+    'expenseId',
+  );
+  @override
+  late final GeneratedColumn<int> expenseId = GeneratedColumn<int>(
+    'expense_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES expenses (id)',
+    ),
+  );
+  static const VerificationMeta _variantIdMeta = const VerificationMeta(
+    'variantId',
+  );
+  @override
+  late final GeneratedColumn<int> variantId = GeneratedColumn<int>(
+    'variant_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES variants (id)',
+    ),
+  );
+  static const VerificationMeta _sizeIdMeta = const VerificationMeta('sizeId');
+  @override
+  late final GeneratedColumn<int> sizeId = GeneratedColumn<int>(
+    'size_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES sizes (id)',
+    ),
+  );
+  static const VerificationMeta _priceMeta = const VerificationMeta('price');
+  @override
+  late final GeneratedColumn<double> price = GeneratedColumn<double>(
+    'price',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    expenseId,
+    variantId,
+    sizeId,
+    price,
+    quantity,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'expenses_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ExpenseItem> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('expense_id')) {
+      context.handle(
+        _expenseIdMeta,
+        expenseId.isAcceptableOrUnknown(data['expense_id']!, _expenseIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_expenseIdMeta);
+    }
+    if (data.containsKey('variant_id')) {
+      context.handle(
+        _variantIdMeta,
+        variantId.isAcceptableOrUnknown(data['variant_id']!, _variantIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_variantIdMeta);
+    }
+    if (data.containsKey('size_id')) {
+      context.handle(
+        _sizeIdMeta,
+        sizeId.isAcceptableOrUnknown(data['size_id']!, _sizeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sizeIdMeta);
+    }
+    if (data.containsKey('price')) {
+      context.handle(
+        _priceMeta,
+        price.isAcceptableOrUnknown(data['price']!, _priceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_priceMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_quantityMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ExpenseItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ExpenseItem(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      expenseId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}expense_id'],
+      )!,
+      variantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}variant_id'],
+      )!,
+      sizeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}size_id'],
+      )!,
+      price: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}price'],
+      )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantity'],
+      )!,
+    );
+  }
+
+  @override
+  $ExpensesItemsTable createAlias(String alias) {
+    return $ExpensesItemsTable(attachedDatabase, alias);
+  }
+}
+
+class ExpenseItem extends DataClass implements Insertable<ExpenseItem> {
+  final int id;
+  final int expenseId;
+  final int variantId;
+  final int sizeId;
+  final double price;
+  final int quantity;
+  const ExpenseItem({
+    required this.id,
+    required this.expenseId,
+    required this.variantId,
+    required this.sizeId,
+    required this.price,
+    required this.quantity,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['expense_id'] = Variable<int>(expenseId);
+    map['variant_id'] = Variable<int>(variantId);
+    map['size_id'] = Variable<int>(sizeId);
+    map['price'] = Variable<double>(price);
+    map['quantity'] = Variable<int>(quantity);
+    return map;
+  }
+
+  ExpensesItemsCompanion toCompanion(bool nullToAbsent) {
+    return ExpensesItemsCompanion(
+      id: Value(id),
+      expenseId: Value(expenseId),
+      variantId: Value(variantId),
+      sizeId: Value(sizeId),
+      price: Value(price),
+      quantity: Value(quantity),
+    );
+  }
+
+  factory ExpenseItem.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ExpenseItem(
+      id: serializer.fromJson<int>(json['id']),
+      expenseId: serializer.fromJson<int>(json['expenseId']),
+      variantId: serializer.fromJson<int>(json['variantId']),
+      sizeId: serializer.fromJson<int>(json['sizeId']),
+      price: serializer.fromJson<double>(json['price']),
+      quantity: serializer.fromJson<int>(json['quantity']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'expenseId': serializer.toJson<int>(expenseId),
+      'variantId': serializer.toJson<int>(variantId),
+      'sizeId': serializer.toJson<int>(sizeId),
+      'price': serializer.toJson<double>(price),
+      'quantity': serializer.toJson<int>(quantity),
+    };
+  }
+
+  ExpenseItem copyWith({
+    int? id,
+    int? expenseId,
+    int? variantId,
+    int? sizeId,
+    double? price,
+    int? quantity,
+  }) => ExpenseItem(
+    id: id ?? this.id,
+    expenseId: expenseId ?? this.expenseId,
+    variantId: variantId ?? this.variantId,
+    sizeId: sizeId ?? this.sizeId,
+    price: price ?? this.price,
+    quantity: quantity ?? this.quantity,
+  );
+  ExpenseItem copyWithCompanion(ExpensesItemsCompanion data) {
+    return ExpenseItem(
+      id: data.id.present ? data.id.value : this.id,
+      expenseId: data.expenseId.present ? data.expenseId.value : this.expenseId,
+      variantId: data.variantId.present ? data.variantId.value : this.variantId,
+      sizeId: data.sizeId.present ? data.sizeId.value : this.sizeId,
+      price: data.price.present ? data.price.value : this.price,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExpenseItem(')
+          ..write('id: $id, ')
+          ..write('expenseId: $expenseId, ')
+          ..write('variantId: $variantId, ')
+          ..write('sizeId: $sizeId, ')
+          ..write('price: $price, ')
+          ..write('quantity: $quantity')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, expenseId, variantId, sizeId, price, quantity);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ExpenseItem &&
+          other.id == this.id &&
+          other.expenseId == this.expenseId &&
+          other.variantId == this.variantId &&
+          other.sizeId == this.sizeId &&
+          other.price == this.price &&
+          other.quantity == this.quantity);
+}
+
+class ExpensesItemsCompanion extends UpdateCompanion<ExpenseItem> {
+  final Value<int> id;
+  final Value<int> expenseId;
+  final Value<int> variantId;
+  final Value<int> sizeId;
+  final Value<double> price;
+  final Value<int> quantity;
+  const ExpensesItemsCompanion({
+    this.id = const Value.absent(),
+    this.expenseId = const Value.absent(),
+    this.variantId = const Value.absent(),
+    this.sizeId = const Value.absent(),
+    this.price = const Value.absent(),
+    this.quantity = const Value.absent(),
+  });
+  ExpensesItemsCompanion.insert({
+    this.id = const Value.absent(),
+    required int expenseId,
+    required int variantId,
+    required int sizeId,
+    required double price,
+    required int quantity,
+  }) : expenseId = Value(expenseId),
+       variantId = Value(variantId),
+       sizeId = Value(sizeId),
+       price = Value(price),
+       quantity = Value(quantity);
+  static Insertable<ExpenseItem> custom({
+    Expression<int>? id,
+    Expression<int>? expenseId,
+    Expression<int>? variantId,
+    Expression<int>? sizeId,
+    Expression<double>? price,
+    Expression<int>? quantity,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (expenseId != null) 'expense_id': expenseId,
+      if (variantId != null) 'variant_id': variantId,
+      if (sizeId != null) 'size_id': sizeId,
+      if (price != null) 'price': price,
+      if (quantity != null) 'quantity': quantity,
+    });
+  }
+
+  ExpensesItemsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? expenseId,
+    Value<int>? variantId,
+    Value<int>? sizeId,
+    Value<double>? price,
+    Value<int>? quantity,
+  }) {
+    return ExpensesItemsCompanion(
+      id: id ?? this.id,
+      expenseId: expenseId ?? this.expenseId,
+      variantId: variantId ?? this.variantId,
+      sizeId: sizeId ?? this.sizeId,
+      price: price ?? this.price,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (expenseId.present) {
+      map['expense_id'] = Variable<int>(expenseId.value);
+    }
+    if (variantId.present) {
+      map['variant_id'] = Variable<int>(variantId.value);
+    }
+    if (sizeId.present) {
+      map['size_id'] = Variable<int>(sizeId.value);
+    }
+    if (price.present) {
+      map['price'] = Variable<double>(price.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<int>(quantity.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExpensesItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('expenseId: $expenseId, ')
+          ..write('variantId: $variantId, ')
+          ..write('sizeId: $sizeId, ')
+          ..write('price: $price, ')
+          ..write('quantity: $quantity')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2036,6 +2779,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SizesTable sizes = $SizesTable(this);
   late final $SalesTable sales = $SalesTable(this);
   late final $SaleItemsTable saleItems = $SaleItemsTable(this);
+  late final $ExpensesTable expenses = $ExpensesTable(this);
+  late final $ExpensesItemsTable expensesItems = $ExpensesItemsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2046,6 +2791,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     sizes,
     sales,
     saleItems,
+    expenses,
+    expensesItems,
   ];
 }
 
@@ -2450,6 +3197,24 @@ final class $$VariantsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$ExpensesItemsTable, List<ExpenseItem>>
+  _expensesItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.expensesItems,
+    aliasName: $_aliasNameGenerator(db.variants.id, db.expensesItems.variantId),
+  );
+
+  $$ExpensesItemsTableProcessedTableManager get expensesItemsRefs {
+    final manager = $$ExpensesItemsTableTableManager(
+      $_db,
+      $_db.expensesItems,
+    ).filter((f) => f.variantId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_expensesItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$VariantsTableFilterComposer
@@ -2515,6 +3280,31 @@ class $$VariantsTableFilterComposer
           }) => $$SizesTableFilterComposer(
             $db: $db,
             $table: $db.sizes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> expensesItemsRefs(
+    Expression<bool> Function($$ExpensesItemsTableFilterComposer f) f,
+  ) {
+    final $$ExpensesItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.expensesItems,
+      getReferencedColumn: (t) => t.variantId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExpensesItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.expensesItems,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2638,6 +3428,31 @@ class $$VariantsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> expensesItemsRefs<T extends Object>(
+    Expression<T> Function($$ExpensesItemsTableAnnotationComposer a) f,
+  ) {
+    final $$ExpensesItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.expensesItems,
+      getReferencedColumn: (t) => t.variantId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExpensesItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.expensesItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VariantsTableTableManager
@@ -2653,7 +3468,11 @@ class $$VariantsTableTableManager
           $$VariantsTableUpdateCompanionBuilder,
           (Variant, $$VariantsTableReferences),
           Variant,
-          PrefetchHooks Function({bool productId, bool sizesRefs})
+          PrefetchHooks Function({
+            bool productId,
+            bool sizesRefs,
+            bool expensesItemsRefs,
+          })
         > {
   $$VariantsTableTableManager(_$AppDatabase db, $VariantsTable table)
     : super(
@@ -2698,59 +3517,98 @@ class $$VariantsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({productId = false, sizesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (sizesRefs) db.sizes],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (productId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.productId,
-                                referencedTable: $$VariantsTableReferences
-                                    ._productIdTable(db),
-                                referencedColumn: $$VariantsTableReferences
-                                    ._productIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                productId = false,
+                sizesRefs = false,
+                expensesItemsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (sizesRefs) db.sizes,
+                    if (expensesItemsRefs) db.expensesItems,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (productId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.productId,
+                                    referencedTable: $$VariantsTableReferences
+                                        ._productIdTable(db),
+                                    referencedColumn: $$VariantsTableReferences
+                                        ._productIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (sizesRefs)
+                        await $_getPrefetchedData<
+                          Variant,
+                          $VariantsTable,
+                          Size
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VariantsTableReferences
+                              ._sizesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VariantsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).sizesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.variantId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (expensesItemsRefs)
+                        await $_getPrefetchedData<
+                          Variant,
+                          $VariantsTable,
+                          ExpenseItem
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VariantsTableReferences
+                              ._expensesItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VariantsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).expensesItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.variantId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (sizesRefs)
-                    await $_getPrefetchedData<Variant, $VariantsTable, Size>(
-                      currentTable: table,
-                      referencedTable: $$VariantsTableReferences
-                          ._sizesRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$VariantsTableReferences(db, table, p0).sizesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.variantId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -2767,7 +3625,11 @@ typedef $$VariantsTableProcessedTableManager =
       $$VariantsTableUpdateCompanionBuilder,
       (Variant, $$VariantsTableReferences),
       Variant,
-      PrefetchHooks Function({bool productId, bool sizesRefs})
+      PrefetchHooks Function({
+        bool productId,
+        bool sizesRefs,
+        bool expensesItemsRefs,
+      })
     >;
 typedef $$SizesTableCreateCompanionBuilder =
     SizesCompanion Function({
@@ -2806,6 +3668,24 @@ final class $$SizesTableReferences
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$ExpensesItemsTable, List<ExpenseItem>>
+  _expensesItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.expensesItems,
+    aliasName: $_aliasNameGenerator(db.sizes.id, db.expensesItems.sizeId),
+  );
+
+  $$ExpensesItemsTableProcessedTableManager get expensesItemsRefs {
+    final manager = $$ExpensesItemsTableTableManager(
+      $_db,
+      $_db.expensesItems,
+    ).filter((f) => f.sizeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_expensesItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
@@ -2859,6 +3739,31 @@ class $$SizesTableFilterComposer extends Composer<_$AppDatabase, $SizesTable> {
           ),
     );
     return composer;
+  }
+
+  Expression<bool> expensesItemsRefs(
+    Expression<bool> Function($$ExpensesItemsTableFilterComposer f) f,
+  ) {
+    final $$ExpensesItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.expensesItems,
+      getReferencedColumn: (t) => t.sizeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExpensesItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.expensesItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -2960,6 +3865,31 @@ class $$SizesTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> expensesItemsRefs<T extends Object>(
+    Expression<T> Function($$ExpensesItemsTableAnnotationComposer a) f,
+  ) {
+    final $$ExpensesItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.expensesItems,
+      getReferencedColumn: (t) => t.sizeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExpensesItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.expensesItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$SizesTableTableManager
@@ -2975,7 +3905,7 @@ class $$SizesTableTableManager
           $$SizesTableUpdateCompanionBuilder,
           (Size, $$SizesTableReferences),
           Size,
-          PrefetchHooks Function({bool variantId})
+          PrefetchHooks Function({bool variantId, bool expensesItemsRefs})
         > {
   $$SizesTableTableManager(_$AppDatabase db, $SizesTable table)
     : super(
@@ -3026,47 +3956,72 @@ class $$SizesTableTableManager
                     (e.readTable(table), $$SizesTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({variantId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (variantId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.variantId,
-                                referencedTable: $$SizesTableReferences
-                                    ._variantIdTable(db),
-                                referencedColumn: $$SizesTableReferences
-                                    ._variantIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({variantId = false, expensesItemsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (expensesItemsRefs) db.expensesItems,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (variantId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.variantId,
+                                    referencedTable: $$SizesTableReferences
+                                        ._variantIdTable(db),
+                                    referencedColumn: $$SizesTableReferences
+                                        ._variantIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (expensesItemsRefs)
+                        await $_getPrefetchedData<
+                          Size,
+                          $SizesTable,
+                          ExpenseItem
+                        >(
+                          currentTable: table,
+                          referencedTable: $$SizesTableReferences
+                              ._expensesItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$SizesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).expensesItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.sizeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -3083,7 +4038,7 @@ typedef $$SizesTableProcessedTableManager =
       $$SizesTableUpdateCompanionBuilder,
       (Size, $$SizesTableReferences),
       Size,
-      PrefetchHooks Function({bool variantId})
+      PrefetchHooks Function({bool variantId, bool expensesItemsRefs})
     >;
 typedef $$SalesTableCreateCompanionBuilder =
     SalesCompanion Function({
@@ -3734,6 +4689,820 @@ typedef $$SaleItemsTableProcessedTableManager =
       SaleItem,
       PrefetchHooks Function({bool saleId})
     >;
+typedef $$ExpensesTableCreateCompanionBuilder =
+    ExpensesCompanion Function({
+      Value<int> id,
+      Value<DateTime> createdAt,
+      Value<String?> note,
+      required int relatedId,
+      required double total,
+    });
+typedef $$ExpensesTableUpdateCompanionBuilder =
+    ExpensesCompanion Function({
+      Value<int> id,
+      Value<DateTime> createdAt,
+      Value<String?> note,
+      Value<int> relatedId,
+      Value<double> total,
+    });
+
+final class $$ExpensesTableReferences
+    extends BaseReferences<_$AppDatabase, $ExpensesTable, Expense> {
+  $$ExpensesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$ExpensesItemsTable, List<ExpenseItem>>
+  _expensesItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.expensesItems,
+    aliasName: $_aliasNameGenerator(db.expenses.id, db.expensesItems.expenseId),
+  );
+
+  $$ExpensesItemsTableProcessedTableManager get expensesItemsRefs {
+    final manager = $$ExpensesItemsTableTableManager(
+      $_db,
+      $_db.expensesItems,
+    ).filter((f) => f.expenseId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_expensesItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ExpensesTableFilterComposer
+    extends Composer<_$AppDatabase, $ExpensesTable> {
+  $$ExpensesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get relatedId => $composableBuilder(
+    column: $table.relatedId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get total => $composableBuilder(
+    column: $table.total,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> expensesItemsRefs(
+    Expression<bool> Function($$ExpensesItemsTableFilterComposer f) f,
+  ) {
+    final $$ExpensesItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.expensesItems,
+      getReferencedColumn: (t) => t.expenseId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExpensesItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.expensesItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ExpensesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ExpensesTable> {
+  $$ExpensesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get relatedId => $composableBuilder(
+    column: $table.relatedId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get total => $composableBuilder(
+    column: $table.total,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ExpensesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ExpensesTable> {
+  $$ExpensesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<int> get relatedId =>
+      $composableBuilder(column: $table.relatedId, builder: (column) => column);
+
+  GeneratedColumn<double> get total =>
+      $composableBuilder(column: $table.total, builder: (column) => column);
+
+  Expression<T> expensesItemsRefs<T extends Object>(
+    Expression<T> Function($$ExpensesItemsTableAnnotationComposer a) f,
+  ) {
+    final $$ExpensesItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.expensesItems,
+      getReferencedColumn: (t) => t.expenseId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExpensesItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.expensesItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ExpensesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ExpensesTable,
+          Expense,
+          $$ExpensesTableFilterComposer,
+          $$ExpensesTableOrderingComposer,
+          $$ExpensesTableAnnotationComposer,
+          $$ExpensesTableCreateCompanionBuilder,
+          $$ExpensesTableUpdateCompanionBuilder,
+          (Expense, $$ExpensesTableReferences),
+          Expense,
+          PrefetchHooks Function({bool expensesItemsRefs})
+        > {
+  $$ExpensesTableTableManager(_$AppDatabase db, $ExpensesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ExpensesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ExpensesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ExpensesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> relatedId = const Value.absent(),
+                Value<double> total = const Value.absent(),
+              }) => ExpensesCompanion(
+                id: id,
+                createdAt: createdAt,
+                note: note,
+                relatedId: relatedId,
+                total: total,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                required int relatedId,
+                required double total,
+              }) => ExpensesCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                note: note,
+                relatedId: relatedId,
+                total: total,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ExpensesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({expensesItemsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (expensesItemsRefs) db.expensesItems,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (expensesItemsRefs)
+                    await $_getPrefetchedData<
+                      Expense,
+                      $ExpensesTable,
+                      ExpenseItem
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ExpensesTableReferences
+                          ._expensesItemsRefsTable(db),
+                      managerFromTypedResult: (p0) => $$ExpensesTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).expensesItemsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.expenseId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ExpensesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ExpensesTable,
+      Expense,
+      $$ExpensesTableFilterComposer,
+      $$ExpensesTableOrderingComposer,
+      $$ExpensesTableAnnotationComposer,
+      $$ExpensesTableCreateCompanionBuilder,
+      $$ExpensesTableUpdateCompanionBuilder,
+      (Expense, $$ExpensesTableReferences),
+      Expense,
+      PrefetchHooks Function({bool expensesItemsRefs})
+    >;
+typedef $$ExpensesItemsTableCreateCompanionBuilder =
+    ExpensesItemsCompanion Function({
+      Value<int> id,
+      required int expenseId,
+      required int variantId,
+      required int sizeId,
+      required double price,
+      required int quantity,
+    });
+typedef $$ExpensesItemsTableUpdateCompanionBuilder =
+    ExpensesItemsCompanion Function({
+      Value<int> id,
+      Value<int> expenseId,
+      Value<int> variantId,
+      Value<int> sizeId,
+      Value<double> price,
+      Value<int> quantity,
+    });
+
+final class $$ExpensesItemsTableReferences
+    extends BaseReferences<_$AppDatabase, $ExpensesItemsTable, ExpenseItem> {
+  $$ExpensesItemsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ExpensesTable _expenseIdTable(_$AppDatabase db) =>
+      db.expenses.createAlias(
+        $_aliasNameGenerator(db.expensesItems.expenseId, db.expenses.id),
+      );
+
+  $$ExpensesTableProcessedTableManager get expenseId {
+    final $_column = $_itemColumn<int>('expense_id')!;
+
+    final manager = $$ExpensesTableTableManager(
+      $_db,
+      $_db.expenses,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_expenseIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $VariantsTable _variantIdTable(_$AppDatabase db) =>
+      db.variants.createAlias(
+        $_aliasNameGenerator(db.expensesItems.variantId, db.variants.id),
+      );
+
+  $$VariantsTableProcessedTableManager get variantId {
+    final $_column = $_itemColumn<int>('variant_id')!;
+
+    final manager = $$VariantsTableTableManager(
+      $_db,
+      $_db.variants,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_variantIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $SizesTable _sizeIdTable(_$AppDatabase db) => db.sizes.createAlias(
+    $_aliasNameGenerator(db.expensesItems.sizeId, db.sizes.id),
+  );
+
+  $$SizesTableProcessedTableManager get sizeId {
+    final $_column = $_itemColumn<int>('size_id')!;
+
+    final manager = $$SizesTableTableManager(
+      $_db,
+      $_db.sizes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sizeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ExpensesItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $ExpensesItemsTable> {
+  $$ExpensesItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get price => $composableBuilder(
+    column: $table.price,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ExpensesTableFilterComposer get expenseId {
+    final $$ExpensesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.expenseId,
+      referencedTable: $db.expenses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExpensesTableFilterComposer(
+            $db: $db,
+            $table: $db.expenses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VariantsTableFilterComposer get variantId {
+    final $$VariantsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.variantId,
+      referencedTable: $db.variants,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VariantsTableFilterComposer(
+            $db: $db,
+            $table: $db.variants,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$SizesTableFilterComposer get sizeId {
+    final $$SizesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sizeId,
+      referencedTable: $db.sizes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SizesTableFilterComposer(
+            $db: $db,
+            $table: $db.sizes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ExpensesItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ExpensesItemsTable> {
+  $$ExpensesItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get price => $composableBuilder(
+    column: $table.price,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ExpensesTableOrderingComposer get expenseId {
+    final $$ExpensesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.expenseId,
+      referencedTable: $db.expenses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExpensesTableOrderingComposer(
+            $db: $db,
+            $table: $db.expenses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VariantsTableOrderingComposer get variantId {
+    final $$VariantsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.variantId,
+      referencedTable: $db.variants,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VariantsTableOrderingComposer(
+            $db: $db,
+            $table: $db.variants,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$SizesTableOrderingComposer get sizeId {
+    final $$SizesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sizeId,
+      referencedTable: $db.sizes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SizesTableOrderingComposer(
+            $db: $db,
+            $table: $db.sizes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ExpensesItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ExpensesItemsTable> {
+  $$ExpensesItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<double> get price =>
+      $composableBuilder(column: $table.price, builder: (column) => column);
+
+  GeneratedColumn<int> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  $$ExpensesTableAnnotationComposer get expenseId {
+    final $$ExpensesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.expenseId,
+      referencedTable: $db.expenses,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExpensesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.expenses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VariantsTableAnnotationComposer get variantId {
+    final $$VariantsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.variantId,
+      referencedTable: $db.variants,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VariantsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.variants,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$SizesTableAnnotationComposer get sizeId {
+    final $$SizesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sizeId,
+      referencedTable: $db.sizes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SizesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.sizes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ExpensesItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ExpensesItemsTable,
+          ExpenseItem,
+          $$ExpensesItemsTableFilterComposer,
+          $$ExpensesItemsTableOrderingComposer,
+          $$ExpensesItemsTableAnnotationComposer,
+          $$ExpensesItemsTableCreateCompanionBuilder,
+          $$ExpensesItemsTableUpdateCompanionBuilder,
+          (ExpenseItem, $$ExpensesItemsTableReferences),
+          ExpenseItem,
+          PrefetchHooks Function({bool expenseId, bool variantId, bool sizeId})
+        > {
+  $$ExpensesItemsTableTableManager(_$AppDatabase db, $ExpensesItemsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ExpensesItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ExpensesItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ExpensesItemsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> expenseId = const Value.absent(),
+                Value<int> variantId = const Value.absent(),
+                Value<int> sizeId = const Value.absent(),
+                Value<double> price = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
+              }) => ExpensesItemsCompanion(
+                id: id,
+                expenseId: expenseId,
+                variantId: variantId,
+                sizeId: sizeId,
+                price: price,
+                quantity: quantity,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int expenseId,
+                required int variantId,
+                required int sizeId,
+                required double price,
+                required int quantity,
+              }) => ExpensesItemsCompanion.insert(
+                id: id,
+                expenseId: expenseId,
+                variantId: variantId,
+                sizeId: sizeId,
+                price: price,
+                quantity: quantity,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ExpensesItemsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({expenseId = false, variantId = false, sizeId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (expenseId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.expenseId,
+                                    referencedTable:
+                                        $$ExpensesItemsTableReferences
+                                            ._expenseIdTable(db),
+                                    referencedColumn:
+                                        $$ExpensesItemsTableReferences
+                                            ._expenseIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (variantId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.variantId,
+                                    referencedTable:
+                                        $$ExpensesItemsTableReferences
+                                            ._variantIdTable(db),
+                                    referencedColumn:
+                                        $$ExpensesItemsTableReferences
+                                            ._variantIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (sizeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.sizeId,
+                                    referencedTable:
+                                        $$ExpensesItemsTableReferences
+                                            ._sizeIdTable(db),
+                                    referencedColumn:
+                                        $$ExpensesItemsTableReferences
+                                            ._sizeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ExpensesItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ExpensesItemsTable,
+      ExpenseItem,
+      $$ExpensesItemsTableFilterComposer,
+      $$ExpensesItemsTableOrderingComposer,
+      $$ExpensesItemsTableAnnotationComposer,
+      $$ExpensesItemsTableCreateCompanionBuilder,
+      $$ExpensesItemsTableUpdateCompanionBuilder,
+      (ExpenseItem, $$ExpensesItemsTableReferences),
+      ExpenseItem,
+      PrefetchHooks Function({bool expenseId, bool variantId, bool sizeId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3748,4 +5517,8 @@ class $AppDatabaseManager {
       $$SalesTableTableManager(_db, _db.sales);
   $$SaleItemsTableTableManager get saleItems =>
       $$SaleItemsTableTableManager(_db, _db.saleItems);
+  $$ExpensesTableTableManager get expenses =>
+      $$ExpensesTableTableManager(_db, _db.expenses);
+  $$ExpensesItemsTableTableManager get expensesItems =>
+      $$ExpensesItemsTableTableManager(_db, _db.expensesItems);
 }

@@ -10,7 +10,22 @@ class PosPageSearchbar extends StatelessWidget {
     return Container(
       height: 50,
       decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceDim,
         borderRadius: BorderRadius.circular(10),
+         boxShadow: [
+          BoxShadow(
+            blurRadius: 3,
+            spreadRadius: 3,
+            color: Colors.black87,
+            offset: Offset(3, 3),
+          ),
+          BoxShadow(
+            blurRadius: 3,
+            spreadRadius: 3,
+            color: Colors.grey.shade800.withAlpha(120),
+            offset: Offset(-3, -3),
+          ),
+        ],
         border: Border.all(
           color: Theme.of(context).colorScheme.primary,
         ),

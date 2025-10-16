@@ -16,6 +16,20 @@ class PosPageCart extends StatelessWidget {
       width: 450,
       height: double.infinity,
       decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 3,
+            spreadRadius: 3,
+            color: Colors.black87,
+            offset: Offset(3, 3),
+          ),
+          BoxShadow(
+            blurRadius: 3,
+            spreadRadius: 3,
+            color: Colors.grey.shade800.withAlpha(120),
+            offset: Offset(-3, -3),
+          ),
+        ],
         color: Theme.of(context).colorScheme.surfaceDim,
         borderRadius: BorderRadius.circular(10),
       ),
@@ -101,7 +115,7 @@ class PosPageCart extends StatelessWidget {
                           cart.length,
                           (index) {
                             CartModel data = cart[index];
-                            
+
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -143,6 +157,7 @@ class PosPageCart extends StatelessWidget {
 
                         LayoutBuilder(
                           builder: (context, constraints) => CustomButton(
+                            showShadow: false,
                             onTap: () =>
                                 context.read<PosBloc>().add(PosCheckOutItems()),
                             width: constraints.maxWidth,

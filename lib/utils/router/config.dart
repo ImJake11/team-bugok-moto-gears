@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:team_bugok_business/ui/global_wrapper.dart';
 import 'package:team_bugok_business/ui/pages/dashboard/dashboard_page.dart';
+import 'package:team_bugok_business/ui/pages/expenses/expenses_page.dart';
 import 'package:team_bugok_business/ui/pages/inventory/inventory.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/new_product_form.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/product_view.dart';
@@ -26,6 +27,11 @@ final GoRouter routeConfig = GoRouter(
           path: "/",
           name: "dashboard",
           builder: (context, state) => DashboardPage(),
+        ),
+        GoRoute(
+          path: "/expenses_page",
+          name: "expenses",
+          builder: (context, state) => ExpensesPage(),
         ),
         GoRoute(
           name: "inventory",

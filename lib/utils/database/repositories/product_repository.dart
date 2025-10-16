@@ -1,11 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:team_bugok_business/utils/database/app_database.dart';
+import 'package:team_bugok_business/utils/database/repositories/expenses_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/variant_repository.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
 
 class ProductRepository {
   final db = appDatabase;
+
+  final ExpensesRepository expensesRepository = ExpensesRepository();
 
   Future<void> insertProduct(ProductModel productData) async =>
       _insertProduct(productData);
@@ -17,6 +20,9 @@ class ProductRepository {
       _updateProduct(productModel);
 
   Future<List<String>> retrieveProductModel() async => _retrieveProductModel();
+
+
+  // ============== Private Functions ========//
 
   Future<void> _insertProduct(ProductModel productData) async {
     try {
@@ -33,6 +39,16 @@ class ProductRepository {
             ),
           );
 
+      // insert as new expenses
+      // and return the id
+      final expensesId = await expensesRepository.insertExpenses(
+        ExpensesCompanion.insert(
+          relatedId: productId,
+          note: Value("New Product Entry"),
+          total: await expensesRepository.computExpensesTotal(productData),
+        ),
+      );
+
       for (var v in productData.variants) {
         final variantId = await db
             .into(db.variants)
@@ -44,7 +60,7 @@ class ProductRepository {
             );
 
         for (var s in v.sizes) {
-          await db
+          final sizeId = await db
               .into(db.sizes)
               .insert(
                 SizesCompanion.insert(
@@ -54,11 +70,21 @@ class ProductRepository {
                   sizeValues: s.sizeValue,
                 ),
               );
+
+          // insert as expense item
+          await expensesRepository.insertExpenseItem(
+            ExpensesItemsCompanion.insert(
+              expenseId: expensesId,
+              variantId: variantId,
+              sizeId: sizeId,
+              price: productData.costPrice,
+              quantity: s.stock,
+            ),
+          );
         }
       }
     } catch (e) {
-      print("Failed to save product");
-      print(e);
+      throw Error();
     }
   }
 
@@ -151,9 +177,27 @@ class ProductRepository {
           ),
         );
 
+    // insert new expenes
+    final totalExpenses = await expensesRepository
+        .computeExpensesTotalOnProductUpdate(productModel);
+    int expensesId = 0;
+
+    // save only as expenses if total is greater than 0
+    if (totalExpenses > 0.0) {
+      expensesId = await expensesRepository.insertExpenses(
+        ExpensesCompanion.insert(
+          note: Value("Product Update"),
+          relatedId: productModel.id!,
+          total: totalExpenses,
+        ),
+      );
+    }
+
     await VariantRepository().upservariant(
       productModel.variants,
       productModel.id!,
+      expensesId,
+      productModel.costPrice,
     );
   }
 

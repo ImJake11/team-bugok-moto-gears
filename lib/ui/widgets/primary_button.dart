@@ -6,6 +6,7 @@ class CustomButton extends StatefulWidget {
   final GestureTapCallback? onTap;
   final double borderRadius;
   final double height;
+  final bool? showShadow;
 
   const CustomButton({
     super.key,
@@ -14,6 +15,7 @@ class CustomButton extends StatefulWidget {
     this.onTap,
     this.height = 50,
     this.borderRadius = 10,
+    this.showShadow = true,
   });
 
   @override
@@ -46,20 +48,22 @@ class _CustomButtonState extends State<CustomButton> {
               stops: _isHovered ? [0.0, 0.5, 1.0] : [0.1, 0.3, 0.6],
               colors: [theme.tertiary, theme.secondary, theme.primary],
             ),
-            boxShadow: [
-               BoxShadow(
-                color: Colors.grey.shade800.withAlpha(120),
-                blurRadius: 3,
-                spreadRadius: 3,
-                offset: const Offset(-3, -3),
-              ),
-              BoxShadow(
-                color: Colors.black54,
-                blurRadius: 3,
-                spreadRadius: 3,
-                offset: const Offset(3, 3),
-              ),
-            ],
+            boxShadow: (widget.showShadow ?? false)
+                ? [
+                    BoxShadow(
+                      color: Colors.grey.shade800.withAlpha(120),
+                      blurRadius: 3,
+                      spreadRadius: 3,
+                      offset: const Offset(-3, -3),
+                    ),
+                    BoxShadow(
+                      color: Colors.black54,
+                      blurRadius: 3,
+                      spreadRadius: 3,
+                      offset: const Offset(3, 3),
+                    ),
+                  ]
+                : [],
           ),
           child: widget.child,
         ),

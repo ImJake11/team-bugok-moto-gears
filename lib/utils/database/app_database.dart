@@ -62,33 +62,60 @@ class SaleItems extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
+@DataClassName('Expense')
+class Expenses extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  TextColumn get note => text().nullable()();
+  IntColumn get relatedId => integer()();
+  RealColumn get total => real()();
+}
+
+@DataClassName('ExpenseItem')
+class ExpensesItems extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get expenseId => integer().references(Expenses, #id)();
+  IntColumn get variantId => integer().references(Variants, #id)();
+  IntColumn get sizeId => integer().references(Sizes, #id)();
+  RealColumn get price => real()();
+  IntColumn get quantity => integer()();
+}
+
 // ---------------------------
 // DATABASE CLASS
 // ---------------------------
 
 @DriftDatabase(
-  tables: [Products, Variants, Sizes, Sales, SaleItems],
+  tables: [
+    Products,
+    Variants,
+    Sizes,
+    Sales,
+    SaleItems,
+    Expenses,
+    ExpensesItems,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   // Increment this when you change your schema
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (Migrator m) async {
       await m.createAll();
     },
-    onUpgrade: (Migrator m, int from, int to) async {
-      if (from < 6) {
-        await m.addColumn(
-          saleItems,
-          saleItems.saleId as GeneratedColumn<Object>,
-        );
-      }
-    },
+    // onUpgrade: (Migrator m, int from, int to) async {
+    //   if (from < 6) {
+    //     await m.addColumn(
+    //       saleItems,
+    //       saleItems.saleId as GeneratedColumn<Object>,
+    //     );
+    //   }
+    // },
   );
 }
 

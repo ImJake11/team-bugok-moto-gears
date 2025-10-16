@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
+import 'package:team_bugok_business/ui/widgets/animated_text_value_change.dart';
 import 'package:team_bugok_business/utils/model/sales_model.dart';
 
 class DashboardPageNoTransactions extends StatelessWidget {
@@ -40,9 +41,10 @@ class DashboardPageNoTransactions extends StatelessWidget {
               return todaySales.length;
             },
             builder: (context, sales) {
-              return Text(
-                sales.toString(),
-                style: TextStyle(
+              return AnimatedTextValueChange(
+                duration: Duration(milliseconds: 1500),
+                value: sales,
+                textStyle: TextStyle(
                   fontSize: 60,
                   color: Theme.of(context).colorScheme.primary,
                   shadows: [

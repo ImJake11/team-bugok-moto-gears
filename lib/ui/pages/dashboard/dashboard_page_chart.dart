@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/line_chart.dart';
+import 'package:team_bugok_business/utils/model/chart_model.dart';
+import 'package:team_bugok_business/utils/model/sales_model.dart';
 
 class DashboardPageChart extends StatefulWidget {
   const DashboardPageChart({super.key});
@@ -11,30 +13,40 @@ class DashboardPageChart extends StatefulWidget {
 }
 
 class _DashboardPageChartState extends State<DashboardPageChart> {
+  final DateTime _today = DateTime.now();
+
   bool _isWeekly = true;
 
   Widget toggleButton(
     String label,
     bool isSelected,
     BorderRadiusGeometry borderRadius,
-  ) => Container(
-    height: 40,
-    decoration: BoxDecoration(
-      borderRadius: borderRadius,
-      color: isSelected
-          ? Theme.of(context).colorScheme.primary
-          : Colors.transparent,
-      border: Border.all(
+  ) => GestureDetector(
+    onTap: () => setState(() => _isWeekly = !_isWeekly),
+    child: AnimatedContainer(
+      
+      duration: Duration(milliseconds: 250),
+      height: 35,
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
         color: isSelected
             ? Theme.of(context).colorScheme.primary
-            : Colors.grey.shade700,
+            : Theme.of(context).colorScheme.surfaceDim,
+        border: Border.all(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Colors.grey.shade700,
+        ),
       ),
-    ),
-    child: Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Text(
-          label,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+            ),
+          ),
         ),
       ),
     ),
@@ -42,12 +54,89 @@ class _DashboardPageChartState extends State<DashboardPageChart> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DashboardBloc, DashboardState, int>(
-      selector: (state) {
-        return 0;
+    final endOfMonth = DateTime(
+      _today.year,
+      _today.month + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
+
+    final List<String> weeklyLabels = [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thur",
+      "Fri",
+      "Sat",
+      "Sun",
+    ];
+
+    final List<String> monthlySalesLabel = List.generate(
+      endOfMonth.day,
+      (index) {
+        return (index + 1).toString();
       },
-      builder: (context, state) {
+    );
+
+    return BlocSelector<DashboardBloc, DashboardState, List<ChartModel>>(
+      selector: (state) {
+        if (state is! DashboardInitial) return [];
+
+        List<SalesModel> sales = state.sales;
+
+        // weekly data
+        List<ChartModel> weeklyData = weeklyLabels.asMap().entries.map(
+          (entry) {
+            final index = entry.key;
+
+            // get the sales based on index
+            final salesPerDay = sales
+                .where((element) => element.createdAt.weekday - 1 == index)
+                .toList();
+
+            final totalSales = salesPerDay.isEmpty
+                ? 0.00
+                : salesPerDay.fold<double>(0.00, (acc, cur) => acc + cur.total);
+
+            return ChartModel(
+              index: index,
+              label: entry.value,
+              sales: totalSales,
+            );
+          },
+        ).toList();
+
+        // monthly data
+        List<ChartModel> monthlyData = monthlySalesLabel.asMap().entries.map(
+          (entry) {
+            final index = entry.key;
+            final value = entry.value;
+
+            // get the sales based on index
+            final salesPerDay = sales
+                .where((element) => element.createdAt.day - 1 == index)
+                .toList();
+
+            final totalSales = salesPerDay.isEmpty
+                ? 0.00
+                : salesPerDay.fold<double>(0.00, (acc, cur) => acc + cur.total);
+
+            return ChartModel(
+              index: index,
+              label: value,
+              sales: totalSales,
+            );
+          },
+        ).toList();
+
+        return _isWeekly ? weeklyData : monthlyData;
+      },
+      builder: (context, chartData) {
         return Container(
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceDim,
             boxShadow: [
@@ -82,51 +171,57 @@ class _DashboardPageChartState extends State<DashboardPageChart> {
                 Row(
                   children: [
                     Text(
-                      "Weekly Sales Chart",
+                      _isWeekly ? "Weekly Sales Chart" : "Monthly Sales Chart",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const Spacer(),
-                    toggleButton(
-                      "Weekly",
-                      _isWeekly,
-                      BorderRadiusGeometry.only(
-                        topLeft: Radius.circular(5),
-                        bottomLeft: Radius.circular(5),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black,
+                            blurRadius: 2,
+                            spreadRadius: 2,
+                            offset: Offset(2, 2),
+                          ),
+                          BoxShadow(
+                            color: Colors.grey.shade900,
+                            blurRadius: 2,
+                            spreadRadius: 2,
+                            offset: Offset(-2, -2),
+                          ),
+                        ],
                       ),
-                    ),
-                    toggleButton(
-                      "Monthly",
-                      !_isWeekly,
-                      BorderRadiusGeometry.only(
-                        topRight: Radius.circular(5),
-                        bottomRight: Radius.circular(5),
+                      child: Row(
+                        children: [
+                          toggleButton(
+                            "Weekly",
+                            _isWeekly,
+                            BorderRadiusGeometry.only(
+                              topLeft: Radius.circular(5),
+                              bottomLeft: Radius.circular(5),
+                            ),
+                          ),
+                          toggleButton(
+                            "Monthly",
+                            !_isWeekly,
+                            BorderRadiusGeometry.only(
+                              topRight: Radius.circular(5),
+                              bottomRight: Radius.circular(5),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
                 Expanded(
                   child: MyLineChart(
-                    sales: [
-                      5000.00,
-                      4300.00,
-                      6200.00,
-                      6500.00,
-                      1200.00,
-                      4000.00,
-                      2400.00,
-                    ],
-                    labels: [
-                      "Mon",
-                      "Tue",
-                      "Wed",
-                      "Thur",
-                      "Fri",
-                      "Sat",
-                      "Sun",
-                    ],
+                    chartData: chartData,
                   ),
                 ),
               ],

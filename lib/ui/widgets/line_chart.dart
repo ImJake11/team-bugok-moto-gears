@@ -1,14 +1,16 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:team_bugok_business/utils/model/chart_model.dart';
+import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
 class MyLineChart extends StatefulWidget {
-  final List<double> sales;
-  final List<String> labels;
+  final double? interval;
+  final List<ChartModel> chartData;
 
   const MyLineChart({
     super.key,
-    required this.sales,
-    required this.labels,
+    required this.chartData,
+    this.interval = 5000.00,
   });
 
   @override
@@ -18,8 +20,6 @@ class MyLineChart extends StatefulWidget {
 class _MyLineChartState extends State<MyLineChart> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
-
     FlTitlesData tilesData = FlTitlesData(
       topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
       rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -29,12 +29,12 @@ class _MyLineChartState extends State<MyLineChart> {
           showTitles: true,
           getTitlesWidget: (value, meta) {
             final index = value.toInt();
-            if (index < 0 || index >= widget.labels.length) {
+            if (index < 0 || index >= widget.chartData.length) {
               return const SizedBox();
             }
             return Center(
               child: Text(
-                widget.labels[index],
+                widget.chartData[index].label,
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.white,
@@ -50,12 +50,12 @@ class _MyLineChartState extends State<MyLineChart> {
           maxIncluded: false,
           minIncluded: false,
           showTitles: true,
-          reservedSize: 50,
+          reservedSize: 40,
           getTitlesWidget: (value, meta) => Text(
-            '₱${value ~/ 1000}k',
+           "₱${(value / 1000).toStringAsFixed(0)}k",
             style: const TextStyle(fontSize: 12),
           ),
-          interval: 2000,
+          interval: widget.interval,
         ),
       ),
     );
@@ -64,8 +64,8 @@ class _MyLineChartState extends State<MyLineChart> {
       show: true,
       getDotPainter: (spot, percent, barData, index) {
         return FlDotCirclePainter(
-          radius: 5,
-          color: Colors.grey.shade600,
+          radius: 4,
+          color: Colors.grey.shade300,
           strokeWidth: 2,
           strokeColor: Theme.of(context).colorScheme.primary,
         );
@@ -75,17 +75,19 @@ class _MyLineChartState extends State<MyLineChart> {
     FlBorderData borderData = FlBorderData(
       border: Border(
         left: BorderSide(
-          color: Colors.grey.shade600,
-          width: 3,
+          color: Colors.grey.shade300,
+          width: 2,
         ),
         bottom: BorderSide(
-          color: Colors.grey.shade600,
-          width: 3,
+          color: Colors.grey.shade300,
+          width: 2,
         ),
       ),
     );
 
     return LineChart(
+      curve: Curves.easeIn,
+      duration: Duration(milliseconds: 800),
       LineChartData(
         minY: 0,
         gridData: FlGridData(
@@ -105,7 +107,7 @@ class _MyLineChartState extends State<MyLineChart> {
               return touchedSpots.map((spot) {
                 return LineTooltipItem(
                   // 👇 Custom text inside tooltip
-                  '₱${spot.y.toStringAsFixed(2)}',
+                  currencyFormatter(spot.y),
                   const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -119,7 +121,16 @@ class _MyLineChartState extends State<MyLineChart> {
         lineBarsData: [
           LineChartBarData(
             isCurved: true,
-            color: theme.primary,
+            preventCurveOverShooting: true,
+            gradientArea: LineChartGradientArea.wholeChart,
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.tertiary,
+              ],
+            ),
             barWidth: 2,
             belowBarData: BarAreaData(
               show: true,
@@ -127,16 +138,17 @@ class _MyLineChartState extends State<MyLineChart> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Theme.of(context).colorScheme.primary.withAlpha(150),
-                  Theme.of(context).colorScheme.primary.withAlpha(70),
-                   Theme.of(context).colorScheme.primary.withAlpha(30)
+                  Theme.of(context).colorScheme.primary.withAlpha(10),
+                  Theme.of(context).colorScheme.primary.withAlpha(10),
+                  Theme.of(context).colorScheme.primary.withAlpha(10),
+                  Theme.of(context).colorScheme.primary.withAlpha(10),
                 ],
               ),
             ),
             dotData: dotData,
             spots: [
-              for (int i = 0; i < widget.sales.length; i++)
-                FlSpot(i.toDouble(), widget.sales[i]),
+              for (int i = 0; i < widget.chartData.length; i++)
+                FlSpot(i.toDouble(), widget.chartData[i].sales),
             ],
           ),
         ],

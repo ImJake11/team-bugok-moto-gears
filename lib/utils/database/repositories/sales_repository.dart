@@ -11,6 +11,7 @@ class SalesRepository {
 
   Future<List<SalesModel>> retrieveSales({
     bool? isFilterInCurrentWeek,
+    bool? isFilterInCurrentMonth,
   }) async => _retrieveSales();
 
   // PRIVATE FUNCTIONS //
@@ -62,11 +63,22 @@ class SalesRepository {
 
   Future<List<SalesModel>> _retrieveSales({
     final bool? isFilterInCurrentWeek,
+    final bool? isFilterInCurrentMonth,
   }) async {
     final DateTime today = DateTime.now();
 
     final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
     final endOfWeek = startOfWeek.add(Duration(days: 6));
+    final startOfMonth = DateTime(today.year, today.month, 1);
+    final endOfMonth = DateTime(
+      today.year,
+      today.month + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
 
     final query =
         db.select(db.sales).join([
@@ -82,6 +94,13 @@ class SalesRepository {
       query.where(
         db.sales.createdAt.isBiggerThanValue(startOfWeek) &
             db.sales.createdAt.isSmallerThanValue(endOfWeek),
+      );
+    }
+
+    if (isFilterInCurrentMonth ?? false) {
+      query.where(
+        db.sales.createdAt.isBiggerThanValue(startOfMonth) &
+            db.sales.createdAt.isSmallerThanValue(endOfMonth),
       );
     }
 

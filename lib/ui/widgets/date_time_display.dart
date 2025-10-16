@@ -44,14 +44,22 @@ class _DateTimeDisplayState extends State<DateTimeDisplay> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.calendar_today, size: 20, color: Colors.grey[700]),
+        Icon(
+          Icons.calendar_today,
+          size: 20,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         const SizedBox(width: 6),
         Text(
           _dateString,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         const Spacer(),
-        Icon(Icons.access_time, size: 20, color: Colors.grey[700]),
+        Icon(
+          Icons.access_time,
+          size: 22,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         const SizedBox(width: 6),
         Text(
           _timeString,

@@ -3,8 +3,12 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
+import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/sales_repository.dart';
+import 'package:team_bugok_business/utils/database/repositories/size_repository.dart';
+import 'package:team_bugok_business/utils/model/product_model.dart';
 import 'package:team_bugok_business/utils/model/sales_model.dart';
+import 'package:team_bugok_business/utils/model/variant_model.dart';
 
 part 'dashboard_event.dart';
 part 'dashboard_state.dart';
@@ -14,7 +18,13 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
   DashboardBloc({
     required PosBloc posBloc,
-  }) : super(DashboardInitial(sales: [])) {
+  }) : super(
+         DashboardInitial(
+           sales: [],
+           products: [],
+           sizes: [],
+         ),
+       ) {
     posBlocSub = posBloc.stream.listen(
       (PosState s) {
         if (s is PosCheckOutSuccessful) {
@@ -33,8 +43,19 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     Emitter<DashboardState> emit,
   ) async {
     final List<SalesModel> sales = await SalesRepository().retrieveSales(
-      isFilterInCurrentWeek: true,
+      isFilterInCurrentMonth: true,
     );
-    emit(DashboardInitial(sales: sales));
+    final List<ProductModel> products = await ProductRepository()
+        .retrieveAllProduct();
+
+    final sizes = await SizeRepository().retrieveAllSizes();
+
+    emit(
+      DashboardInitial(
+        sales: sales,
+        products: products,
+        sizes: sizes,
+      ),
+    );
   }
 }

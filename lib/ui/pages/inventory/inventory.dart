@@ -80,6 +80,7 @@ class _InventoryPageState extends State<InventoryPage> {
             textEditingController: _searchController,
             suffixIcon: LucideIcons.search,
             placeholder: "Search Model",
+            fillColor: Theme.of(context).colorScheme.surfaceDim,
             onChange: (value) {
               _searchQuery();
             },

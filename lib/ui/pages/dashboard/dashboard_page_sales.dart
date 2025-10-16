@@ -42,36 +42,33 @@ class DashboardPageSales extends StatelessWidget {
           return SizedBox(
             child: SingleChildScrollView(
               child: Column(
-
+                spacing: 20,
                 children: List.generate(
                   sales.length,
                   (index) {
                     final sale = sales[index];
 
-                    return SizedBox(
-                      height: 30,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            convertDateStringToDate(sale.createdAt),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade400,
-                            ),
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          convertDateStringToDate(sale.createdAt),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade400,
                           ),
-                          Text(
-                            extractTime(
-                              sale.createdAt,
-                              showSeconds: false,
-                            ),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
+                        ),
+                        Text(
+                          extractTime(
+                            sale.createdAt,
+                            showSeconds: false,
                           ),
-                        ],
-                      ),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),
