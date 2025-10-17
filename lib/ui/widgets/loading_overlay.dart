@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
+import 'package:team_bugok_business/utils/provider/loading_provider.dart';
+
+class LoadingOverlay extends StatelessWidget {
+  const LoadingOverlay({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final loadingProvider = context.watch<LoadingProvider>();
+
+    bool isShow = loadingProvider.isLoading;
+    String message = loadingProvider.message;
+
+    if (!isShow) return SizedBox();
+
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.width,
+      color: Theme.of(context).colorScheme.surfaceDim.withAlpha(220),
+      child: Center(
+        child: Container(
+          width: 300,
+          height: 200,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceDim,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: Colors.grey.shade500,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 10,
+            children: [
+              SpinKitFadingCircle(
+                color: Theme.of(context).colorScheme.primary,
+                size: 50,
+              ),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

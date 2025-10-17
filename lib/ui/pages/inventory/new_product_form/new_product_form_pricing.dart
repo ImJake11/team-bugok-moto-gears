@@ -26,7 +26,7 @@ class NewProductFormPricing extends StatelessWidget {
         CustomTextfield(
           fillColor: Theme.of(context).colorScheme.surface,
           showShadow: false,
-          width: 400,
+          width: 200,
           textEditingController: costPriceController,
           placeholder: "Cost Price",
           onChange: (value) => context.read<ProductFormBloc>().add(
@@ -40,7 +40,7 @@ class NewProductFormPricing extends StatelessWidget {
         CustomTextfield(
           fillColor: Theme.of(context).colorScheme.surface,
           showShadow: false,
-          width: 400,
+          width: 200,
           textEditingController: sellingPriceController,
           onChange: (value) => context.read<ProductFormBloc>().add(
             ProductFormUpdateData(

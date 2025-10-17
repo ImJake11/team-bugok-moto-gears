@@ -68,19 +68,29 @@ class _ExpensesPageState extends State<ExpensesPage> {
           999,
         );
 
-        final List<String> monthlySalesLabel = List.generate(
-          endOfMonth.day,
-          (index) => (index + 1).toString(),
-        );
+        const List<String> shortMonths = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
 
-        List<ChartModel> chartData = monthlySalesLabel.asMap().entries.map(
+        List<ChartModel> chartData = shortMonths.asMap().entries.map(
           (entry) {
             final index = entry.key;
             final value = entry.value;
 
             // get the sales based on index
             final salesPerDay = expenses.where(
-              (element) => element.createdAt.day - 1 == index,
+              (element) => element.createdAt.month -1 == index,
             );
 
             final totalSales = salesPerDay.isEmpty
@@ -105,7 +115,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
               // Chart
               Container(
                 width: double.infinity,
-                height: 350,
+                height: 300,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: Theme.of(context).colorScheme.surfaceDim,
@@ -136,13 +146,14 @@ class _ExpensesPageState extends State<ExpensesPage> {
                       Text(
                         "This Month Expenses",
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Expanded(
                         child: MyLineChart(
-                          interval: 20000.00,
+
+                          interval: 200000.00,
                           chartData: chartData,
                         ),
                       ),

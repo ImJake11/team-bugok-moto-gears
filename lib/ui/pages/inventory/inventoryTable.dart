@@ -32,7 +32,7 @@ class _InventoryTableState extends State<InventoryTable> {
               ? Colors.grey.shade800
               : index.isEven
               ? Theme.of(context).colorScheme.surface
-              : Color(0xFF141414),
+              : Colors.grey.shade900,
         ),
         height: 50,
         child: Center(
@@ -84,8 +84,8 @@ class _InventoryTableState extends State<InventoryTable> {
       3: FlexColumnWidth(2),
       4: FlexColumnWidth(2),
       5: FlexColumnWidth(2),
-      6: FlexColumnWidth(1),
-      7: FlexColumnWidth(2),
+      6: FlexColumnWidth(2),
+      7: FlexColumnWidth(1),
       8: FlexColumnWidth(2),
     };
 

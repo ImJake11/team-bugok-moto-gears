@@ -65,6 +65,18 @@ class DashboardTopProducts extends StatelessWidget {
               builder: (context, result) {
                 final (products, totalSales) = result;
 
+                if (products.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No Products.",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  );
+                }
+
                 return SingleChildScrollView(
                   child: Column(
                     spacing: 15,

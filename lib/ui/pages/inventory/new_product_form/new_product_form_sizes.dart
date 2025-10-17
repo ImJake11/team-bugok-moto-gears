@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
+import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/stock_controller.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/toggle_switch.dart';
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
-import 'package:team_bugok_business/ui/widgets/text_field.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
 import 'package:team_bugok_business/utils/services/get_available_sizes.dart';
 
@@ -23,10 +23,9 @@ class NewProductFormSizes extends StatelessWidget {
     required this.index,
     required this.size,
   });
-  
+
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.only(left: 100),
       child: Row(
@@ -45,22 +44,10 @@ class NewProductFormSizes extends StatelessWidget {
             ),
             label: "Select Size",
           ),
-          CustomTextfield(
-            fillColor: Theme.of(context).colorScheme.surface,
-            showShadow: false,
-            textEditingController: stockController,
-            width: 200,
-            onChange: (value) => context.read<ProductFormBloc>().add(
-              ProductFormUpdateSize(
-                variantIndex: variantIndex,
-                sizeIndex: index,
-                stock: int.tryParse(value),
-              ),
-            ),
-            placeholder: "Stock",
-            formatter: [
-              FilteringTextInputFormatter.digitsOnly,
-            ],
+          StockController(
+            sizeIndex: index,
+            stockController: stockController,
+            variantIndex: variantIndex,
           ),
           size.id == null
               ? Transform(

@@ -13,7 +13,7 @@ class PosPageCart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 450,
+      width: 400,
       height: double.infinity,
       decoration: BoxDecoration(
         boxShadow: [

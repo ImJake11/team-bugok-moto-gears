@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/product_view_preview.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/product_view_related_brands.dart';
 import 'package:team_bugok_business/ui/widgets/appbar.dart';
@@ -42,9 +39,10 @@ class _ProductViewState extends State<ProductView> {
         CustomAppbar(
           child: Padding(
             padding: const EdgeInsets.only(
-              left: 50,
+              left: 20,
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [NavBackButton()],
             ),
@@ -52,27 +50,24 @@ class _ProductViewState extends State<ProductView> {
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(30),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 20,
-                horizontal: 40,
-              ),
-              child: Row(
-                spacing: 20,
-                children: [
-                  ProductViewPreview(
-                    onTap: (index) => setState(() => _selectedColor = index),
-                    selectedColor: _selectedColor,
-                    productModel: _productModel,
-                  ),
-                  ProductViewRelatedBrands(
-                    onTap: _selectProduct,
-                    currentProductId: _productModel.id!,
-                    currentBrand: _productModel.brand,
-                  ),
-                ],
-              ),
+            padding: const EdgeInsets.symmetric(
+              vertical: 20,
+              horizontal: 20,
+            ),
+            child: Row(
+              spacing: 20,
+              children: [
+                ProductViewPreview(
+                  onTap: (index) => setState(() => _selectedColor = index),
+                  selectedColor: _selectedColor,
+                  productModel: _productModel,
+                ),
+                ProductViewRelatedBrands(
+                  onTap: _selectProduct,
+                  currentProductId: _productModel.id!,
+                  currentBrand: _productModel.brand,
+                ),
+              ],
             ),
           ),
         ),

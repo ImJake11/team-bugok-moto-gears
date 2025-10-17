@@ -50,9 +50,9 @@ class _MyLineChartState extends State<MyLineChart> {
           maxIncluded: false,
           minIncluded: false,
           showTitles: true,
-          reservedSize: 40,
+          reservedSize: 60,
           getTitlesWidget: (value, meta) => Text(
-           "₱${(value / 1000).toStringAsFixed(0)}k",
+            "₱${(value / 1000).toStringAsFixed(0)}k",
             style: const TextStyle(fontSize: 12),
           ),
           interval: widget.interval,

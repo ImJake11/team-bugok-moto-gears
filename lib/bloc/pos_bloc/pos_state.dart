@@ -39,6 +39,10 @@ class PosProductInitialized extends PosState {
 
 class PosLoadingState extends PosState {}
 
-class PosErrorState extends PosState {}
+class PosErrorState extends PosState {
+  final String message;
+
+  PosErrorState({required this.message});
+}
 
 class PosCheckOutSuccessful extends PosState {}

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/animated_text_value_change.dart';
-import 'package:team_bugok_business/utils/model/sales_model.dart';
+import 'package:team_bugok_business/utils/services/responsive_font.dart';
 
 class DashboardPageNoTransactions extends StatelessWidget {
   const DashboardPageNoTransactions({super.key});
@@ -13,12 +13,11 @@ class DashboardPageNoTransactions extends StatelessWidget {
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           BlocSelector<DashboardBloc, DashboardState, int>(
             selector: (state) {
               if (state is! DashboardInitial) return 0;
-              final now = DateTime.now();
+              final now = state.currentDate;
               final startOfDay = DateTime(now.year, now.month, now.day);
               final endOfDay = DateTime(
                 now.year,
@@ -29,23 +28,21 @@ class DashboardPageNoTransactions extends StatelessWidget {
                 59,
                 999,
               );
-
-              List<SalesModel> todaySales = state.sales
+              final todaySales = state.sales
                   .where(
                     (e) =>
                         e.createdAt.isAfter(startOfDay) &&
                         e.createdAt.isBefore(endOfDay),
                   )
                   .toList();
-
               return todaySales.length;
             },
             builder: (context, sales) {
               return AnimatedTextValueChange(
-                duration: Duration(milliseconds: 1500),
+                duration: Duration(milliseconds: 1000),
                 value: sales,
                 textStyle: TextStyle(
-                  fontSize: 60,
+                  fontSize: responsiveFontSize(context, 30),
                   color: Theme.of(context).colorScheme.primary,
                   shadows: [
                     Shadow(
@@ -65,9 +62,7 @@ class DashboardPageNoTransactions extends StatelessWidget {
           ),
           Text(
             'Today',
-            style: TextStyle(
-              color: Colors.grey.shade500,
-            ),
+            style: TextStyle(color: Colors.grey.shade500),
           ),
         ],
       ),

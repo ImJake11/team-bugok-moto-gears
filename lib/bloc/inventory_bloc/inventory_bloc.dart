@@ -28,7 +28,7 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     );
 
     formBlocSub = formBloc.stream.listen((ProductFormState s) {
-      if (s is ProductFormSuccessAndSaveOnly) {
+      if (s is ProductFormSaveProduct) {
         add(InventoryLoadInitialData());
       }
     });
@@ -39,7 +39,7 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     add(InventoryLoadInitialData());
   }
 
-  FutureOr<void> _inventoryLoadInitialData(
+  Future<void> _inventoryLoadInitialData(
     InventoryLoadInitialData event,
     Emitter<InventoryState> emit,
   ) async {

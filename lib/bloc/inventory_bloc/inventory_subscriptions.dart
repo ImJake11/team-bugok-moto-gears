@@ -21,7 +21,7 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
 
     // Listen to ProductForm bloc
     formBlocSub = formBloc.stream.listen((formState) {
-      if (formState is ProductFormSuccessAndSaveOnly) {
+      if (formState is ProductFormSaveProduct) {
         add(InventoryLoadInitialData());
       }
     });

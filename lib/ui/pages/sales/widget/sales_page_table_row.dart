@@ -31,7 +31,6 @@ class _SalesPageTableRowState extends State<SalesPageTableRow> {
 
   @override
   Widget build(BuildContext context) {
-
     final viewBtn = Flexible(
       child: GestureDetector(
         onTap: () => widget.isOnView ? widget.onHide() : widget.onView(),
@@ -63,14 +62,11 @@ class _SalesPageTableRowState extends State<SalesPageTableRow> {
         curve: Curves.ease,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          border: Border(
-            bottom: BorderSide(
-              color: Theme.of(context).colorScheme.surfaceDim,
-            ),
-          ),
           color: _isHovered
               ? Theme.of(context).colorScheme.surfaceDim
-              : Theme.of(context).colorScheme.surface,
+              : widget.index.isEven
+              ? Theme.of(context).colorScheme.surface
+              : Colors.grey.shade900,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(

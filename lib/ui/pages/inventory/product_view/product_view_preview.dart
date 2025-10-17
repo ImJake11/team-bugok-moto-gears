@@ -148,7 +148,7 @@ class _ProductViewPreviewState extends State<ProductViewPreview> {
                       onTap: () {
                         context.read<ProductFormBloc>().add(
                           ProductFormUpdateExistingProduct(
-                            productModel: widget.productModel,
+                            productId: widget.productModel.id!,
                           ),
                         );
                         GoRouter.of(context).pushNamed('new-product-form');

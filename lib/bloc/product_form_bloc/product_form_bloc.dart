@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:team_bugok_business/constants/product_form_keys.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
@@ -23,6 +24,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     on<ProductFormUpdateSize>(_productFormUpdateSize);
     on<ProductFormUpdateExistingProduct>(_productFormUpdateExistingProduct);
     on<ProductFormSaveUpdateProduct>(_productFormSaveUpdateProduct);
+    on<ProductFormResetForm>(_productFormResetForm);
   }
 
   void _productFormUpdate(
@@ -111,7 +113,6 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     Emitter<ProductFormState> emit,
   ) async {
     if (state is! ProductFormInitial) return;
-
     final s = state as ProductFormInitial;
 
     final category = s.productData.category;
@@ -171,6 +172,13 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     }
 
     await ProductRepository().insertProduct(s.productData);
+    // call success state
+    emit(
+      ProductFormSaveProduct(
+        isSaveOnly: event.isSaveOnly,
+        message: "Product Saved Successfull",
+      ),
+    );
     emit(ProductFormInitial());
   }
 
@@ -400,22 +408,51 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     ProductFormUpdateExistingProduct event,
     Emitter<ProductFormState> emit,
   ) async {
-    emit(ProductFormLoadingState());
-    await Future.delayed(Duration(seconds: 2));
-    emit(
-      ProductFormInitial(
-        productData: event.productModel,
-      ),
-    );
+    try {
+      emit(ProductFormLoadingState());
+      final productModel = await ProductRepository().fetchSingleProduct(
+        event.productId,
+      );
+      await Future.delayed(Duration(seconds: 1));
+      emit(
+        ProductFormInitial(
+          productData: productModel,
+        ),
+      );
+    } catch (e, st) {
+      print("Error fetching product ${e}");
+      print(st);
+      emit(ProductFormErrorState(message: "Failed to fetched product"));
+    }
   }
-}
 
-void _productFormSaveUpdateProduct(
-  ProductFormSaveUpdateProduct event,
-  Emitter<ProductFormState> emit,
-) async {
-  emit(ProductFormLoadingState());
-  await ProductRepository().updateProduct(event.productModel);
-  emit(ProductFormSuccessAndSaveOnly());
-  emit(ProductFormInitial());
+  void _productFormResetForm(
+    ProductFormResetForm event,
+    Emitter<ProductFormState> emit,
+  ) {
+    emit(ProductFormInitial());
+  }
+
+  void _productFormSaveUpdateProduct(
+    ProductFormSaveUpdateProduct event,
+    Emitter<ProductFormState> emit,
+  ) async {
+    if (state is! ProductFormInitial) return;
+
+    final s = state as ProductFormInitial;
+
+    try {
+      await ProductRepository().updateProduct(event.productModel);
+      emit(
+        ProductFormSaveProduct(
+          isSaveOnly: true,
+          message: "Product Updated Successful",
+        ),
+      );
+      emit(ProductFormInitial());
+    } catch (e) {
+      emit(ProductFormErrorState(message: "Failed to update product"));
+      emit(s.copyWith());
+    }
+  }
 }

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:team_bugok_business/bloc/inventory_bloc/inventory_bloc.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/sales_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/size_repository.dart';
@@ -71,12 +70,18 @@ class PosBloc extends Bloc<PosEvent, PosState> {
     final newItem = event.cartModel;
 
     //serve as index holder if current product id is existing to cart list
-    final isItemExisting = s.cart.indexWhere(
-      (element) => element.id == newItem.id,
-    );
+    final isExisting = updatedCart.any((cart) {
+      if (cart.color == newItem.color &&
+          cart.size == newItem.size &&
+          cart.id == newItem.id) {
+        return true;
+      }
 
-    if (isItemExisting > 0) {
-      updatedCart[isItemExisting] = newItem;
+      return false;
+    });
+
+    if (isExisting) {
+      emit(PosErrorState(message: "This product is existing on your cart"));
     } else {
       updatedCart.add(event.cartModel);
     }
@@ -151,9 +156,10 @@ class PosBloc extends Bloc<PosEvent, PosState> {
 
       emit(PosCheckOutSuccessful());
       add(PosLoadProducts());
-    
-    } catch (e) {
-      emit(PosErrorState());
+    } catch (e, st) {
+      print("Error to checkout item ${e}");
+      print(st);
+      emit(PosErrorState(message: "Failed to check out product"));
     }
   }
 }

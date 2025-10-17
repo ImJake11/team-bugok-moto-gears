@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
+import 'package:team_bugok_business/ui/widgets/text_field.dart';
 
 class PosPageSearchbar extends StatelessWidget {
   const PosPageSearchbar({super.key});
@@ -12,7 +13,7 @@ class PosPageSearchbar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceDim,
         borderRadius: BorderRadius.circular(10),
-         boxShadow: [
+        boxShadow: [
           BoxShadow(
             blurRadius: 3,
             spreadRadius: 3,
@@ -30,23 +31,17 @@ class PosPageSearchbar extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
-      child: TextField(
-        onChanged: (value) =>
-            context.read<PosBloc>().add(PosSearch(query: value)),
-        decoration: InputDecoration(
-          hintText: "Search Model",
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.transparent,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.transparent,
-            ),
-          ),
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return CustomTextfield(
+            onChange: (value) =>
+                context.read<PosBloc>().add(PosSearch(query: value)),
+            suffixIcon: Icons.search,
+            placeholder: "Search Model",
+            fillColor: Theme.of(context).colorScheme.surfaceDim,
+            width: constraints.maxWidth,
+          );
+        },
       ),
     );
   }

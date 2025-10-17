@@ -10,6 +10,7 @@ class CustomTextfield extends StatefulWidget {
   final TextEditingController? textEditingController;
   final bool? showShadow;
   final Color? fillColor;
+  final int? maxLength;
 
   const CustomTextfield({
     super.key,
@@ -21,6 +22,7 @@ class CustomTextfield extends StatefulWidget {
     this.textEditingController,
     this.showShadow = true,
     this.fillColor = const Color(0xFF282828),
+    this.maxLength = 10,
   });
 
   @override
@@ -76,6 +78,8 @@ class _CustomTextfieldState extends State<CustomTextfield> {
         width: widget.width,
         height: 50,
         child: TextField(
+          
+          maxLength: widget.maxLength,
           controller: _textEditingController,
           style: TextStyle(
             fontSize: 13,
@@ -83,6 +87,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           onChanged: widget.onChange,
           inputFormatters: widget.formatter ?? [],
           decoration: InputDecoration(
+            counterText: "",
             fillColor: widget.fillColor,
             filled: true,
             contentPadding: EdgeInsets.all(5),

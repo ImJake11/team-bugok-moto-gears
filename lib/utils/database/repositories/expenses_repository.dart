@@ -1,7 +1,7 @@
+import 'package:drift/drift.dart';
 import 'package:team_bugok_business/utils/database/app_database.dart';
 import 'package:team_bugok_business/utils/model/expenses_model.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
-import 'package:team_bugok_business/utils/model/variant_model.dart';
 
 class ExpensesRepository {
   final db = appDatabase;
@@ -19,117 +19,144 @@ class ExpensesRepository {
     ProductModel productData,
   ) async => _computeExpensesTotalOnProductUpdate(productData);
 
-  Future<List<ExpensesModel>> retriveAllExpenses() async =>
-      _retrieveAllExpenses();
+  Future<List<ExpensesModel>> retriveAllExpenses({
+    DateTime? referenceDate,
+    bool? isMonthOnly,
+  }) async => _retrieveAllExpenses(
+    referenceDate: referenceDate,
+    isMonthlyOnly: isMonthOnly,
+  );
 
   // =========================== Private Functions ============================ //
 
   Future<int> _insertExpenses(ExpensesCompanion expenes) async {
     try {
-      int id = await db.into(db.expenses).insert(expenes);
-      print("Expense ID ${id}");
-
+      final id = await db.into(db.expenses).insert(expenes);
       return id;
-    } catch (e) {
-      print(e);
-      return 0;
+    } catch (e, st) {
+      print("🔥 [ExpensesRepository] _insertExpenses error: $e");
+      print("📜 Stack trace: $st");
+      rethrow;
     }
   }
 
   Future<void> _insertExpenseItem(ExpensesItemsCompanion item) async {
     try {
-      final id = await db.into(db.expensesItems).insert(item);
-      print("Expense ITem id ${id}");
-    } catch (e) {
-      print(e);
+      await db.into(db.expensesItems).insert(item);
+    } catch (e, st) {
+      print("🔥 [ExpensesRepository] _insertExpenseItem error: $e");
+      print("📜 Stack trace: $st");
+      rethrow;
     }
   }
 
   Future<double> _computeExpensesTotal(ProductModel product) async {
-    double totalExpenses = 0.00;
+    try {
+      double totalExpenses = 0.00;
+      final costPrice = product.costPrice;
 
-    final costPrice = product.costPrice;
+      for (final variant in product.variants) {
+        for (final size in variant.sizes) {
+          if (size.id == null) {
+            totalExpenses += (costPrice * size.stock);
+          } else {
+            final currentData = await (db.select(
+              db.sizes,
+            )..where((tbl) => tbl.id.equals(size.id!))).getSingleOrNull();
 
-    for (final variant in product.variants) {
-      List<VariantSizeModel> sizes = variant.sizes;
-
-      for (final size in sizes) {
-        if (size.id == null) {
-          totalExpenses += (costPrice * size.stock);
-        } else {
-          final currentData =
-              await (db.select(db.sizes)..where(
-                    (tbl) => tbl.id.equals(size.id!),
-                  ))
-                  .getSingle();
-
-          final currentStock = currentData.stock;
-          final stockDifference = size.stock - currentStock;
-
-          if (stockDifference > 0) {
-            totalExpenses += stockDifference * costPrice;
+            if (currentData != null) {
+              final currentStock = currentData.stock;
+              final stockDifference = size.stock - currentStock;
+              if (stockDifference > 0) {
+                totalExpenses += stockDifference * costPrice;
+              }
+            }
           }
         }
       }
-    }
 
-    return totalExpenses;
+      return totalExpenses;
+    } catch (e, st) {
+      print("🔥 [ExpensesRepository] _computeExpensesTotal error: $e");
+      print("📜 Stack trace: $st");
+      rethrow;
+    }
   }
 
-  // this function is to get the total expenses of the current product that is being updated
-  // we need to check each sizes if it has changes or not so that's why we seperated this function
-  // on the other compute total expenses which is less complex than this current function
   Future<double> _computeExpensesTotalOnProductUpdate(
     ProductModel productData,
   ) async {
-    double totalExpenses = 0.00;
+    try {
+      double totalExpenses = 0.00;
+      final costPrice = productData.costPrice;
 
-    final costPrice = productData.costPrice;
+      for (final variant in productData.variants) {
+        for (final size in variant.sizes) {
+          final isExisting = size.id != null;
 
-    for (final variant in productData.variants) {
-      final sizes = variant.sizes;
+          if (isExisting) {
+            final currentData = await (db.select(
+              db.sizes,
+            )..where((tbl) => tbl.id.equals(size.id!))).getSingleOrNull();
 
-      for (final size in sizes) {
-        // each sizes has an id that is possibly null
-        // this mean this product is new and we can insert it easily
-        // but if the id is not null this means  it is modified
-        // so we will get the difference of the current stock from db and subtract
-        // it to new stock passed on the parameter
-        bool isExisting = size.id != null;
+            final stock = currentData?.stock ?? 0;
+            final stockDifference = size.stock - stock;
 
-        if (isExisting) {
-          final currentData =
-              await (db.select(db.sizes)..where(
-                    (tbl) => tbl.id.equals(size.id!),
-                  ))
-                  .getSingleOrNull();
-
-          final stock = currentData?.stock ?? 0;
-
-          final stockDifference = size.stock - stock;
-
-          if (stockDifference > 0) {
-            totalExpenses += (costPrice * stockDifference);
+            if (stockDifference > 0) {
+              totalExpenses += (costPrice * stockDifference);
+            }
+          } else {
+            totalExpenses += (costPrice * size.stock);
           }
-        } else {
-          totalExpenses += (costPrice * size.stock);
         }
       }
+
+      return totalExpenses;
+    } catch (e, st) {
+      print(
+        "🔥 [ExpensesRepository] _computeExpensesTotalOnProductUpdate error: $e",
+      );
+      print("📜 Stack trace: $st");
+      rethrow;
     }
-    return totalExpenses;
   }
 
-  Future<List<ExpensesModel>> _retrieveAllExpenses() async {
-    final results = await (db.select(db.expenses)).get();
+  Future<List<ExpensesModel>> _retrieveAllExpenses({
+    DateTime? referenceDate,
+    bool? isMonthlyOnly,
+  }) async {
+    try {
+      final now = referenceDate ?? DateTime.now();
+      final firstDay = DateTime(now.year, now.month, 1);
+      final lastDay = DateTime(now.year, now.month + 1, 0);
 
-    return [
-      for (final result in results)
-        ExpensesModel(
-          id: result.id,
-          note: result.note,
-          createdAt: result.createdAt,
-          total: result.total,
-        ),
-    ];
+      final query = db.select(db.expenses)
+        ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)]);
+
+      if (isMonthlyOnly ?? false) {
+        query.where(
+          (tbl) =>
+              tbl.createdAt.isBiggerThanValue(firstDay) &
+              tbl.createdAt.isSmallerThanValue(lastDay),
+        );
+      }
+
+      final results = await query.get();
+
+      return results
+          .map(
+            (result) => ExpensesModel(
+              id: result.id,
+              note: result.note,
+              createdAt: result.createdAt,
+              total: result.total,
+            ),
+          )
+          .toList();
+    } catch (e, st) {
+      print("🔥 [ExpensesRepository] _retrieveAllExpenses error: $e");
+      print("📜 Stack trace: $st");
+      rethrow;
+    }
   }
 }

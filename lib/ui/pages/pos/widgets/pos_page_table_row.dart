@@ -50,7 +50,7 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
               color: _isHovered
                   ? Theme.of(context).colorScheme.surfaceDim
                   : widget.index.isOdd
-                  ? Colors.black26
+                  ? Colors.grey.shade900
                   : Theme.of(context).colorScheme.surface,
             ),
             child: Flex(

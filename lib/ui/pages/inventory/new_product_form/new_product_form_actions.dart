@@ -4,6 +4,7 @@ import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dar
 import 'package:team_bugok_business/ui/widgets/cancel_button.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
+import 'package:team_bugok_business/utils/provider/loading_provider.dart';
 
 class NewProductFormActions extends StatelessWidget {
   const NewProductFormActions({super.key});
@@ -26,6 +27,11 @@ class NewProductFormActions extends StatelessWidget {
             if (value?.id == 0)
               CustomButton(
                 width: 200,
+                onTap: () {
+                  context.read<ProductFormBloc>().add(
+                    ProductFormInsertProduct(isSaveOnly: false),
+                  );
+                },
                 child: Center(
                   child: Text(
                     "Save & Create Another",
@@ -34,6 +40,7 @@ class NewProductFormActions extends StatelessWidget {
               ),
             CustomButton(
               onTap: () {
+                context.read<LoadingProvider>().showLoading("Saving Product");
                 if (value?.id == 0) {
                   context.read<ProductFormBloc>().add(
                     ProductFormInsertProduct(isSaveOnly: true),

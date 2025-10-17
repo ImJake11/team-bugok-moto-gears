@@ -98,8 +98,11 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
                 BlocSelector<ProductFormBloc, ProductFormState, String>(
                   selector: (state) {
                     if (state is ProductFormInitial) {
-                      final selectedColor =
-                          state.productData.variants[widget.variantIndex].color;
+                      final variants = state.productData.variants;
+
+                      final selectedColor = variants.isEmpty
+                          ? ""
+                          : variants[widget.variantIndex].color;
 
                       return selectedColor;
                     }
@@ -125,9 +128,17 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
                 addSizeBtn(),
 
                 BlocSelector<ProductFormBloc, ProductFormState, VariantModel?>(
-                  selector: (state) => (state is ProductFormInitial)
-                      ? state.productData.variants[widget.variantIndex]
-                      : null,
+                  selector: (state) {
+                    if (state is ProductFormInitial) {
+                      final variants = state.productData.variants;
+
+                      return variants.isNotEmpty
+                          ? variants[widget.variantIndex]
+                          : null;
+                    }
+
+                    return null;
+                  },
                   builder: (context, variant) {
                     if (variant == null || variant.id == null) {
                       return CustomErrorButton(

@@ -26,6 +26,13 @@ class PosPage extends StatelessWidget {
                   message: "Your purchase has been completed successfully",
                 ).show();
               }
+
+              if (state is PosErrorState) {
+                CustomSnackBar(
+                  context: context,
+                  message: state.message,
+                ).show();
+              }
             },
             builder: (context, s) {
               if (s is PosLoadingState) {
@@ -33,13 +40,13 @@ class PosPage extends StatelessWidget {
                   child: LoadingWidget(),
                 );
               }
-        
+
               if (s is PosErrorState) {
                 return Center(
                   child: Text('Something went wrong'),
                 );
               }
-        
+
               return Row(
                 spacing: 30,
                 children: [

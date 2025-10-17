@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
+import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/utils/model/low_stock_product_model.dart';
 
 class DashbardPageNoStock extends StatelessWidget {
@@ -22,7 +24,7 @@ class DashbardPageNoStock extends StatelessWidget {
               selector: (state) {
                 if (state is! DashboardInitial) return [];
 
-                final int threshold = 5;
+                final int threshold = 3;
                 final products = state.products;
                 final sizes = state.sizes;
 
@@ -56,6 +58,18 @@ class DashbardPageNoStock extends StatelessWidget {
                 return lowStockProducts;
               },
               builder: (context, products) {
+                if (products.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No products.",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  );
+                }
+
                 return SingleChildScrollView(
                   child: Column(
                     spacing: 10,
@@ -81,43 +95,53 @@ class DashbardPageNoStock extends StatelessWidget {
                               ),
                             ),
                             const Spacer(),
-                            Container(
-                              height: 30,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey.shade800,
-                                ),
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.surfaceDim,
-                                borderRadius: BorderRadius.circular(40),
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 2,
-                                    spreadRadius: 2,
-                                    color: Colors.black,
-                                    offset: Offset(2, 2),
+                            GestureDetector(
+                              onTap: () {
+                                context.read<ProductFormBloc>().add(
+                                  ProductFormUpdateExistingProduct(
+                                    productId: product.id,
                                   ),
-                                  BoxShadow(
-                                    blurRadius: 2,
-                                    spreadRadius: 2,
-                                    color: Colors.grey.shade900,
-                                    offset: Offset(-2, -2),
+                                );
+                                context.goNamed("new-product-form");
+                              },
+                              child: Container(
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey.shade800,
                                   ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.surfaceDim,
+                                  borderRadius: BorderRadius.circular(40),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 2,
+                                      spreadRadius: 2,
+                                      color: Colors.black,
+                                      offset: Offset(2, 2),
+                                    ),
+                                    BoxShadow(
+                                      blurRadius: 2,
+                                      spreadRadius: 2,
+                                      color: Colors.grey.shade900,
+                                      offset: Offset(-2, -2),
+                                    ),
+                                  ],
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    "Restock",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "Restock",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                      ),
                                     ),
                                   ),
                                 ),

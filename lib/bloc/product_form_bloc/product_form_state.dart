@@ -29,10 +29,6 @@ final class ProductFormInitial extends ProductFormState {
   }
 }
 
-class ProductFormLoadingState extends ProductFormState {}
-
-class ProductFormSuccessAndSaveOnly extends ProductFormState {}
-
 class ProductFormShowSnackbar extends ProductFormState {
   final String message;
   final Duration duration;
@@ -44,4 +40,19 @@ class ProductFormValidtionError extends ProductFormState {
   final String message;
 
   ProductFormValidtionError({required this.message});
+}
+
+class ProductFormLoadingState extends ProductFormState {}
+
+class ProductFormSaveProduct extends ProductFormState {
+  final bool isSaveOnly;
+  final String message;
+
+  ProductFormSaveProduct({required this.message, required this.isSaveOnly});
+}
+
+class ProductFormErrorState extends ProductFormState {
+  final String message;
+
+  ProductFormErrorState({required this.message});
 }
