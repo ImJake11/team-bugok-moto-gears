@@ -1,40 +1,26 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
+import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 
-List<String> availableColors(
-  BuildContext context,
-  final String currentColor,
-) {
+List<String> availableColors(BuildContext context, String selectedColor) {
+  final references = context.read<ReferencesValuesProviderCache>();
   final s = context.read<ProductFormBloc>().state;
 
   if (s is! ProductFormInitial) return [];
 
-  final List<String> colors = [
-    "Matte Metalic Red",
-    "Red/Gray",
-    "Gloss Black",
-    "Matte Black",
-    "Moss Green",
-    "Pearl White",
-    "Pink/Blue",
-    "Blue/Red",
-    "Gloss Reed",
-    "Gloss Cool Gray",
-  ];
+  // Collect selected color IDs
+  final selectedColorIds = s.productData.variants.map((v) => v.color).toList();
 
-  final List<String> usedColors = s.productData.variants
-      .map(
-        (e) => e.color,
-      )
-      .toList();
-
-  // remove the current color from the main list 
-  usedColors.removeWhere((element) => element == currentColor);
-  
-  return colors
+  // Filter colors:
+  final unselectedColors = references.colors
       .where(
-        (color) => !usedColors.contains(color),
+        (color) =>
+            // show if it's not selected OR if it's the currently selected color
+            !selectedColorIds.contains(color.$1) || selectedColor == color.$2,
       )
+      .map((color) => color.$2)
       .toList();
+
+  return unselectedColors;
 }

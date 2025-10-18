@@ -45,9 +45,11 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       }
     });
 
+    // =========== FUNCTIONS ====== //
     on<DashboardLoadData>(_dashboardLoadData);
     on<DashboardPickDate>(_dashboardPickDate);
 
+    // ========= INITIAL FUNCTIONS ============ //
     add(DashboardLoadData());
   }
 
@@ -110,4 +112,5 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       ),
     );
   }
+
 }

@@ -29,7 +29,7 @@ class ProductFormDeleteVariant extends ProductFormEvent {
 
 class ProductFormUpdateVariant extends ProductFormEvent {
   final int variantIndex;
-  final String colorValue;
+  final int colorValue;
 
   ProductFormUpdateVariant({
     required this.variantIndex,
@@ -53,7 +53,7 @@ class ProductFormDeleteSize extends ProductFormEvent {
 class ProductFormUpdateSize extends ProductFormEvent {
   final int variantIndex;
   final int sizeIndex;
-  final String? size;
+  final int? size;
   final int? isActive;
   final int? stock;
 

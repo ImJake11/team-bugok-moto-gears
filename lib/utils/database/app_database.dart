@@ -14,9 +14,9 @@ part "app_database.g.dart";
 @DataClassName('Product')
 class Products extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get brand => text()();
+  IntColumn get brand => integer().references(Brands, #id)();
   TextColumn get model => text()();
-  TextColumn get category => text()();
+  IntColumn get category => integer().references(Categories, #id)();
   RealColumn get costPrice => real()();
   RealColumn get sellingPrice => real()();
   IntColumn get isActive => integer()();
@@ -27,7 +27,7 @@ class Products extends Table {
 class Variants extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get productId => integer().references(Products, #id)();
-  TextColumn get color => text()();
+  IntColumn get color => integer().references(AvailableColors, #id)();
   IntColumn get isActive => integer().withDefault(const Constant(1))();
 }
 
@@ -37,7 +37,7 @@ class Sizes extends Table {
   IntColumn get variantId => integer().references(Variants, #id)();
   IntColumn get productId => integer().references(Variants, #productId)();
   IntColumn get stock => integer()();
-  TextColumn get sizeValues => text()();
+  IntColumn get sizeValues => integer().references(AvailableSizes, #id)();
   IntColumn get isActive => integer().withDefault(const Constant(1))();
 }
 
@@ -54,10 +54,10 @@ class SaleItems extends Table {
   IntColumn get saleId => integer().references(Sales, #id)();
   RealColumn get price => real()();
   IntColumn get quantity => integer()();
-  TextColumn get brand => text()();
+  IntColumn get brand => integer().references(Brands, #id)();
   TextColumn get model => text()();
-  TextColumn get size => text()();
-  TextColumn get color => text()();
+  IntColumn get size => integer().references(AvailableSizes, #id)();
+  IntColumn get color => integer().references(AvailableColors, #id)();
   IntColumn get productId => integer()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
@@ -81,6 +81,36 @@ class ExpensesItems extends Table {
   IntColumn get quantity => integer()();
 }
 
+@DataClassName('Brand')
+class Brands extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get value => text()();
+}
+
+@DataClassName('AvailableSize')
+class AvailableSizes extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get value => text()();
+}
+
+@DataClassName('AvailableColor')
+class AvailableColors extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get value => text()();
+}
+
+@DataClassName('Category')
+class Categories extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get value => text()();
+}
+
+@DataClassName("Cache")
+class Caches extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get theme => integer().withDefault(Constant(0))();
+  IntColumn get passaword => integer().withDefault(Constant(102025))();
+}
 // ---------------------------
 // DATABASE CLASS
 // ---------------------------
@@ -94,6 +124,11 @@ class ExpensesItems extends Table {
     SaleItems,
     Expenses,
     ExpensesItems,
+    Brands,
+    AvailableSizes,
+    AvailableColors,
+    Categories,
+    Caches,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -101,21 +136,18 @@ class AppDatabase extends _$AppDatabase {
 
   // Increment this when you change your schema
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 19;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (Migrator m) async {
       await m.createAll();
     },
-    // onUpgrade: (Migrator m, int from, int to) async {
-    //   if (from < 6) {
-    //     await m.addColumn(
-    //       saleItems,
-    //       saleItems.saleId as GeneratedColumn<Object>,
-    //     );
-    //   }
-    // },
+    onUpgrade: (Migrator m, int from, int to) async {
+      if (from == 18) {
+        await m.createTable(caches);
+      }
+    },
   );
 }
 

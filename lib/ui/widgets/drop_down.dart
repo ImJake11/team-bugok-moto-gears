@@ -6,6 +6,7 @@ class CustomDropdown extends StatelessWidget {
   final double? width;
   final ValueChanged<String?>? onSelected;
   final String? selectedValue;
+  final bool showDecoration;
 
   const CustomDropdown({
     super.key,
@@ -14,48 +15,71 @@ class CustomDropdown extends StatelessWidget {
     this.width = 400,
     this.onSelected,
     this.selectedValue,
+    this.showDecoration = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return DropdownMenu(
-      textStyle: TextStyle(
-        fontSize: 13,
-      ),
-      menuStyle: MenuStyle(
-        side: WidgetStatePropertyAll(
-          BorderSide(
-            color: Color(0xFF555555),
+    return Container(
+      decoration: showDecoration
+          ? BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceDim,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 3,
+                  spreadRadius: 3,
+                  color: Colors.black,
+                  offset: Offset(3, 3),
+                ),
+                BoxShadow(
+                  blurRadius: 3,
+                  spreadRadius: 3,
+                  color: Colors.grey.shade800.withAlpha(120),
+                  offset: Offset(-3, -3),
+                ),
+              ],
+            )
+          : null,
+      child: DropdownMenu(
+        textStyle: TextStyle(
+          fontSize: 13,
+        ),
+        menuStyle: MenuStyle(
+          side: WidgetStatePropertyAll(
+            BorderSide(
+              color: Color(0xFF555555),
+            ),
           ),
         ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Color(0xFF555555),
+        inputDecorationTheme: InputDecorationTheme(
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color(0xFF555555),
+            ),
+            borderRadius: BorderRadius.circular(10),
           ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Color(0xFF555555),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color(0xFF555555),
+            ),
+            borderRadius: BorderRadius.circular(10),
           ),
-          borderRadius: BorderRadius.circular(10),
         ),
+        onSelected: onSelected,
+        initialSelection: selectedValue,
+        hintText: label,
+        width: width,
+        enableSearch: true,
+        enableFilter: true,
+        menuHeight: 400,
+        dropdownMenuEntries: entries.map((etnry) {
+          return DropdownMenuEntry(
+            value: etnry,
+            label: etnry,
+          );
+        }).toList(),
       ),
-      onSelected: onSelected,
-      initialSelection: selectedValue,
-      hintText: label,
-      width: width,
-      enableSearch: true,
-      enableFilter: true,
-      menuHeight: 400,
-      dropdownMenuEntries: entries.map((etnry) {
-        return DropdownMenuEntry(
-          value: etnry,
-          label: etnry,
-        );
-      }).toList(),
     );
   }
 }

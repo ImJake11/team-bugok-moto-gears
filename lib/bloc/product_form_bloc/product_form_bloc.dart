@@ -38,18 +38,14 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
 
     if (event.key == ProductFormKeys.costPrice) {
       emit(
-        ProductFormInitial(
-          productData: s.productData.copyWith(
-            costPrice: doubleValue,
-          ),
-        ),
+        s.copyWith(productData: s.productData.copyWith(costPrice: doubleValue)),
       );
       return;
     }
 
     if (event.key == ProductFormKeys.sellingPrice) {
       emit(
-        ProductFormInitial(
+        s.copyWith(
           productData: s.productData.copyWith(
             sellingPrice: doubleValue,
           ),
@@ -60,7 +56,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
 
     if (event.key == ProductFormKeys.isActive) {
       emit(
-        ProductFormInitial(
+        s.copyWith(
           productData: s.productData.copyWith(
             isActive: event.value ? 1 : 0,
           ),
@@ -83,7 +79,11 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
       variants: s.productData.variants,
     );
 
-    emit(ProductFormInitial(productData: updatedProduct));
+    emit(
+      s.copyWith(
+        productData: updatedProduct,
+      ),
+    );
   }
 
   void _productFormCreateVariant(
@@ -96,11 +96,11 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
 
     final updatedVariants = [
       ...s.productData.variants,
-      VariantModel(color: "", sizes: []),
+      VariantModel(color: 0, sizes: []),
     ];
 
     emit(
-      ProductFormInitial(
+      s.copyWith(
         productData: s.productData.copyWith(
           variants: updatedVariants,
         ),
@@ -124,8 +124,8 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
 
     emit(ProductFormLoadingState());
 
-    if (category.isEmpty ||
-        brand.isEmpty ||
+    if (category < 0 ||
+        brand <= 0 ||
         model.isEmpty ||
         sellingPrice <= 0 ||
         costPrice <= 0 ||
@@ -139,10 +139,10 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
 
     final errorVariants = s.productData.variants.any(
       (element) =>
-          element.color.isEmpty ||
+          element.color < 0 ||
           element.sizes.isEmpty ||
           element.sizes.any(
-            (size) => size.stock <= 0 || size.sizeValue.isEmpty,
+            (size) => size.stock <= 0 || size.sizeValue < 0,
           ),
     );
 
@@ -230,7 +230,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
 
       // Emit the updated state with the modified variants list
       emit(
-        ProductFormInitial(
+        s.copyWith(
           productData: s.productData.copyWith(variants: updatedVariantList),
         ),
       );
@@ -242,7 +242,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     updatedVariantList.removeAt(i);
 
     emit(
-      ProductFormInitial(
+      s.copyWith(
         productData: s.productData.copyWith(
           variants: updatedVariantList,
         ),
@@ -270,7 +270,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
               "This color has already been added. Please choose a different color",
         ),
       );
-      emit(ProductFormInitial(productData: s.productData.copyWith()));
+      emit(s.copyWith());
       return;
     }
 
@@ -280,7 +280,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
       );
 
     emit(
-      ProductFormInitial(
+      s.copyWith(
         productData: s.productData.copyWith(
           variants: updatedVariantList,
         ),
@@ -300,7 +300,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     final updatedVariant = s.productData.variants[i].copyWith(
       sizes: [
         ...s.productData.variants[i].sizes,
-        VariantSizeModel(sizeValue: "", stock: 0),
+        VariantSizeModel(sizeValue: -1, stock: 0),
       ],
     );
 
@@ -308,7 +308,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
       ..[i] = updatedVariant;
 
     emit(
-      ProductFormInitial(
+      s.copyWith(
         productData: s.productData.copyWith(
           variants: updatedVariants,
         ),
@@ -347,7 +347,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
       }
 
       emit(
-        ProductFormInitial(
+        s.copyWith(
           productData: s.productData.copyWith(
             variants: updatedVariants,
           ),
@@ -364,7 +364,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
       );
 
     emit(
-      ProductFormInitial(
+      s.copyWith(
         productData: s.productData.copyWith(
           variants: updatedVariant,
         ),
@@ -385,7 +385,6 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     final sizes = [...s.productData.variants[variantI].sizes];
 
     VariantSizeModel size = sizes.elementAt(sizeI);
-
     sizes[sizeI] = size.copyWith(
       isActive: event.isActive ?? size.isActive,
       sizeValue: event.size ?? size.sizeValue,
@@ -396,7 +395,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
       ..[variantI] = s.productData.variants[variantI].copyWith(sizes: sizes);
 
     emit(
-      ProductFormInitial(
+      s.copyWith(
         productData: s.productData.copyWith(
           variants: updatedVariants,
         ),
@@ -413,6 +412,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
       final productModel = await ProductRepository().fetchSingleProduct(
         event.productId,
       );
+
       await Future.delayed(Duration(seconds: 1));
       emit(
         ProductFormInitial(
@@ -430,7 +430,15 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     ProductFormResetForm event,
     Emitter<ProductFormState> emit,
   ) {
-    emit(ProductFormInitial());
+    if (state is! ProductFormInitial) return;
+
+    final s = state as ProductFormInitial;
+
+    emit(
+      s.copyWith(
+        productData: null,
+      ),
+    );
   }
 
   void _productFormSaveUpdateProduct(
@@ -449,7 +457,11 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
           message: "Product Updated Successful",
         ),
       );
-      emit(ProductFormInitial());
+      emit(
+        s.copyWith(
+          productData: null,
+        ),
+      );
     } catch (e) {
       emit(ProductFormErrorState(message: "Failed to update product"));
       emit(s.copyWith());

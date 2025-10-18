@@ -5,12 +5,14 @@ import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dar
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/stock_controller.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/toggle_switch.dart';
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_id_by_value.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
+import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/services/get_available_sizes.dart';
 
 class NewProductFormSizes extends StatelessWidget {
-  final String selectedSize;
-  final TextEditingController stockController;
+  final int selectedSize;
   final int variantIndex;
   final int index;
   final VariantSizeModel size;
@@ -18,7 +20,6 @@ class NewProductFormSizes extends StatelessWidget {
   const NewProductFormSizes({
     super.key,
     required this.selectedSize,
-    required this.stockController,
     required this.variantIndex,
     required this.index,
     required this.size,
@@ -26,6 +27,12 @@ class NewProductFormSizes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cacheProvider = context.read<ReferencesValuesProviderCache>();
+
+    List<(int, String)> sizesReferences = cacheProvider.sizes;
+
+    final sizeValue = referencesGetValueByID(sizesReferences, size.sizeValue);
+
     return Padding(
       padding: const EdgeInsets.only(left: 100),
       child: Row(
@@ -33,20 +40,28 @@ class NewProductFormSizes extends StatelessWidget {
         children: [
           CustomDropdown(
             width: 150,
-            selectedValue: selectedSize,
-            entries: availableSizes(context, selectedSize, variantIndex),
-            onSelected: (value) => context.read<ProductFormBloc>().add(
-              ProductFormUpdateSize(
-                variantIndex: variantIndex,
-                sizeIndex: index,
-                size: value,
-              ),
+            selectedValue: sizeValue,
+            entries: availableSizes(
+              context,
+              variantIndex,
+              sizeValue,
             ),
+            onSelected: (value) {
+              final sizeId = referenceGetIdByValue(sizesReferences, value!);
+
+              context.read<ProductFormBloc>().add(
+                ProductFormUpdateSize(
+                  variantIndex: variantIndex,
+                  sizeIndex: index,
+                  size: sizeId,
+                ),
+              );
+            },
             label: "Select Size",
           ),
           StockController(
             sizeIndex: index,
-            stockController: stockController,
+            currentStock: size.stock,
             variantIndex: variantIndex,
           ),
           size.id == null

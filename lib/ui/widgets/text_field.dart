@@ -11,6 +11,9 @@ class CustomTextfield extends StatefulWidget {
   final bool? showShadow;
   final Color? fillColor;
   final int? maxLength;
+  final double? height;
+  final int? maxLines;
+  final TextAlign? textAlign;
 
   const CustomTextfield({
     super.key,
@@ -23,6 +26,9 @@ class CustomTextfield extends StatefulWidget {
     this.showShadow = true,
     this.fillColor = const Color(0xFF282828),
     this.maxLength = 10,
+    this.height = 50,
+    this.maxLines = 1,
+    this.textAlign,
   });
 
   @override
@@ -31,7 +37,6 @@ class CustomTextfield extends StatefulWidget {
 
 class _CustomTextfieldState extends State<CustomTextfield> {
   late TextEditingController _textEditingController;
-  bool _isHovered = false;
 
   @override
   void initState() {
@@ -52,63 +57,60 @@ class _CustomTextfieldState extends State<CustomTextfield> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
 
-    return MouseRegion(
-      onEnter: (event) => setState(() => _isHovered = true),
-      onExit: (event) => setState(() => _isHovered = false),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: widget.showShadow ?? false
-              ? [
-                  BoxShadow(
-                    blurRadius: 5,
-                    spreadRadius: 2,
-                    offset: Offset(3, 3),
-                    color: Colors.black54,
-                  ),
-                  BoxShadow(
-                    blurRadius: 5,
-                    spreadRadius: 2,
-                    offset: Offset(-3, -3),
-                    color: Colors.grey.shade800.withAlpha(120),
-                  ),
-                ]
-              : [],
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: widget.showShadow ?? false
+            ? [
+                BoxShadow(
+                  blurRadius: 5,
+                  spreadRadius: 2,
+                  offset: Offset(3, 3),
+                  color: Colors.black54,
+                ),
+                BoxShadow(
+                  blurRadius: 5,
+                  spreadRadius: 2,
+                  offset: Offset(-3, -3),
+                  color: Colors.grey.shade800.withAlpha(120),
+                ),
+              ]
+            : [],
+      ),
+      width: widget.width,
+      height: widget.height,
+      child: TextField(
+        textAlign: widget.textAlign ?? TextAlign.left,
+        maxLines: widget.maxLines,
+        maxLength: widget.maxLength,
+        controller: _textEditingController,
+        style: TextStyle(
+          fontSize: 13,
         ),
-        width: widget.width,
-        height: 50,
-        child: TextField(
-          
-          maxLength: widget.maxLength,
-          controller: _textEditingController,
-          style: TextStyle(
-            fontSize: 13,
-          ),
-          onChanged: widget.onChange,
-          inputFormatters: widget.formatter ?? [],
-          decoration: InputDecoration(
-            counterText: "",
-            fillColor: widget.fillColor,
-            filled: true,
-            contentPadding: EdgeInsets.all(5),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary.withAlpha(200),
-              ),
+        onChanged: widget.onChange,
+        inputFormatters: widget.formatter ?? [],
+        decoration: InputDecoration(
+          counterText: "",
+          fillColor: widget.fillColor,
+          filled: true,
+          contentPadding: EdgeInsets.all(5),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary.withAlpha(200),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            hintText: widget.placeholder,
-            hintStyle: TextStyle(color: Colors.grey.shade700),
-            prefixIcon: widget.suffixIcon != null
-                ? Icon(widget.suffixIcon, color: theme.primary, size: 20)
-                : null,
           ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          hintText: widget.placeholder,
+          hintStyle: TextStyle(color: Colors.grey.shade700),
+          prefixIcon: widget.suffixIcon != null
+              ? Icon(widget.suffixIcon, color: theme.primary, size: 20)
+              : null,
         ),
       ),
     );

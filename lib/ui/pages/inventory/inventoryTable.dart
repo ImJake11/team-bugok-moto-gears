@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:team_bugok_business/utils/helpers/compute_product_stock.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
+import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/services/convertDateStringToDate.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
@@ -65,6 +67,11 @@ class _InventoryTableState extends State<InventoryTable> {
 
   @override
   Widget build(BuildContext context) {
+    final cacheProvider = context.read<ReferencesValuesProviderCache>();
+
+    List<(int, String)> brands = cacheProvider.brands;
+    List<(int, String)> categories = cacheProvider.categories;
+
     final List<String> tableHeaders = [
       "ID",
       "Brand",
@@ -116,12 +123,23 @@ class _InventoryTableState extends State<InventoryTable> {
                 (index) {
                   final product = widget.products[index];
 
+                  final brand = brands
+                      .where((e) => e.$1 == product.brand)
+                      .first
+                      .$2;
+                  final category = categories
+                      .where(
+                        (e) => e.$1 == product.category,
+                      )
+                      .first
+                      .$2;
+
                   return TableRow(
                     children: [
                       tableCell(product.id, index),
-                      tableCell(product.brand, index),
+                      tableCell(brand, index),
                       tableCell(product.model, index),
-                      tableCell(product.category, index),
+                      tableCell(category, index),
                       tableCell(currencyFormatter(product.costPrice), index),
                       tableCell(currencyFormatter(product.sellingPrice), index),
                       tableCell(product.variants.length, index),

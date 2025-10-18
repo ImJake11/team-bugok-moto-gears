@@ -27,6 +27,11 @@ class Sidebar extends StatelessWidget {
         icon: "assets/images/pos-terminal.png",
       ),
       ButtonProp(
+        name: "Small Expense",
+        icon: "assets/images/shopping-bag.png",
+        routeName: "small-purchase",
+      ),
+      ButtonProp(
         name: "Sales History",
         icon: "assets/images/sales.png",
         routeName: 'sales',
@@ -57,7 +62,7 @@ class Sidebar extends StatelessWidget {
           Container(
             width: sidebarWidth,
             height: double.infinity,
-           color: Theme.of(context).colorScheme.surfaceDim.withAlpha(230),
+            color: Theme.of(context).colorScheme.surfaceDim.withAlpha(230),
           ),
           Column(
             spacing: 10,

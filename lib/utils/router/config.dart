@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:team_bugok_business/ui/global_wrapper.dart';
+import 'package:team_bugok_business/ui/pages/auth_page/auth_page.dart';
 import 'package:team_bugok_business/ui/pages/dashboard/dashboard_page.dart';
 import 'package:team_bugok_business/ui/pages/expenses/expenses_page.dart';
 import 'package:team_bugok_business/ui/pages/inventory/inventory.dart';
@@ -9,11 +10,19 @@ import 'package:team_bugok_business/ui/pages/inventory/product_view/product_view
 import 'package:team_bugok_business/ui/pages/pos/pos_page.dart';
 import 'package:team_bugok_business/ui/pages/sales/sales_page.dart';
 import 'package:team_bugok_business/ui/pages/settings/settings_page.dart';
+import 'package:team_bugok_business/ui/pages/small_purchases/small_purchase.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 
 final GoRouter routeConfig = GoRouter(
-  initialLocation: "/",
+  initialLocation: "/auth_page",
   routes: [
+    GoRoute(
+      path: "/auth_page",
+      name: 'auth-page',
+      pageBuilder: (context, state) => MaterialPage(
+        child: AuthPage(),
+      ),
+    ),
     ShellRoute(
       pageBuilder: (context, state, child) {
         return MaterialPage(
@@ -32,6 +41,11 @@ final GoRouter routeConfig = GoRouter(
           path: "/expenses_page",
           name: "expenses",
           builder: (context, state) => ExpensesPage(),
+        ),
+        GoRoute(
+          path: "/small_purchase",
+          name: "small-purchase",
+          builder: (context, state) => SmallPurchase(),
         ),
         GoRoute(
           name: "inventory",

@@ -2,8 +2,8 @@ import 'package:team_bugok_business/utils/model/variant_model.dart';
 
 class ProductModel {
   final int? id;
-  final String brand;
-  final String category;
+  final int brand;
+  final int category;
   final String model;
   final double costPrice;
   final double sellingPrice;
@@ -25,8 +25,8 @@ class ProductModel {
 
   ProductModel copyWith({
     int? id,
-    String? brand,
-    String? category,
+    int? brand,
+    int? category,
     String? model,
     int? stock,
     double? costPrice,

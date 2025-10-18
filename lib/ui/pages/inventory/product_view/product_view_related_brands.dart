@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_related_button.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
+import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 
 class ProductViewRelatedBrands extends StatefulWidget {
-  final String currentBrand;
+  final int currentBrand;
   final int currentProductId;
   final Function(ProductModel) onTap;
 
@@ -43,6 +46,8 @@ class _ProductViewRelatedBrandsState extends State<ProductViewRelatedBrands> {
 
   @override
   Widget build(BuildContext context) {
+    final brands = context.read<ReferencesValuesProviderCache>().brands;
+
     return SizedBox(
       width: 300,
       child: Column(
@@ -92,7 +97,10 @@ class _ProductViewRelatedBrandsState extends State<ProductViewRelatedBrands> {
                               widget.onTap(e);
                             },
                             child: ProductViewRelatedButton(
-                              brand: e.brand,
+                              brand: referencesGetValueByID(
+                                brands,
+                                widget.currentBrand,
+                              ),
                               model: e.model,
                             ),
                           ),

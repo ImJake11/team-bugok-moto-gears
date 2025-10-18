@@ -30,7 +30,7 @@ class _PosPageProductsState extends State<PosPageProducts> {
   Widget build(BuildContext context) {
     return Expanded(
       child: Column(
-        spacing: 20,
+        spacing: 10,
         children: [
           Flex(
             direction: Axis.horizontal,
@@ -62,7 +62,7 @@ class _PosPageProductsState extends State<PosPageProducts> {
 
                   return SingleChildScrollView(
                     child: Column(
-                      spacing: isSelectedProduct ? 20 : 10,
+                      spacing: isSelectedProduct ? 15 : 5,
                       children: List.generate(
                         displayList.length,
                         (index) => PosPageTableRow(
@@ -87,9 +87,7 @@ class _PosPageProductsState extends State<PosPageProducts> {
 }
 
 class _PlaceOrderButton extends StatefulWidget {
-  const _PlaceOrderButton({
-    super.key,
-  });
+  const _PlaceOrderButton();
 
   @override
   State<_PlaceOrderButton> createState() => __PlaceOrderButtonState();

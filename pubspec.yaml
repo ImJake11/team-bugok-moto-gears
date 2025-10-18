@@ -94,6 +94,10 @@ flutter:
     - assets/images/palette.png
     - assets/images/carbon.png
     - assets/images/calendar.png
+    - assets/images/shopping-bag.png
+    - assets/images/price-tag.png
+    - assets/images/expand.png
+    - assets/images/apps.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

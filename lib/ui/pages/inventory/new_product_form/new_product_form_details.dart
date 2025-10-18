@@ -4,53 +4,53 @@ import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dar
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/new_product_form_variant.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/form_wrapper.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/utils/model/variant_model.dart';
 
-class NewProductFormDetails extends StatefulWidget {
+class NewProductFormDetails extends StatelessWidget {
   const NewProductFormDetails({super.key});
 
-  @override
-  State<NewProductFormDetails> createState() => _NewProductFormDetailsState();
-}
-
-class _NewProductFormDetailsState extends State<NewProductFormDetails> {
   @override
   Widget build(BuildContext context) {
     return FormWrapper(
       title: "Variants Management",
-      child: BlocSelector<ProductFormBloc, ProductFormState, int>(
-        selector: (state) {
-          if (state is ProductFormInitial) {
-            return state.productData.variants.length;
-          }
-          return 0;
-        },
-        builder: (context, length) => Column(
-          spacing: 30,
-          children: [
-            if (length > 0)
-              ...List.generate(
-                length,
-                (index) => NewProductFormVariant(
-                  variantIndex: index,
-                ),
-              ),
+      child:
+          BlocSelector<ProductFormBloc, ProductFormState, List<VariantModel>>(
+            selector: (state) {
+              if (state is ProductFormInitial) {
+                return state.productData.variants;
+              }
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              return [];
+            },
+            builder: (context, variants) => Column(
+              spacing: 30,
               children: [
-                CustomButton(
-                  onTap: () => context.read<ProductFormBloc>().add(
-                    ProductFormCreateVariant(),
+                if (variants.isNotEmpty)
+                  ...List.generate(
+                    variants.length,
+                    (index) => NewProductFormVariant(
+                      variantModel: variants[index],
+                      key: ValueKey(index),
+                      variantIndex: index,
+                    ),
                   ),
-                  child: Center(
-                    child: Text("Add Variant"),
-                  ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    CustomButton(
+                      onTap: () => context.read<ProductFormBloc>().add(
+                        ProductFormCreateVariant(),
+                      ),
+                      child: Center(
+                        child: Text("Add Variant"),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }

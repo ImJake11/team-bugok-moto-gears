@@ -1,6 +1,6 @@
 class VariantModel {
   int? id;
-  String color;
+  int color;
   List<VariantSizeModel> sizes;
   int isActive;
   int? productId;
@@ -14,7 +14,7 @@ class VariantModel {
   });
 
   VariantModel copyWith({
-    String? color,
+    int? color,
     List<VariantSizeModel>? sizes,
     int? isActive,
     int? id,
@@ -28,17 +28,11 @@ class VariantModel {
       isActive: isActive ?? this.isActive,
     );
   }
-
-  Map<String, Object?> toMap() {
-    return {
-      "color": color,
-    };
-  }
 }
 
 class VariantSizeModel {
   int? id;
-  final String sizeValue;
+  final int sizeValue;
   final int stock;
   int isActive;
   int? variantId;
@@ -54,7 +48,7 @@ class VariantSizeModel {
   });
 
   VariantSizeModel copyWith({
-    String? sizeValue,
+    int? sizeValue,
     int? stock,
     int? id,
     int? variantId,

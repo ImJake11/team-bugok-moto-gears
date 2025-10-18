@@ -108,6 +108,7 @@ class _NewProductFormState extends State<NewProductForm> {
                   }
 
                   if (state is ProductFormValidtionError) {
+                    context.read<LoadingProvider>().closeLoading();
                     CustomSnackBar(
                       context: context,
                       message: state.message,
@@ -154,15 +155,18 @@ class _NewProductFormState extends State<NewProductForm> {
                             BlocSelector<
                               ProductFormBloc,
                               ProductFormState,
-                              String
+                              int
                             >(
-                              selector: (state) => state is ProductFormInitial
-                                  ? state.productData.category
-                                  : '',
+                              selector: (state) {
+                                if (state is ProductFormInitial) {
+                                  return state.productData.category;
+                                }
+                                return 0;
+                              },
                               builder: (context, category) {
                                 return TimelineComponent(
                                   isLast: false,
-                                  isPast: category.isNotEmpty,
+                                  isPast: category > 0,
                                   isFirst: true,
                                   child: NewProductFormCategory(
                                     selectedCategory: category,
@@ -174,7 +178,7 @@ class _NewProductFormState extends State<NewProductForm> {
                             BlocSelector<
                               ProductFormBloc,
                               ProductFormState,
-                              (String, String)
+                              (int, String)
                             >(
                               selector: (state) {
                                 if (state is ProductFormInitial) {
@@ -183,13 +187,14 @@ class _NewProductFormState extends State<NewProductForm> {
                                     state.productData.model,
                                   );
                                 }
-                                return ('', '');
+                                return (0, '');
                               },
                               builder: (context, brandModel) {
                                 final (brand, model) = brandModel;
+
                                 return TimelineComponent(
                                   isLast: false,
-                                  isPast: brand.isNotEmpty && model.isNotEmpty,
+                                  isPast: brand > 0 && model.isNotEmpty,
                                   isFirst: false,
                                   child: NewProductFormName(
                                     selectedBrand: brand,

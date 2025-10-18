@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_color_button.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_size_button.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
+import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
-class ProductViewPreview extends StatefulWidget {
+class ProductViewPreview extends StatelessWidget {
   final ProductModel productModel;
   final int selectedColor;
   final void Function(int index) onTap;
@@ -21,12 +23,15 @@ class ProductViewPreview extends StatefulWidget {
   });
 
   @override
-  State<ProductViewPreview> createState() => _ProductViewPreviewState();
-}
-
-class _ProductViewPreviewState extends State<ProductViewPreview> {
-  @override
   Widget build(BuildContext context) {
+    final cacheProvider = context.read<ReferencesValuesProviderCache>();
+
+    final brands = cacheProvider.brands;
+    final colors = cacheProvider.colors;
+    final sizes = cacheProvider.sizes;
+
+    final brand = brands.where((e) => e.$1 == productModel.brand).first.$2;
+
     return Expanded(
       child: Center(
         child: Container(
@@ -62,8 +67,8 @@ class _ProductViewPreviewState extends State<ProductViewPreview> {
               spacing: 15,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _titleWidget(widget.productModel.model, "Model"),
-                _titleWidget(widget.productModel.brand, "Brand"),
+                _titleWidget(productModel.model, "Model"),
+                _titleWidget(brand, "Brand"),
                 Divider(
                   color: Colors.grey.shade600,
                   thickness: 3,
@@ -81,12 +86,17 @@ class _ProductViewPreviewState extends State<ProductViewPreview> {
                   spacing: 10,
                   runSpacing: 10,
                   direction: Axis.horizontal,
-                  children: widget.productModel.variants.asMap().entries.map(
+                  children: productModel.variants.asMap().entries.map(
                     (e) {
+                      final color = colors
+                          .where((c) => c.$1 == e.value.color)
+                          .first
+                          .$2;
+
                       return ProductViewColorButton(
-                        onTap: () => widget.onTap(e.key),
-                        isSelected: widget.selectedColor == e.key,
-                        label: e.value.color,
+                        onTap: () => onTap(e.key),
+                        isSelected: selectedColor == e.key,
+                        label: color,
                       );
                     },
                   ).toList(),
@@ -100,33 +110,26 @@ class _ProductViewPreviewState extends State<ProductViewPreview> {
                 ),
                 Wrap(
                   spacing: 10,
-                  children:
-                      List.from([
-                        "S",
-                        "M",
-                        "L",
-                        "XL",
-                        "XXL",
-                      ]).map(
-                        (s) {
-                          final sizes = widget
-                              .productModel
-                              .variants[widget.selectedColor]
-                              .sizes;
+                  children: List.from(sizes).map(
+                    (s) {
+                      final (id, value) = s;
 
-                          final stocks = sizes.where(
-                            (element) => element.sizeValue == s,
-                          );
+                      final variantSizes =
+                          productModel.variants[selectedColor].sizes;
 
-                          return ProductViewSizeButton(
-                            stock: stocks.isEmpty ? 0 : stocks.first.stock,
-                            isAvailable: sizes.any(
-                              (element) => element.sizeValue == s,
-                            ),
-                            label: s,
-                          );
-                        },
-                      ).toList(),
+                      final stocks = variantSizes.where(
+                        (element) => element.sizeValue == id,
+                      );
+
+                      final size = sizes.where((e) => e.$1 == id).first.$2;
+
+                      return ProductViewSizeButton(
+                        stock: stocks.isEmpty ? 0 : stocks.first.stock,
+                        isAvailable: variantSizes.any((e) => e.sizeValue == id),
+                        label: size,
+                      );
+                    },
+                  ).toList(),
                 ),
                 Spacer(),
                 Row(
@@ -135,7 +138,14 @@ class _ProductViewPreviewState extends State<ProductViewPreview> {
                     CustomButton(
                       width: 150,
                       height: 40,
-                      onTap: () {},
+                      onTap: () {
+                        context.read<PosBloc>().add(
+                          PosSelectProduct(
+                            productID: productModel.id!,
+                          ),
+                        );
+                        GoRouter.of(context).goNamed("pos");
+                      },
                       borderRadius: 50,
                       child: Center(
                         child: Text("Place in Order"),
@@ -148,7 +158,7 @@ class _ProductViewPreviewState extends State<ProductViewPreview> {
                       onTap: () {
                         context.read<ProductFormBloc>().add(
                           ProductFormUpdateExistingProduct(
-                            productId: widget.productModel.id!,
+                            productId: productModel.id!,
                           ),
                         );
                         GoRouter.of(context).pushNamed('new-product-form');
@@ -159,7 +169,7 @@ class _ProductViewPreviewState extends State<ProductViewPreview> {
                     ),
                     Spacer(),
                     Text(
-                      currencyFormatter(widget.productModel.sellingPrice),
+                      currencyFormatter(productModel.sellingPrice),
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

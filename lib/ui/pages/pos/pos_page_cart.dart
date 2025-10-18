@@ -12,6 +12,7 @@ class PosPageCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return Container(
       width: 400,
       height: double.infinity,
@@ -42,7 +43,7 @@ class PosPageCart extends StatelessWidget {
             Text(
               'Current Cart',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 16,
               ),
             ),
             Expanded(
@@ -143,13 +144,13 @@ class PosPageCart extends StatelessWidget {
                             Text(
                               'Total',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                               ),
                             ),
                             Text(
                               computeCartTotal(context),
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                               ),
                             ),
                           ],

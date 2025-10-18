@@ -42,7 +42,7 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
               productModel: widget.productModel,
             );
           }
-          
+
           return AnimatedContainer(
             duration: Duration(milliseconds: 200),
             decoration: BoxDecoration(
@@ -110,7 +110,12 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
     child: SizedBox(
       height: 55,
       child: Center(
-        child: Text("${data}"),
+        child: Text(
+          "${data}",
+          style: TextStyle(
+            fontSize: 12,
+          ),
+        ),
       ),
     ),
   );

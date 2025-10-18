@@ -1,6 +1,6 @@
 class TopProductsMdodel {
   final int id;
-  final String brand;
+  final int brand;
   final String model;
   final int sales;
 
@@ -13,7 +13,7 @@ class TopProductsMdodel {
 
   TopProductsMdodel copyWith({
     int? id,
-    String? brand,
+    int? brand,
     String? model,
     int? sales,
   }) => TopProductsMdodel(

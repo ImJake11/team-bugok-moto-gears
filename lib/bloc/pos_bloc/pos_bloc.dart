@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/sales_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/size_repository.dart';
@@ -13,7 +14,16 @@ part 'pos_event.dart';
 part 'pos_state.dart';
 
 class PosBloc extends Bloc<PosEvent, PosState> {
-  PosBloc() : super(PosInitial()) {
+  late final StreamSubscription formBlocSubs;
+
+  PosBloc({required ProductFormBloc formBloc}) : super(PosInitial()) {
+    formBlocSubs = formBloc.stream.listen((ProductFormState state) {
+      if (state is ProductFormSaveProduct) {
+        add(PosLoadProducts());
+      }
+    });
+
+    // ============== Functions ============= //
     on<PosLoadProducts>(_posLoadProducts);
     on<PosSearch>(_posSearch);
     on<PosSelectProduct>(_posSelectProduct);

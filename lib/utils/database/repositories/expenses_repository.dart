@@ -22,9 +22,13 @@ class ExpensesRepository {
   Future<List<ExpensesModel>> retriveAllExpenses({
     DateTime? referenceDate,
     bool? isMonthOnly,
+    bool? isAnnualy,
+    int? year,
   }) async => _retrieveAllExpenses(
     referenceDate: referenceDate,
     isMonthlyOnly: isMonthOnly,
+    isAnnualy: isAnnualy,
+    year: year,
   );
 
   // =========================== Private Functions ============================ //
@@ -124,9 +128,12 @@ class ExpensesRepository {
   Future<List<ExpensesModel>> _retrieveAllExpenses({
     DateTime? referenceDate,
     bool? isMonthlyOnly,
+    bool? isAnnualy,
+    int? year,
   }) async {
     try {
       final now = referenceDate ?? DateTime.now();
+      final currentYear = year ?? now.year;
       final firstDay = DateTime(now.year, now.month, 1);
       final lastDay = DateTime(now.year, now.month + 1, 0);
 
@@ -139,6 +146,10 @@ class ExpensesRepository {
               tbl.createdAt.isBiggerThanValue(firstDay) &
               tbl.createdAt.isSmallerThanValue(lastDay),
         );
+      }
+
+      if (isAnnualy ?? false) {
+        query.where((tbl) => tbl.createdAt.year.equals(currentYear));
       }
 
       final results = await query.get();

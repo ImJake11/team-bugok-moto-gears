@@ -3,9 +3,9 @@ class CartModel {
   final int quantity;
   final double price;
   final String model;
-  final String color;
-  final String size;
-  final String brand;
+  final int color;
+  final int size;
+  final int brand;
   final int? saleId;
 
   CartModel({
@@ -24,9 +24,9 @@ class CartModel {
     int? quantity,
     double? price,
     String? model,
-    String? brand,
-    String? color,
-    String? size,
+    int? brand,
+    int? color,
+    int? size,
   }) {
     return CartModel(
       id: id ?? this.id,

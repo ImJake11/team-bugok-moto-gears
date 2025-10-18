@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/cart_model.dart';
+import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
 class PosCartTile extends StatefulWidget {
@@ -16,6 +18,14 @@ class PosCartTile extends StatefulWidget {
 class _PosCartTileState extends State<PosCartTile> {
   @override
   Widget build(BuildContext context) {
+    final cacheProvider = context.read<ReferencesValuesProviderCache>();
+
+    final cart = widget.cartModel;
+
+    final brands = cacheProvider.brands;
+    final colors = cacheProvider.colors;
+    final sizes = cacheProvider.sizes;
+
     return Row(
       spacing: 20,
       children: [
@@ -43,7 +53,7 @@ class _PosCartTileState extends State<PosCartTile> {
                     spacing: 10,
                     children: [
                       Text(
-                        widget.cartModel.brand,
+                        referencesGetValueByID(brands, cart.brand),
                         style: TextStyle(
                           fontSize: 16,
                         ),
@@ -57,7 +67,7 @@ class _PosCartTileState extends State<PosCartTile> {
                       ),
                       Spacer(),
                       Text(
-                        widget.cartModel.size,
+                        referencesGetValueByID(sizes, cart.size),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -66,7 +76,7 @@ class _PosCartTileState extends State<PosCartTile> {
                     ],
                   ),
                   Text(
-                    widget.cartModel.color,
+                    referencesGetValueByID(colors, cart.color),
                     style: TextStyle(
                       color: Colors.grey.shade400,
                       fontSize: 12,

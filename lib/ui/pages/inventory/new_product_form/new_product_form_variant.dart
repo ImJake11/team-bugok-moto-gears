@@ -5,15 +5,20 @@ import 'package:team_bugok_business/ui/pages/inventory/new_product_form/new_prod
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/toggle_switch.dart';
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
 import 'package:team_bugok_business/ui/widgets/error_button.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_id_by_value.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
+import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/services/get_available_colors.dart';
 
 class NewProductFormVariant extends StatefulWidget {
+  final VariantModel variantModel;
   final int variantIndex;
 
   const NewProductFormVariant({
     super.key,
     required this.variantIndex,
+    required this.variantModel,
   });
 
   @override
@@ -21,18 +26,30 @@ class NewProductFormVariant extends StatefulWidget {
 }
 
 class _NewProductFormVariantState extends State<NewProductFormVariant> {
-  late List<TextEditingController> _stockControllers;
+  List<TextEditingController> _stockControllers = [];
   bool isNewSizeButtonHovered = false;
 
   @override
   void initState() {
     super.initState();
+    _initializedControllers();
+  }
 
-    final s = context.read<ProductFormBloc>().state as ProductFormInitial;
+  @override
+  void didUpdateWidget(covariant NewProductFormVariant oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.variantModel != widget.variantModel) {
+      _initializedControllers();
+    }
+  }
 
-    _stockControllers = s.productData.variants[widget.variantIndex].sizes
-        .map((v) => TextEditingController(text: v.stock.toString()))
-        .toList();
+  void _initializedControllers() {
+    if (widget.variantModel.sizes.isNotEmpty) {
+      _stockControllers = widget.variantModel.sizes
+          .map((v) => TextEditingController(text: v.stock.toString()))
+          .toList();
+    }
+    setState(() {});
   }
 
   @override
@@ -76,7 +93,18 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
 
   @override
   Widget build(BuildContext context) {
-    // add size button
+    final cacheProvider = context.read<ReferencesValuesProviderCache>();
+
+    List<(int, String)> colorsReferences = cacheProvider.colors;
+
+    VariantModel variant = widget.variantModel;
+
+    List<VariantSizeModel> sizes = variant.sizes;
+
+    final selectedColor = referencesGetValueByID(
+      colorsReferences,
+      variant.color,
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -95,125 +123,69 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
             Row(
               spacing: 20,
               children: [
-                BlocSelector<ProductFormBloc, ProductFormState, String>(
-                  selector: (state) {
-                    if (state is ProductFormInitial) {
-                      final variants = state.productData.variants;
+                CustomDropdown(
+                  width: 250,
+                  selectedValue: selectedColor,
+                  onSelected: (value) {
+                    final colorId = referenceGetIdByValue(
+                      colorsReferences,
+                      value!,
+                    );
 
-                      final selectedColor = variants.isEmpty
-                          ? ""
-                          : variants[widget.variantIndex].color;
-
-                      return selectedColor;
-                    }
-                    return '';
-                  },
-                  builder: (_, selectedColor) {
-                    return CustomDropdown(
-                      width: 250,
-                      selectedValue: selectedColor,
-                      onSelected: (value) =>
-                          context.read<ProductFormBloc>().add(
-                            ProductFormUpdateVariant(
-                              variantIndex: widget.variantIndex,
-                              colorValue: value ?? "",
-                            ),
-                          ),
-                      entries: availableColors(context, selectedColor),
-                      label: "Select Color",
+                    context.read<ProductFormBloc>().add(
+                      ProductFormUpdateVariant(
+                        variantIndex: widget.variantIndex,
+                        colorValue: colorId,
+                      ),
                     );
                   },
+                  entries: availableColors(
+                    context,
+                    selectedColor,
+                  ),
+                  label: "Select Color",
                 ),
                 Spacer(),
                 addSizeBtn(),
 
-                BlocSelector<ProductFormBloc, ProductFormState, VariantModel?>(
-                  selector: (state) {
-                    if (state is ProductFormInitial) {
-                      final variants = state.productData.variants;
-
-                      return variants.isNotEmpty
-                          ? variants[widget.variantIndex]
-                          : null;
-                    }
-
-                    return null;
-                  },
-                  builder: (context, variant) {
-                    if (variant == null || variant.id == null) {
-                      return CustomErrorButton(
+                variant.id == null
+                    ? CustomErrorButton(
                         ontap: () => context.read<ProductFormBloc>().add(
                           ProductFormDeleteVariant(
                             variantIndex: widget.variantIndex,
                           ),
                         ),
                         child: Center(child: Text('Delete')),
-                      );
-                    }
-
-                    return CustomToggleSwitch(
-                      onChange: (_) => context.read<ProductFormBloc>().add(
-                        ProductFormDeleteVariant(
-                          variantIndex: widget.variantIndex,
+                      )
+                    : CustomToggleSwitch(
+                        onChange: (_) => context.read<ProductFormBloc>().add(
+                          ProductFormDeleteVariant(
+                            variantIndex: widget.variantIndex,
+                          ),
                         ),
+                        isActive: variant.isActive == 1,
                       ),
-                      isActive: variant.isActive == 1,
-                    );
-                  },
-                ),
               ],
             ),
 
             // SIZED LIST
-            BlocSelector<
-              ProductFormBloc,
-              ProductFormState,
-              List<VariantSizeModel>
-            >(
-              selector: (state) {
-                if (state is ProductFormInitial &&
-                    widget.variantIndex < state.productData.variants.length) {
-                  return state.productData.variants[widget.variantIndex].sizes;
-                }
-                return [];
-              },
-              builder: (context, sizes) {
-                for (int i = 0; i < sizes.length; i++) {
-                  if (i >= _stockControllers.length) {
-                    // New controller for new size row
-                    _stockControllers.add(
-                      TextEditingController(text: sizes[i].stock.toString()),
+            if (sizes.isNotEmpty)
+              Column(
+                spacing: 30,
+                children: List.generate(
+                  sizes.length,
+                  (index) {
+                    final selectedSize = sizes[index].sizeValue;
+
+                    return NewProductFormSizes(
+                      selectedSize: selectedSize,
+                      index: index,
+                      variantIndex: widget.variantIndex,
+                      size: sizes[index],
                     );
-                  }
-                }
-
-                // Dispose extra controllers if any
-                while (_stockControllers.length > sizes.length) {
-                  _stockControllers.removeLast().dispose();
-                }
-
-                return sizes.isEmpty
-                    ? SizedBox()
-                    : Column(
-                        spacing: 30,
-                        children: List.generate(
-                          sizes.length,
-                          (index) {
-                            return NewProductFormSizes(
-                              key: ValueKey(
-                                'variant_${widget.variantIndex}_size_${index}',
-                              ),
-                              selectedSize: sizes[index].sizeValue,
-                              stockController: _stockControllers[index],
-                              index: index,
-                              variantIndex: widget.variantIndex,
-                              size: sizes[index],
-                            );
-                          },
-                        ),
-                      );
-              },
-            ),
+                  },
+                ),
+              ),
           ],
         ),
       ),

@@ -5,23 +5,27 @@ sealed class ProductFormState {}
 
 final class ProductFormInitial extends ProductFormState {
   final ProductModel productData;
-
-  ProductFormInitial({ProductModel? productData})
-    : productData =
-          productData ??
-          ProductModel(
-            brand: '',
-            category: '',
-            model: '',
-            costPrice: 0,
-            sellingPrice: 0,
-            isActive: 1,
-            createdAt: DateTime.now(),
-            variants: [],
-          );
+  ProductFormInitial({
+    ProductModel? productData,
+  }) : productData =
+           productData ??
+           ProductModel(
+             brand: 0,
+             category: 0,
+             model: '',
+             costPrice: 0,
+             sellingPrice: 0,
+             isActive: 1,
+             createdAt: DateTime.now(),
+             variants: [],
+           );
 
   ProductFormInitial copyWith({
     ProductModel? productData,
+    List<(int, String)>? brands,
+    categories,
+    sizes,
+    colors,
   }) {
     return ProductFormInitial(
       productData: productData ?? this.productData,

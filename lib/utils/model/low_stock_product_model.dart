@@ -1,6 +1,6 @@
 class LowStockProductModel {
   final int id;
-  final String brand;
+  final int brand;
   final String model;
   final int totalStock;
 

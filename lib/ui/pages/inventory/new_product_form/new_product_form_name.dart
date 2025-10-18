@@ -8,15 +8,18 @@ import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_id_by_value.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
+import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 
 class NewProductFormName extends StatefulWidget {
   final TextEditingController modelController;
-  final String? selectedBrand;
+  final int selectedBrand;
 
   const NewProductFormName({
     super.key,
     required this.modelController,
-    this.selectedBrand,
+    required this.selectedBrand,
   });
 
   @override
@@ -78,6 +81,18 @@ class _NewProductFormNameState extends State<NewProductFormName> {
 
   @override
   Widget build(BuildContext context) {
+    final cacheProvider = context.read<ReferencesValuesProviderCache>();
+
+    List<(int, String)> brandReferences = cacheProvider.brands;
+
+    List<String> dropDownEntries = brandReferences
+        .map<String>(
+          (e) => e.$2,
+        )
+        .toList();
+
+    final brand = referencesGetValueByID(brandReferences, widget.selectedBrand);
+
     return FormWrapper(
       title: "Brand and Model Management",
       child: Column(
@@ -86,16 +101,20 @@ class _NewProductFormNameState extends State<NewProductFormName> {
         children: [
           // dropdown for product brand
           CustomDropdown(
-            selectedValue: widget.selectedBrand,
+            selectedValue: brand,
             width: 500,
-            onSelected: (value) => context.read<ProductFormBloc>().add(
-              ProductFormUpdateData(key: ProductFormKeys.brand, value: value),
-            ),
-            entries: [
-              "Evo",
-              "Ryzen",
-              "Sec",
-            ],
+            onSelected: (value) {
+          
+              final brandId = referenceGetIdByValue(brandReferences, value!);
+
+              context.read<ProductFormBloc>().add(
+                ProductFormUpdateData(
+                  key: ProductFormKeys.brand,
+                  value: brandId,
+                ),
+              );
+            },
+            entries: dropDownEntries,
             label: "Brand",
           ),
           CustomTextfield(

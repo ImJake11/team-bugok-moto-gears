@@ -5,15 +5,15 @@ import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dar
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
 
 class StockController extends StatefulWidget {
-  final TextEditingController stockController;
+  final int currentStock;
   final int variantIndex;
   final int sizeIndex;
 
   const StockController({
     super.key,
-    required this.stockController,
     required this.variantIndex,
     required this.sizeIndex,
+    required this.currentStock,
   });
 
   @override
@@ -21,11 +21,19 @@ class StockController extends StatefulWidget {
 }
 
 class _StockControllerState extends State<StockController> {
-  void _onStockAction(bool isAdd) {
-    int stock = int.tryParse(widget.stockController.text) ?? 0;
-    int newStock = isAdd ? stock + 1 : (stock > 0 ? stock - 1 : stock);
+  late TextEditingController _controller;
 
-    widget.stockController.text = newStock.toString();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = TextEditingController(text: widget.currentStock.toString());
+  }
+
+  void _onStockAction(bool isAdd) {
+    int stock = widget.currentStock;
+    int newStock = isAdd ? stock + 1 : (stock > 0 ? stock - 1 : stock);
+    _controller.text = newStock.toString();
 
     context.read<ProductFormBloc>().add(
       ProductFormUpdateSize(
@@ -40,15 +48,27 @@ class _StockControllerState extends State<StockController> {
   Widget build(BuildContext context) {
     double iconSize = 30;
 
-    return Stack(
+    return Row(
+      spacing: 10,
       children: [
+        GestureDetector(
+          onTap: () {
+            _onStockAction(false);
+          },
+          child: Icon(
+            Icons.horizontal_rule_rounded,
+            size: iconSize,
+          ),
+        ),
         SizedBox(
           height: 50,
+          width: 100,
           child: CustomTextfield(
+            textAlign: TextAlign.center,
             maxLength: 3,
             fillColor: Theme.of(context).colorScheme.surface,
             showShadow: false,
-            textEditingController: widget.stockController,
+            textEditingController: _controller,
             width: 200,
             onChange: (value) => context.read<ProductFormBloc>().add(
               ProductFormUpdateSize(
@@ -63,30 +83,13 @@ class _StockControllerState extends State<StockController> {
             ],
           ),
         ),
-        Positioned(
-          right: 5,
-          top: 2,
-          child: GestureDetector(
-            onTap: () {
-              _onStockAction(true);
-            },
-            child: Icon(
-              Icons.arrow_drop_up,
-              size: iconSize,
-            ),
-          ),
-        ),
-        Positioned(
-          right: 5,
-          bottom: 2,
-          child: GestureDetector(
-            onTap: () {
-              _onStockAction(false);
-            },
-            child: Icon(
-              Icons.arrow_drop_down,
-              size: iconSize,
-            ),
+        GestureDetector(
+          onTap: () {
+            _onStockAction(true);
+          },
+          child: Icon(
+            Icons.add_rounded,
+            size: iconSize,
           ),
         ),
       ],
