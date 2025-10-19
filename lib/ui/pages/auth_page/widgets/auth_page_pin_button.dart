@@ -5,11 +5,13 @@ import 'package:team_bugok_business/utils/provider/auth_provider.dart';
 class AuthPagePinButton extends StatefulWidget {
   final String label;
   final int index;
+  final bool isPressed;
 
   const AuthPagePinButton({
     super.key,
     required this.label,
     required this.index,
+    required this.isPressed,
   });
 
   @override
@@ -18,6 +20,28 @@ class AuthPagePinButton extends StatefulWidget {
 
 class _AuthPagePinButtonState extends State<AuthPagePinButton> {
   bool _isHovered = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<AuthProvider>().checkUserSession();
+  }
+
+  @override
+  void didUpdateWidget(covariant AuthPagePinButton oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPressed != widget.isPressed) {
+      _showFeedPressedFeedback();
+    }
+  }
+
+  void _showFeedPressedFeedback() async {
+    setState(() => _isHovered = true);
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() => _isHovered = false);
+  }
 
   @override
   Widget build(BuildContext context) {

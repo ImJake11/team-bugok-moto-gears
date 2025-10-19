@@ -110,6 +110,8 @@ class Caches extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get theme => integer().withDefault(Constant(0))();
   IntColumn get passaword => integer().withDefault(Constant(102025))();
+  IntColumn get isRememberedPin => integer().withDefault(Constant(0))();
+  IntColumn get isLoggedIn => integer().withDefault(Constant(0))();
 }
 // ---------------------------
 // DATABASE CLASS
@@ -136,7 +138,7 @@ class AppDatabase extends _$AppDatabase {
 
   // Increment this when you change your schema
   @override
-  int get schemaVersion => 19;
+  int get schemaVersion => 20;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -144,8 +146,9 @@ class AppDatabase extends _$AppDatabase {
       await m.createAll();
     },
     onUpgrade: (Migrator m, int from, int to) async {
-      if (from == 18) {
-        await m.createTable(caches);
+      if (from == 19) {
+        await m.addColumn(caches, caches.isRememberedPin);
+        await m.addColumn(caches, caches.isLoggedIn);
       }
     },
   );

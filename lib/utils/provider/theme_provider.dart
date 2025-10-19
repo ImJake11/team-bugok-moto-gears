@@ -1,7 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:team_bugok_business/utils/database/repositories/cache_repository.dart';
 
 class MyThemeProvider extends ChangeNotifier {
+  MyThemeProvider() {
+    _getCurrentTheme();
+  }
+
+  final CacheRepository cacheRepository = CacheRepository();
+
   final List<ColorProp> _colorAccents = [
     ColorProp(
       name: "Team Bugok Theme",
@@ -82,13 +89,26 @@ class MyThemeProvider extends ChangeNotifier {
   int get selectedIndex => _selectedIndex;
 
   void updateThemeColor(int i) => _updateThemeColor(i);
+  // Future<void> getCurrentTheme() async => _getCurrentTheme();
 
-  // FUNCTIONS //
-  void _updateThemeColor(int i) {
+  // ================== Functions ========================//
+  Future<void> _getCurrentTheme() async {
+    try {
+      final currentTheme = await cacheRepository.getTheme();
+
+      _updateThemeColor(currentTheme);
+    } catch (e, st) {
+      print("Failed to get current theme ${e}");
+      print(st);
+    }
+  }
+
+  void _updateThemeColor(int i) async {
     _selectedIndex = i;
     _primaryColor = _colorAccents[i].colors[0];
     _secondaryColor = _colorAccents[i].colors[1];
     _teriaryColor = _colorAccents[i].colors[2];
+    cacheRepository.setTheme(i);
     notifyListeners();
   }
 }

@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:team_bugok_business/utils/provider/auth_provider.dart';
 
 class AuthPagePinInputIndicator extends StatelessWidget {
   final bool isContained;
+  
 
   const AuthPagePinInputIndicator({super.key, required this.isContained});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
+    final provider = context.read<AuthProvider>();
+
+    final hasError = provider.hasError;
+    final isLoggedIn = provider.isLoggedIn;
 
     return Container(
       width: 20,
@@ -17,7 +24,11 @@ class AuthPagePinInputIndicator extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(
           width: 1,
-          color: Colors.grey.shade800,
+          color: hasError
+              ? Colors.red
+              : isLoggedIn
+              ? Colors.green
+              : Colors.grey.shade800,
         ),
       ),
       child: TweenAnimationBuilder(

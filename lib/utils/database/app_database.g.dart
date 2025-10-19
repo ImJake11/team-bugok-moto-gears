@@ -3589,8 +3589,38 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
     requiredDuringInsert: false,
     defaultValue: Constant(102025),
   );
+  static const VerificationMeta _isRememberedPinMeta = const VerificationMeta(
+    'isRememberedPin',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, theme, passaword];
+  late final GeneratedColumn<int> isRememberedPin = GeneratedColumn<int>(
+    'is_remembered_pin',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: Constant(0),
+  );
+  static const VerificationMeta _isLoggedInMeta = const VerificationMeta(
+    'isLoggedIn',
+  );
+  @override
+  late final GeneratedColumn<int> isLoggedIn = GeneratedColumn<int>(
+    'is_logged_in',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    theme,
+    passaword,
+    isRememberedPin,
+    isLoggedIn,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3618,6 +3648,24 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
         passaword.isAcceptableOrUnknown(data['passaword']!, _passawordMeta),
       );
     }
+    if (data.containsKey('is_remembered_pin')) {
+      context.handle(
+        _isRememberedPinMeta,
+        isRememberedPin.isAcceptableOrUnknown(
+          data['is_remembered_pin']!,
+          _isRememberedPinMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_logged_in')) {
+      context.handle(
+        _isLoggedInMeta,
+        isLoggedIn.isAcceptableOrUnknown(
+          data['is_logged_in']!,
+          _isLoggedInMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3639,6 +3687,14 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
         DriftSqlType.int,
         data['${effectivePrefix}passaword'],
       )!,
+      isRememberedPin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}is_remembered_pin'],
+      )!,
+      isLoggedIn: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}is_logged_in'],
+      )!,
     );
   }
 
@@ -3652,13 +3708,23 @@ class Cache extends DataClass implements Insertable<Cache> {
   final int id;
   final int theme;
   final int passaword;
-  const Cache({required this.id, required this.theme, required this.passaword});
+  final int isRememberedPin;
+  final int isLoggedIn;
+  const Cache({
+    required this.id,
+    required this.theme,
+    required this.passaword,
+    required this.isRememberedPin,
+    required this.isLoggedIn,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['theme'] = Variable<int>(theme);
     map['passaword'] = Variable<int>(passaword);
+    map['is_remembered_pin'] = Variable<int>(isRememberedPin);
+    map['is_logged_in'] = Variable<int>(isLoggedIn);
     return map;
   }
 
@@ -3667,6 +3733,8 @@ class Cache extends DataClass implements Insertable<Cache> {
       id: Value(id),
       theme: Value(theme),
       passaword: Value(passaword),
+      isRememberedPin: Value(isRememberedPin),
+      isLoggedIn: Value(isLoggedIn),
     );
   }
 
@@ -3679,6 +3747,8 @@ class Cache extends DataClass implements Insertable<Cache> {
       id: serializer.fromJson<int>(json['id']),
       theme: serializer.fromJson<int>(json['theme']),
       passaword: serializer.fromJson<int>(json['passaword']),
+      isRememberedPin: serializer.fromJson<int>(json['isRememberedPin']),
+      isLoggedIn: serializer.fromJson<int>(json['isLoggedIn']),
     );
   }
   @override
@@ -3688,19 +3758,35 @@ class Cache extends DataClass implements Insertable<Cache> {
       'id': serializer.toJson<int>(id),
       'theme': serializer.toJson<int>(theme),
       'passaword': serializer.toJson<int>(passaword),
+      'isRememberedPin': serializer.toJson<int>(isRememberedPin),
+      'isLoggedIn': serializer.toJson<int>(isLoggedIn),
     };
   }
 
-  Cache copyWith({int? id, int? theme, int? passaword}) => Cache(
+  Cache copyWith({
+    int? id,
+    int? theme,
+    int? passaword,
+    int? isRememberedPin,
+    int? isLoggedIn,
+  }) => Cache(
     id: id ?? this.id,
     theme: theme ?? this.theme,
     passaword: passaword ?? this.passaword,
+    isRememberedPin: isRememberedPin ?? this.isRememberedPin,
+    isLoggedIn: isLoggedIn ?? this.isLoggedIn,
   );
   Cache copyWithCompanion(CachesCompanion data) {
     return Cache(
       id: data.id.present ? data.id.value : this.id,
       theme: data.theme.present ? data.theme.value : this.theme,
       passaword: data.passaword.present ? data.passaword.value : this.passaword,
+      isRememberedPin: data.isRememberedPin.present
+          ? data.isRememberedPin.value
+          : this.isRememberedPin,
+      isLoggedIn: data.isLoggedIn.present
+          ? data.isLoggedIn.value
+          : this.isLoggedIn,
     );
   }
 
@@ -3709,45 +3795,60 @@ class Cache extends DataClass implements Insertable<Cache> {
     return (StringBuffer('Cache(')
           ..write('id: $id, ')
           ..write('theme: $theme, ')
-          ..write('passaword: $passaword')
+          ..write('passaword: $passaword, ')
+          ..write('isRememberedPin: $isRememberedPin, ')
+          ..write('isLoggedIn: $isLoggedIn')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, theme, passaword);
+  int get hashCode =>
+      Object.hash(id, theme, passaword, isRememberedPin, isLoggedIn);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Cache &&
           other.id == this.id &&
           other.theme == this.theme &&
-          other.passaword == this.passaword);
+          other.passaword == this.passaword &&
+          other.isRememberedPin == this.isRememberedPin &&
+          other.isLoggedIn == this.isLoggedIn);
 }
 
 class CachesCompanion extends UpdateCompanion<Cache> {
   final Value<int> id;
   final Value<int> theme;
   final Value<int> passaword;
+  final Value<int> isRememberedPin;
+  final Value<int> isLoggedIn;
   const CachesCompanion({
     this.id = const Value.absent(),
     this.theme = const Value.absent(),
     this.passaword = const Value.absent(),
+    this.isRememberedPin = const Value.absent(),
+    this.isLoggedIn = const Value.absent(),
   });
   CachesCompanion.insert({
     this.id = const Value.absent(),
     this.theme = const Value.absent(),
     this.passaword = const Value.absent(),
+    this.isRememberedPin = const Value.absent(),
+    this.isLoggedIn = const Value.absent(),
   });
   static Insertable<Cache> custom({
     Expression<int>? id,
     Expression<int>? theme,
     Expression<int>? passaword,
+    Expression<int>? isRememberedPin,
+    Expression<int>? isLoggedIn,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (theme != null) 'theme': theme,
       if (passaword != null) 'passaword': passaword,
+      if (isRememberedPin != null) 'is_remembered_pin': isRememberedPin,
+      if (isLoggedIn != null) 'is_logged_in': isLoggedIn,
     });
   }
 
@@ -3755,11 +3856,15 @@ class CachesCompanion extends UpdateCompanion<Cache> {
     Value<int>? id,
     Value<int>? theme,
     Value<int>? passaword,
+    Value<int>? isRememberedPin,
+    Value<int>? isLoggedIn,
   }) {
     return CachesCompanion(
       id: id ?? this.id,
       theme: theme ?? this.theme,
       passaword: passaword ?? this.passaword,
+      isRememberedPin: isRememberedPin ?? this.isRememberedPin,
+      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
     );
   }
 
@@ -3775,6 +3880,12 @@ class CachesCompanion extends UpdateCompanion<Cache> {
     if (passaword.present) {
       map['passaword'] = Variable<int>(passaword.value);
     }
+    if (isRememberedPin.present) {
+      map['is_remembered_pin'] = Variable<int>(isRememberedPin.value);
+    }
+    if (isLoggedIn.present) {
+      map['is_logged_in'] = Variable<int>(isLoggedIn.value);
+    }
     return map;
   }
 
@@ -3783,7 +3894,9 @@ class CachesCompanion extends UpdateCompanion<Cache> {
     return (StringBuffer('CachesCompanion(')
           ..write('id: $id, ')
           ..write('theme: $theme, ')
-          ..write('passaword: $passaword')
+          ..write('passaword: $passaword, ')
+          ..write('isRememberedPin: $isRememberedPin, ')
+          ..write('isLoggedIn: $isLoggedIn')
           ..write(')'))
         .toString();
   }
@@ -8387,12 +8500,16 @@ typedef $$CachesTableCreateCompanionBuilder =
       Value<int> id,
       Value<int> theme,
       Value<int> passaword,
+      Value<int> isRememberedPin,
+      Value<int> isLoggedIn,
     });
 typedef $$CachesTableUpdateCompanionBuilder =
     CachesCompanion Function({
       Value<int> id,
       Value<int> theme,
       Value<int> passaword,
+      Value<int> isRememberedPin,
+      Value<int> isLoggedIn,
     });
 
 class $$CachesTableFilterComposer
@@ -8416,6 +8533,16 @@ class $$CachesTableFilterComposer
 
   ColumnFilters<int> get passaword => $composableBuilder(
     column: $table.passaword,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get isRememberedPin => $composableBuilder(
+    column: $table.isRememberedPin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get isLoggedIn => $composableBuilder(
+    column: $table.isLoggedIn,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -8443,6 +8570,16 @@ class $$CachesTableOrderingComposer
     column: $table.passaword,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get isRememberedPin => $composableBuilder(
+    column: $table.isRememberedPin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get isLoggedIn => $composableBuilder(
+    column: $table.isLoggedIn,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CachesTableAnnotationComposer
@@ -8462,6 +8599,16 @@ class $$CachesTableAnnotationComposer
 
   GeneratedColumn<int> get passaword =>
       $composableBuilder(column: $table.passaword, builder: (column) => column);
+
+  GeneratedColumn<int> get isRememberedPin => $composableBuilder(
+    column: $table.isRememberedPin,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get isLoggedIn => $composableBuilder(
+    column: $table.isLoggedIn,
+    builder: (column) => column,
+  );
 }
 
 class $$CachesTableTableManager
@@ -8495,16 +8642,28 @@ class $$CachesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> theme = const Value.absent(),
                 Value<int> passaword = const Value.absent(),
-              }) => CachesCompanion(id: id, theme: theme, passaword: passaword),
+                Value<int> isRememberedPin = const Value.absent(),
+                Value<int> isLoggedIn = const Value.absent(),
+              }) => CachesCompanion(
+                id: id,
+                theme: theme,
+                passaword: passaword,
+                isRememberedPin: isRememberedPin,
+                isLoggedIn: isLoggedIn,
+              ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> theme = const Value.absent(),
                 Value<int> passaword = const Value.absent(),
+                Value<int> isRememberedPin = const Value.absent(),
+                Value<int> isLoggedIn = const Value.absent(),
               }) => CachesCompanion.insert(
                 id: id,
                 theme: theme,
                 passaword: passaword,
+                isRememberedPin: isRememberedPin,
+                isLoggedIn: isLoggedIn,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
