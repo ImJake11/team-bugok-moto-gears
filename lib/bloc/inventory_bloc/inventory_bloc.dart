@@ -49,6 +49,7 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       final List<ProductModel> products = await ProductRepository()
           .retrieveAllProduct();
 
+      await Future.delayed(Duration(seconds: 2));
       emit(
         InventoryInitial(
           products: products,

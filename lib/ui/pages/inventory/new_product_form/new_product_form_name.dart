@@ -6,19 +6,19 @@ import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dar
 import 'package:team_bugok_business/constants/product_form_keys.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/form_wrapper.dart';
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
-import 'package:team_bugok_business/ui/widgets/text_field.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
+import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_id_by_value.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 
 class NewProductFormName extends StatefulWidget {
-  final TextEditingController modelController;
+  final String model;
   final int selectedBrand;
 
   const NewProductFormName({
     super.key,
-    required this.modelController,
+    required this.model,
     required this.selectedBrand,
   });
 
@@ -32,39 +32,30 @@ class _NewProductFormNameState extends State<NewProductFormName> {
   bool _isError = false;
 
   @override
+  void didUpdateWidget(covariant NewProductFormName oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.model != widget.model) {
+      // check if model is existin
+      bool isExisting = _usedModels.any(
+        (element) => element.contains(widget.model),
+      );
+
+      setState(() => _isError = isExisting);
+    }
+  }
+
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _retriveUsedModels();
   }
 
-  void _onModelControllerDebounce() {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-
-    _debounce = Timer.periodic(
-      Duration(seconds: 3),
-      (_) {
-        final s = context.read<ProductFormBloc>().state;
-
-        if (s is! ProductFormInitial) {
-          _debounce?.cancel();
-          return;
-        }
-
-        _isError = _usedModels.any(
-          (element) =>
-              element.toLowerCase() ==
-              widget.modelController.text.toLowerCase(),
-        );
-        setState(() {});
-      },
-    );
-  }
-
   Future<void> _retriveUsedModels() async {
     final result = await ProductRepository().retrieveProductModel();
 
-    result.removeWhere((element) => element == widget.modelController.text);
+    result.removeWhere((element) => element == widget.model);
 
     setState(() {
       _usedModels = result;
@@ -91,7 +82,11 @@ class _NewProductFormNameState extends State<NewProductFormName> {
         )
         .toList();
 
-    final brand = referencesGetValueByID(brandReferences, widget.selectedBrand);
+    final brand = referencesGetValueByID(
+      context,
+      ReferenceType.brands,
+      widget.selectedBrand,
+    );
 
     return FormWrapper(
       title: "Brand and Model Management",
@@ -104,8 +99,11 @@ class _NewProductFormNameState extends State<NewProductFormName> {
             selectedValue: brand,
             width: 500,
             onSelected: (value) {
-          
-              final brandId = referenceGetIdByValue(brandReferences, value!);
+              final brandId = referenceGetIdByValue(
+                context,
+                ReferenceType.brands,
+                value!,
+              );
 
               context.read<ProductFormBloc>().add(
                 ProductFormUpdateData(
@@ -115,14 +113,18 @@ class _NewProductFormNameState extends State<NewProductFormName> {
               );
             },
             entries: dropDownEntries,
-            label: "Brand",
+            label: "Select Brand",
           ),
-          CustomTextfield(
-            fillColor: Theme.of(context).colorScheme.surface,
-            showShadow: false,
-            textEditingController: widget.modelController,
-            onChange: (value) {
-              _onModelControllerDebounce();
+          CustomDropdown(
+            width: 500,
+            entries: cacheProvider.models
+                .map(
+                  (e) => e.$2,
+                )
+                .toList(),
+            label: "Select Model",
+            selectedValue: widget.model,
+            onSelected: (value) {
               context.read<ProductFormBloc>().add(
                 ProductFormUpdateData(
                   key: ProductFormKeys.model,
@@ -130,7 +132,6 @@ class _NewProductFormNameState extends State<NewProductFormName> {
                 ),
               );
             },
-            placeholder: "Model",
           ),
           if (_isError)
             Text(

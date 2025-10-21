@@ -6,6 +6,7 @@ import 'package:team_bugok_business/ui/widgets/line_chart.dart';
 import 'package:team_bugok_business/utils/helpers/dashboard_get_chart_data_and_sales_total.dart';
 import 'package:team_bugok_business/utils/model/chart_model.dart';
 import 'package:team_bugok_business/utils/model/sales_model.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class DashboardPageChart extends StatefulWidget {
   const DashboardPageChart({super.key});
@@ -17,42 +18,40 @@ class DashboardPageChart extends StatefulWidget {
 class _DashboardPageChartState extends State<DashboardPageChart> {
   bool _isWeekly = true;
 
-  Widget toggleButton(
-    String label,
-    bool isSelected,
-    BorderRadiusGeometry borderRadius,
-  ) => GestureDetector(
-    onTap: () => setState(() => _isWeekly = !_isWeekly),
-    child: AnimatedContainer(
-      duration: Duration(milliseconds: 250),
-      height: 30,
-      decoration: BoxDecoration(
-        borderRadius: borderRadius,
-        color: isSelected
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.surfaceDim,
-        border: Border.all(
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : Colors.grey.shade700,
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
+    Widget toggleButton(
+      String label,
+      bool isSelected,
+      BorderRadiusGeometry borderRadius,
+    ) => GestureDetector(
+      onTap: () => setState(() => _isWeekly = !_isWeekly),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 250),
+        height: 30,
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          color: isSelected ? theme.primary : theme.surfaceDim,
+          border: Border.all(
+            color: isSelected ? theme.primary : theme.borderColor,
+          ),
         ),
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
+    );
 
-  @override
-  Widget build(BuildContext context) {
     return BlocSelector<
       DashboardBloc,
       DashboardState,
@@ -78,25 +77,12 @@ class _DashboardPageChartState extends State<DashboardPageChart> {
         return Container(
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceDim,
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 5,
-                spreadRadius: 3,
-                color: Colors.grey.shade800.withAlpha(120),
-                offset: Offset(-3, -3),
-              ),
-              BoxShadow(
-                blurRadius: 5,
-                spreadRadius: 3,
-                color: Colors.black,
-                offset: Offset(3, 3),
-              ),
-            ],
-            borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: Color(0xFF555555),
+              color: theme.borderColor,
             ),
+            color: theme.surfaceDim,
+            boxShadow: theme.shadow,
+            borderRadius: BorderRadius.circular(10),
           ),
           width: double.infinity,
           height: 380,
@@ -130,7 +116,7 @@ class _DashboardPageChartState extends State<DashboardPageChart> {
                           textStyle: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: theme.primary,
                           ),
                           duration: Duration(seconds: 1),
                         ),
@@ -140,20 +126,7 @@ class _DashboardPageChartState extends State<DashboardPageChart> {
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black,
-                            blurRadius: 2,
-                            spreadRadius: 2,
-                            offset: Offset(2, 2),
-                          ),
-                          BoxShadow(
-                            color: Colors.grey.shade900,
-                            blurRadius: 2,
-                            spreadRadius: 2,
-                            offset: Offset(-2, -2),
-                          ),
-                        ],
+                        boxShadow: theme.shadow,
                       ),
                       child: Row(
                         children: [

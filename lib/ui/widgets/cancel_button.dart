@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class CancelButton extends StatefulWidget {
   const CancelButton({super.key});
@@ -12,7 +14,7 @@ class _CancelButtonState extends State<CancelButton> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),

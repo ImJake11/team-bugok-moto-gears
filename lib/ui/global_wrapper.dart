@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:team_bugok_business/ui/widgets/loading_overlay.dart';
 import 'package:team_bugok_business/ui/widgets/sidebar.dart';
-import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
-import 'package:team_bugok_business/utils/provider/theme_provider.dart';
+
+import '../utils/provider/references_values_cache_provider.dart';
+import '../utils/provider/theme_provider.dart';
 
 class GlobalWrapper extends StatefulWidget {
   final Widget child;
@@ -29,8 +30,10 @@ class _GlobalWrapperState extends State<GlobalWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+    
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.surface,
       body: Stack(
         children: [
           Row(

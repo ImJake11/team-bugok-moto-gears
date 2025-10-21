@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_size_button.dart';
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
+import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/cart_model.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
 import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
 class PosPageSelectedProductVariants extends StatefulWidget {
@@ -27,18 +29,25 @@ class _PosPageSelectedProductVariantsState
   @override
   Widget build(BuildContext context) {
     final cacheProvider = context.read<ReferencesValuesProviderCache>();
+    final theme = context.watch<MyThemeProvider>();
 
     final colors = cacheProvider.colors;
-    final brands = cacheProvider.brands;
-    final sizes = cacheProvider.sizes;
 
     final ProductModel productModel = widget.productModel;
 
     List<VariantModel> variants = productModel.variants;
 
-    List<String> dropdownEntries = variants.map(
+    List<VariantModel> availableVariants = variants
+        .where(
+          (variant) => variant.isActive == 1,
+        )
+        .toList();
+
+    List<String> dropdownEntries = availableVariants.map(
       (e) {
-        final query = colors.where((c) => c.$1 == e.color);
+        final query = colors.where(
+          (c) => c.$1 == e.color,
+        );
 
         if (query.isNotEmpty) {
           return query.first.$2;
@@ -53,30 +62,25 @@ class _PosPageSelectedProductVariantsState
       (e) => e.color == _selectedVariantId,
     );
 
-    List<VariantSizeModel> availableSizes =
+    List<VariantSizeModel> variantSizes =
         _selectedVariantId > 0 && queryAvailableSizes.isNotEmpty
         ? queryAvailableSizes.first.sizes
         : [];
 
+    List<VariantSizeModel> availableSizes = variantSizes
+        .where((s) => s.isActive == 1)
+        .toList();
+
+    bool hasAvailableVariants = availableVariants.isNotEmpty;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceDim,
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 5,
-            spreadRadius: 3,
-            color: Colors.grey.shade800.withAlpha(120),
-            offset: Offset(-3, -3),
-          ),
-          BoxShadow(
-            blurRadius: 5,
-            spreadRadius: 3,
-            color: Colors.black,
-            offset: Offset(3, 3),
-          ),
-        ],
-        border: Border.all(color: Color(0xFF555555)),
+        color: theme.surfaceDim,
+        boxShadow: theme.shadow,
+        border: Border.all(
+          color: theme.borderColor,
+        ),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
@@ -103,7 +107,11 @@ class _PosPageSelectedProductVariantsState
                   ),
                 ),
                 Text(
-                  referencesGetValueByID(brands, widget.productModel.brand),
+                  referencesGetValueByID(
+                    context,
+                    ReferenceType.brands,
+                    widget.productModel.brand,
+                  ),
                   style: TextStyle(
                     fontSize: 22,
                     color: Colors.grey.shade600,
@@ -128,7 +136,7 @@ class _PosPageSelectedProductVariantsState
               currencyFormatter(widget.productModel.sellingPrice),
               style: TextStyle(
                 fontSize: 18,
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.primary,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -137,29 +145,35 @@ class _PosPageSelectedProductVariantsState
               color: Color(0xFF333333),
             ),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomDropdown(
-                  onSelected: (value) {
-                    final query = colors.where((c) => c.$2 == value);
+            if (hasAvailableVariants)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomDropdown(
+                    onSelected: (value) {
+                      final query = colors.where((c) => c.$2 == value);
 
-                    if (query.isEmpty) return;
+                      if (query.isEmpty) return;
 
-                    final variantId = query.first.$1;
+                      final variantId = query.first.$1;
 
-                    setState(() => _selectedVariantId = variantId);
-                  },
-                  selectedValue: referencesGetValueByID(
-                    colors,
-                    _selectedVariantId,
+                      setState(() => _selectedVariantId = variantId);
+                    },
+                    selectedValue: referencesGetValueByID(
+                      context,
+                      ReferenceType.colors,
+                      _selectedVariantId,
+                    ),
+                    width: 250,
+                    entries: dropdownEntries,
+                    label: "Select Color",
                   ),
-                  width: 250,
-                  entries: dropdownEntries,
-                  label: "Select Color",
-                ),
-              ],
-            ),
+                ],
+              )
+            else
+              Text(
+                'Product currently has no active variants available for sale',
+              ),
 
             if (availableSizes.isNotEmpty)
               Row(
@@ -168,21 +182,22 @@ class _PosPageSelectedProductVariantsState
                   availableSizes.length,
                   (index) {
                     final sizeId = availableSizes[index].id;
-                    final sizeValue = availableSizes[index].sizeValue;
 
                     // get the value of the size value of available sizes
-                    final querySize = sizes.where((s) => s.$1 == sizeValue);
-
-                    final sizeLabel = querySize.isEmpty
-                        ? ""
-                        : querySize.first.$2;
+                    final sizeLabel = referencesGetValueByID(
+                      context,
+                      ReferenceType.sizes,
+                      sizeId!,
+                    );
+                    final isInActive = availableSizes[index].isActive == 0;
 
                     return ProductViewSizeButton(
+                      isInActive: isInActive,
                       onTap: () => context.read<PosBloc>().add(
                         PosAddProductCart(
                           cartModel: CartModel(
                             color: _selectedVariantId,
-                            size: sizeId!,
+                            size: sizeId,
                             id: availableSizes[index].id!,
                             price: widget.productModel.sellingPrice,
                             model: widget.productModel.model,
@@ -197,6 +212,11 @@ class _PosPageSelectedProductVariantsState
                     );
                   },
                 ),
+              ),
+
+            if (availableSizes.isEmpty && _selectedVariantId > 0)
+              Text(
+                'No available sizes for this product',
               ),
           ],
         ),

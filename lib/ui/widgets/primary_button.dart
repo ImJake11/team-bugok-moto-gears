@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class CustomButton extends StatefulWidget {
   final Widget child;
@@ -27,7 +29,7 @@ class _CustomButtonState extends State<CustomButton> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -48,22 +50,7 @@ class _CustomButtonState extends State<CustomButton> {
               stops: _isHovered ? [0.0, 0.5, 1.0] : [0.1, 0.3, 0.6],
               colors: [theme.tertiary, theme.secondary, theme.primary],
             ),
-            boxShadow: (widget.showShadow ?? false)
-                ? [
-                    BoxShadow(
-                      color: Colors.grey.shade800.withAlpha(120),
-                      blurRadius: 3,
-                      spreadRadius: 3,
-                      offset: const Offset(-3, -3),
-                    ),
-                    BoxShadow(
-                      color: Colors.black54,
-                      blurRadius: 3,
-                      spreadRadius: 3,
-                      offset: const Offset(3, 3),
-                    ),
-                  ]
-                : [],
+            boxShadow: (widget.showShadow ?? false) ? theme.shadow : [],
           ),
           child: widget.child,
         ),

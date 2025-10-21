@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
@@ -7,6 +9,7 @@ class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routeName = GoRouter.of(context).state.name;
+    final theme = context.watch<MyThemeProvider>();
 
     final double sidebarWidth = 270;
 
@@ -42,14 +45,14 @@ class Sidebar extends StatelessWidget {
         routeName: 'expenses',
       ),
       ButtonProp(
-        name: "Settings",
+        name: "Store Setup",
         icon: "assets/images/settings.png",
         routeName: 'settings',
       ),
     ];
 
     return Container(
-      color: Theme.of(context).colorScheme.surfaceDim,
+      color: theme.surfaceDim,
       width: sidebarWidth,
       height: MediaQuery.of(context).size.height,
       child: Stack(
@@ -62,7 +65,7 @@ class Sidebar extends StatelessWidget {
           Container(
             width: sidebarWidth,
             height: double.infinity,
-            color: Theme.of(context).colorScheme.surfaceDim.withAlpha(230),
+            color: theme.surfaceDim.withAlpha(252),
           ),
           Column(
             spacing: 10,
@@ -78,9 +81,11 @@ class Sidebar extends StatelessWidget {
               ...List.generate(
                 buttonsData.length,
                 (index) => GestureDetector(
-                  onTap: () => GoRouter.of(context).goNamed(
-                    buttonsData[index].routeName,
-                  ),
+                  onTap: () {
+                    GoRouter.of(context).goNamed(
+                      buttonsData[index].routeName,
+                    );
+                  },
                   child: SidebarButton(
                     data: buttonsData[index],
                     isSelected: buttonsData[index].routeName == routeName,
@@ -98,6 +103,7 @@ class Sidebar extends StatelessWidget {
 class SidebarButton extends StatefulWidget {
   final ButtonProp data;
   final bool isSelected;
+
   const SidebarButton({
     super.key,
     required this.data,
@@ -113,7 +119,7 @@ class _SidebarButtonState extends State<SidebarButton> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -122,7 +128,7 @@ class _SidebarButtonState extends State<SidebarButton> {
         onExit: (_) => setState(() => _isHovered = false),
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
-          curve: Curves.easeInCirc,
+          curve: Curves.linear,
           height: 50,
           decoration: widget.isSelected
               ? BoxDecoration(
@@ -138,7 +144,11 @@ class _SidebarButtonState extends State<SidebarButton> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     stops: _isHovered ? [0.0, 0.5, 1.0] : [0.1, 0.3, 0.6],
-                    colors: [theme.tertiary, theme.secondary, theme.primary],
+                    colors: [
+                      theme.tertiary,
+                      theme.secondary,
+                      theme.primary,
+                    ],
                   ),
                 )
               : BoxDecoration(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class DashboardComponentWrapper extends StatelessWidget {
   final String title;
@@ -18,7 +20,7 @@ class DashboardComponentWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     List<Color> colors = gradientColors?.isEmpty ?? true
         ? [theme.surfaceDim, theme.surfaceDim]
@@ -29,29 +31,16 @@ class DashboardComponentWrapper extends StatelessWidget {
       width: width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: Theme.of(context).colorScheme.surfaceDim,
+        color: theme.surfaceDim,
         border: Border.all(
-          color: Color(0xFF555555),
+          color: theme.borderColor,
         ),
         gradient: LinearGradient(
           colors: colors,
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 5,
-            spreadRadius: 2,
-            offset: Offset(3, 3),
-            color: Colors.black,
-          ),
-          BoxShadow(
-            blurRadius: 5,
-            spreadRadius: 2,
-            offset: Offset(-3, -3),
-            color: Colors.grey.shade800.withAlpha(120),
-          ),
-        ],
+        boxShadow: theme.shadow,
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),

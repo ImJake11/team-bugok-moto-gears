@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/utils/model/chart_model.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
 class MyLineChart extends StatefulWidget {
@@ -20,6 +22,8 @@ class MyLineChart extends StatefulWidget {
 class _MyLineChartState extends State<MyLineChart> {
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     FlTitlesData tilesData = FlTitlesData(
       topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
       rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -67,7 +71,7 @@ class _MyLineChartState extends State<MyLineChart> {
           radius: 4,
           color: Colors.grey.shade300,
           strokeWidth: 2,
-          strokeColor: Theme.of(context).colorScheme.primary,
+          strokeColor: theme.primary,
         );
       },
     );
@@ -127,8 +131,8 @@ class _MyLineChartState extends State<MyLineChart> {
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
               colors: [
-                Theme.of(context).colorScheme.primary,
-                Theme.of(context).colorScheme.tertiary,
+                theme.primary,
+                theme.tertiary,
               ],
             ),
             barWidth: 2,
@@ -138,10 +142,10 @@ class _MyLineChartState extends State<MyLineChart> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Theme.of(context).colorScheme.primary.withAlpha(10),
-                  Theme.of(context).colorScheme.primary.withAlpha(10),
-                  Theme.of(context).colorScheme.primary.withAlpha(10),
-                  Theme.of(context).colorScheme.primary.withAlpha(10),
+                  theme.primary.withAlpha(10),
+                  theme.primary.withAlpha(10),
+                  theme.primary.withAlpha(10),
+                  theme.primary.withAlpha(10),
                 ],
               ),
             ),

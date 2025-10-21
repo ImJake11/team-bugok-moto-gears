@@ -10,6 +10,7 @@ import 'package:team_bugok_business/ui/widgets/appbar.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class InventoryPage extends StatefulWidget {
   const InventoryPage({super.key});
@@ -80,7 +81,7 @@ class _InventoryPageState extends State<InventoryPage> {
             textEditingController: _searchController,
             suffixIcon: LucideIcons.search,
             placeholder: "Search Model",
-            fillColor: Theme.of(context).colorScheme.surfaceDim,
+            fillColor: context.watch<MyThemeProvider>().surfaceDim,
             onChange: (value) {
               _searchQuery();
             },
@@ -98,39 +99,45 @@ class _InventoryPageState extends State<InventoryPage> {
         ),
         child: BlocBuilder<InventoryBloc, InventoryState>(
           builder: (context, state) {
-            if (state is InventoryInitial) {
+            if (state is InventoryLoadingState) {
+              return Center(
+                child: LoadingWidget(),
+              );
+            } else if (state is InventoryInitial) {
               final isFiltering = state.isFiltering;
               final searchResults = state.searchResults;
               final products = state.products;
 
+              if (products.isEmpty) {
+                return Center(
+                  child: Text("No products found"),
+                );
+              }
+
               return InventoryTable(
                 products: isFiltering ? searchResults : products,
               );
-            }
-
-            if (state is InventoryErrorState) {
+            } else {
               return Center(
                 child: Text('Something went wrong'),
               );
             }
-
-            return Center(
-              child: Transform(
-                transform: Matrix4.translationValues(-80, 0, 0),
-                child: LoadingWidget(),
-              ),
-            );
           },
         ),
       ),
     );
 
-    return Column(
-      spacing: 30,
-      children: [
-        CustomAppbar(child: appbar),
-        body,
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 20,
+      ),
+      child: Column(
+        children: [
+          CustomAppbar(child: appbar),
+          body,
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class ProductViewRelatedButton extends StatefulWidget {
   final String brand;
@@ -19,7 +21,8 @@ class _ProductViewRelatedButtonState extends State<ProductViewRelatedButton> {
 
   @override
   Widget build(BuildContext context) {
-    final shadowColor = Theme.of(context).colorScheme.primary.withAlpha(60);
+    final theme =  context.watch<MyThemeProvider>();
+    final shadowColor =theme.primary.withAlpha(60);
 
     return MouseRegion(
       onEnter: (event) => setState(() => _isHovered = true),
@@ -29,7 +32,7 @@ class _ProductViewRelatedButtonState extends State<ProductViewRelatedButton> {
         width: double.infinity,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceDim,
+          color: theme.surfaceDim,
           borderRadius: BorderRadius.circular(10),
           boxShadow: _isHovered
               ? [
@@ -80,7 +83,7 @@ class _ProductViewRelatedButtonState extends State<ProductViewRelatedButton> {
                     tween: ColorTween(
                       begin: Colors.grey.shade700,
                       end: _isHovered
-                          ? Theme.of(context).colorScheme.primary
+                          ? theme.primary
                           : Colors.grey.shade700, // 🎨 target color
                     ),
                     duration: const Duration(milliseconds: 200),

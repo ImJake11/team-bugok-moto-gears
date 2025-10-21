@@ -5,11 +5,19 @@ class CacheRepository {
   final db = appDatabase;
 
   Future<int> getPassword() async => _getPassword();
+
   Future<void> loginUser(bool isRememberedPin) async =>
       _logInUser(isRememberedPin);
+
   Future<(int, int)> checkUserSession() async => _checkUserSession();
+
   Future<int> getTheme() async => _getTheme();
+
   Future<void> setTheme(int index) async => _setTheme(index);
+
+  Future<void> saveNewPin(int newPin) async => _saveNewPin(newPin);
+
+  Future<void> logOut() async => _logOut();
 
   // ============================================= //
   Future<int> _getTheme() async {
@@ -35,6 +43,22 @@ class CacheRepository {
           );
     } catch (e, st) {
       print("Failed to set theme ${e}");
+      print(st);
+      rethrow;
+    }
+  }
+
+  Future<void> _saveNewPin(int newPin) async {
+    try {
+      await db
+          .update(db.caches)
+          .write(
+            CachesCompanion(
+              passaword: Value(newPin),
+            ),
+          );
+    } catch (e, st) {
+      print("Failed to save new pin ${e}");
       print(st);
       rethrow;
     }
@@ -81,6 +105,22 @@ class CacheRepository {
       return password;
     } catch (e, st) {
       print("Failed to get password ${e}");
+      print(st);
+      rethrow;
+    }
+  }
+
+  Future<void> _logOut() async {
+    try {
+      await db
+          .update(db.caches)
+          .write(
+            CachesCompanion(
+              isLoggedIn: Value(0),
+            ),
+          );
+    } catch (e, st) {
+      print("Failed to log out ${e}");
       print(st);
       rethrow;
     }

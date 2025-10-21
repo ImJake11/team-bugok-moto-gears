@@ -157,6 +157,7 @@ class ExpensesRepository {
       return results
           .map(
             (result) => ExpensesModel(
+              category: result.category,
               id: result.id,
               note: result.note,
               createdAt: result.createdAt,

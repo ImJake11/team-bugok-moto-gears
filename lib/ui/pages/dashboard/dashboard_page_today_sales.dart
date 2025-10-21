@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/animated_text_value_change.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/responsive_font.dart';
 
 class DashboardPageTodaySales extends StatelessWidget {
@@ -67,7 +68,7 @@ class DashboardPageTodaySales extends StatelessWidget {
                         ),
                       ],
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: context.watch<MyThemeProvider>().primary,
                     ),
                   ),
                 ),

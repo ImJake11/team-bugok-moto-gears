@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class ProductViewColorButton extends StatefulWidget {
   final String label;
@@ -21,6 +23,8 @@ class _ProductViewColorButtonState extends State<ProductViewColorButton> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     return GestureDetector(
       onTap: widget.onTap,
       child: MouseRegion(
@@ -32,11 +36,11 @@ class _ProductViewColorButtonState extends State<ProductViewColorButton> {
           decoration: BoxDecoration(
             color: _isHovered
                 ? Colors.grey.shade900
-                : Theme.of(context).colorScheme.surfaceDim,
+                : theme.surfaceDim,
             border: Border.all(
               color: widget.isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.surface,
+                  ? theme.primary
+                  : theme.surface,
             ),
             borderRadius: BorderRadius.circular(10),
           ),

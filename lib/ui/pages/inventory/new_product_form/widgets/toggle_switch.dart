@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class CustomToggleSwitch extends StatefulWidget {
   final bool isActive;
@@ -22,7 +24,7 @@ class _CustomToggleSwitchState extends State<CustomToggleSwitch> {
       children: [
         Switch(
           value: widget.isActive,
-          activeThumbColor: Theme.of(context).colorScheme.primary,
+          activeThumbColor: context.watch<MyThemeProvider>().primary,
           inactiveThumbColor: Colors.grey.shade700,
           onChanged: widget.onChange,
         ),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_related_button.dart';
+import 'package:team_bugok_business/ui/widgets/primary_button.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
+import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
-import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 
 class ProductViewRelatedBrands extends StatefulWidget {
   final int currentBrand;
@@ -46,18 +47,16 @@ class _ProductViewRelatedBrandsState extends State<ProductViewRelatedBrands> {
 
   @override
   Widget build(BuildContext context) {
-    final brands = context.read<ReferencesValuesProviderCache>().brands;
-
     return SizedBox(
       width: 300,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         spacing: 20,
         children: [
           Text(
             "Related Product",
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -87,27 +86,57 @@ class _ProductViewRelatedBrandsState extends State<ProductViewRelatedBrands> {
               );
 
               return Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    spacing: 10,
-                    children: filteredList
-                        .map(
-                          (e) => GestureDetector(
-                            onTap: () {
-                              widget.onTap(e);
-                            },
-                            child: ProductViewRelatedButton(
-                              brand: referencesGetValueByID(
-                                brands,
-                                widget.currentBrand,
+                child: filteredList.isEmpty
+                    ? Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 15,
+                          children: [
+                            Text(
+                              'No related product found',
+                              style: TextStyle(
+                                fontSize: 12,
                               ),
-                              model: e.model,
                             ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
+                            CustomButton(
+                              onTap: () {
+                                GoRouter.of(context).go('inventory');
+                              },
+                              child: Center(
+                                child: Text(
+                                  "Go to inventory",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          spacing: 10,
+                          children: filteredList
+                              .map(
+                                (e) => GestureDetector(
+                                  onTap: () {
+                                    widget.onTap(e);
+                                  },
+                                  child: ProductViewRelatedButton(
+                                    brand: referencesGetValueByID(
+                                      context,
+                                      ReferenceType.brands,
+                                      widget.currentBrand,
+                                    ),
+                                    model: e.model,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ),
               );
             },
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:team_bugok_business/utils/constants/theme_colors.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class SettingsPageThemeAccents extends StatelessWidget {
@@ -9,11 +10,12 @@ class SettingsPageThemeAccents extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<MyThemeProvider>();
 
-    final accents = themeProvider.colorAccents;
+    final accents = colorAccents;
 
     final selectedIndex = themeProvider.selectedIndex;
 
     return Column(
+      spacing: 5,
       children: List.generate(
         accents.length,
         (i) {
@@ -22,15 +24,23 @@ class SettingsPageThemeAccents extends StatelessWidget {
           final isSelected = selectedIndex == i;
 
           return GestureDetector(
-            onTap: () => themeProvider.updateThemeColor(i),
+            onTap: () {
+              Provider.of<MyThemeProvider>(
+                context,
+                listen: false,
+              ).updateThemeColor(i);
+            },
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: AnimatedContainer(
                 duration: Duration(milliseconds: 300),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? Colors.grey.shade900
-                      : Theme.of(context).colorScheme.surfaceDim,
+                  border: Border.all(
+                    color: isSelected
+                        ? themeProvider.primary
+                        : themeProvider.borderColor,
+                  ),
+
                   borderRadius: BorderRadius.circular(10),
                 ),
                 height: 50,
@@ -46,7 +56,7 @@ class SettingsPageThemeAccents extends StatelessWidget {
                         accents[i].name,
                         style: TextStyle(
                           color: isSelected
-                              ? Theme.of(context).colorScheme.primary
+                              ? themeProvider.primary
                               : Colors.white,
                           fontWeight: isSelected
                               ? FontWeight.bold

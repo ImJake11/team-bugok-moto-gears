@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/ui/widgets/snackbar.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
 import 'package:team_bugok_business/utils/database/repositories/store_setup_repository.dart';
 import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class SettingsReferencesValue extends StatefulWidget {
   final ReferenceType reference;
@@ -44,22 +46,36 @@ class _SettingsReferencesValueState extends State<SettingsReferencesValue> {
         });
       }
 
+      if (!mounted) return;
+
       final results = await _setupRepository.getReferencesValues(
         widget.reference,
       );
       await Future.delayed(Duration(seconds: 1));
       _references = results;
       _initializedControllers();
-      setState(() => _isInitialized = true);
     } catch (e, st) {
       print("Failed to fetch ${widget.reference} ${e}");
       print(st);
       setState(() => _hasError = true);
+    } finally {
+      setState(() => _isInitialized = true);
     }
   }
 
   Future<void> _saveValues() async {
     try {
+      bool isValid = _references.every((e) => e.$2.isNotEmpty);
+
+      if (!isValid) {
+        CustomSnackBar(
+          context: context,
+          message: "Some fields are empty!",
+        ).show();
+        return;
+      }
+      ;
+
       setState(() => _isInitialized = false);
 
       await _setupRepository.saveReferenceValue(_references, widget.reference);
@@ -88,6 +104,8 @@ class _SettingsReferencesValueState extends State<SettingsReferencesValue> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     if (!_isInitialized) {
       return LoadingWidget();
     }
@@ -127,11 +145,14 @@ class _SettingsReferencesValueState extends State<SettingsReferencesValue> {
         ...List.generate(
           _references.length,
           (index) {
+            bool showButton = _references[index].$1 <= 0;
+
             return Row(
+              spacing: 10,
               children: [
                 CustomTextfield(
                   textEditingController: _controllers[index],
-                  fillColor: Theme.of(context).colorScheme.surfaceDim,
+                  fillColor: theme.surfaceDim,
                   maxLength: 100,
                   placeholder: "Enter new value",
                   showShadow: false,
@@ -139,6 +160,33 @@ class _SettingsReferencesValueState extends State<SettingsReferencesValue> {
                     _references[index] = (_references[index].$1, value);
                   },
                 ),
+
+                if (showButton)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _references.removeAt(index);
+                      });
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withAlpha(20),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.red,
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.delete_rounded,
+                          size: 20,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             );
           },
@@ -149,15 +197,30 @@ class _SettingsReferencesValueState extends State<SettingsReferencesValue> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             CustomButton(
+              showShadow: false,
+              height: 45,
+              width: 100,
               onTap: () => _addNew(),
               child: Center(
-                child: Text("Add New"),
+                child: Text(
+                  "Add New",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
               ),
             ),
             CustomButton(
+              height: 45,
+              showShadow: false,
               onTap: () => _saveValues(),
               child: Center(
-                child: Text("Save Changes"),
+                child: Text(
+                  "Save Changes",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
               ),
             ),
           ],

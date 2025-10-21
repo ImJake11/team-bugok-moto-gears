@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 class TimelineComponent extends StatelessWidget {
@@ -19,13 +21,13 @@ class TimelineComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     return TweenAnimationBuilder<Color?>(
       tween: ColorTween(
         begin: Colors.grey.shade800,
         end: isPast
-            ? Theme.of(context).colorScheme.tertiary
+            ? theme.tertiary
             : Colors.grey.shade800,
       ),
       duration: Duration(milliseconds: 200),

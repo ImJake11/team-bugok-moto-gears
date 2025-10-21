@@ -29,6 +29,8 @@ class StoreSetupRepository {
         results = await db.select(db.categories).get();
       } else if (referenceType == ReferenceType.colors) {
         results = await db.select(db.availableColors).get();
+      } else if (referenceType == ReferenceType.models) {
+        results = await db.select(db.models).get();
       } else {
         throw Exception("Unknown reference type: $referenceType");
       }
@@ -85,6 +87,11 @@ class StoreSetupRepository {
               (tbl) => tbl.id.equals(id),
             ))
             .write(AvailableColorsCompanion(value: Value(value)));
+      } else if (referenceType == ReferenceType.models) {
+        await (db.update(db.models)..where(
+              (tbl) => tbl.id.equals(id),
+            ))
+            .write(ModelsCompanion(value: Value(value)));
       } else {
         throw Exception("Unknown reference type: $referenceType");
       }
@@ -123,6 +130,12 @@ class StoreSetupRepository {
             .into(db.availableColors)
             .insert(
               AvailableColorsCompanion.insert(value: value),
+            );
+      } else if (referenceType == ReferenceType.models) {
+        await db
+            .into(db.models)
+            .insert(
+              ModelsCompanion.insert(value: value),
             );
       } else {
         throw Exception("Unknown reference type: $referenceType");

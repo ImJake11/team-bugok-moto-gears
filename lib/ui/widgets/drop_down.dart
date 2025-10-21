@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class CustomDropdown extends StatelessWidget {
   final List<String> entries;
@@ -20,25 +22,14 @@ class CustomDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     return Container(
       decoration: showDecoration
           ? BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceDim,
+              color: theme.surfaceDim,
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 3,
-                  spreadRadius: 3,
-                  color: Colors.black,
-                  offset: Offset(3, 3),
-                ),
-                BoxShadow(
-                  blurRadius: 3,
-                  spreadRadius: 3,
-                  color: Colors.grey.shade800.withAlpha(120),
-                  offset: Offset(-3, -3),
-                ),
-              ],
+              boxShadow: theme.shadow,
             )
           : null,
       child: DropdownMenu(
@@ -55,13 +46,13 @@ class CustomDropdown extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: Color(0xFF555555),
+              color: theme.borderColor,
             ),
             borderRadius: BorderRadius.circular(10),
           ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: Color(0xFF555555),
+              color: theme.borderColor,
             ),
             borderRadius: BorderRadius.circular(10),
           ),

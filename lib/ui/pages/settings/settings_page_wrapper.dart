@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class SettingsPageWrapper extends StatefulWidget {
   final String title;
   final Widget child;
   final String icon;
+  final String subTitle;
+  final Color? borderColor;
 
   const SettingsPageWrapper({
     super.key,
+    this.borderColor,
     required this.title,
     required this.child,
     required this.icon,
+    required this.subTitle,
   });
 
   @override
@@ -21,71 +27,93 @@ class _SettingsPageWrapperState extends State<SettingsPageWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => setState(() => _isCollapsed = !_isCollapsed),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceDim,
-          borderRadius: BorderRadius.circular(10),
+    final theme = context.watch<MyThemeProvider>();
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: widget.borderColor ?? theme.borderColor,
         ),
-        width: double.infinity,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 50,
-            vertical: 25,
-          ),
-          child: Column(
-            spacing: 20,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                spacing: 10,
-                children: [
-                  Image.asset(
-                    widget.icon,
-                    width: 18,
-                    colorBlendMode: BlendMode.srcIn,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  Text(
-                    widget.title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+        color: Colors.black26,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 30,
+          vertical: 20,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              spacing: 10,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 5,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  TweenAnimationBuilder<double>(
-                    tween: Tween(
-                      begin: 0,
-                      end: _isCollapsed ? 3.2 : 0,
+                    Text(
+                      widget.subTitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
-                    duration: Duration(milliseconds: 300),
-                    builder: (context, value, child) {
-                      return Transform.rotate(
-                        angle: value,
-                        child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _isCollapsed = !_isCollapsed),
-                          child: Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 30,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              if (_isCollapsed)
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 30,
-                  ),
-                  child: widget.child,
+                  ],
                 ),
-            ],
-          ),
+                const Spacer(),
+                TweenAnimationBuilder<double>(
+                  tween: Tween(
+                    begin: 0,
+                    end: _isCollapsed ? 3.2 : 0,
+                  ),
+                  duration: Duration(milliseconds: 300),
+                  builder: (context, value, child) {
+                    return Transform.rotate(
+                      angle: value,
+                      child: GestureDetector(
+                        onTap: () =>
+                            setState(() => _isCollapsed = !_isCollapsed),
+                        child: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          size: 30,
+                          color: theme.primary,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            AnimatedSwitcher(
+              duration: Duration(milliseconds: 400),
+              switchInCurve: Curves.easeIn,
+              switchOutCurve: Curves.linear,
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              child: _isCollapsed
+                  ? Padding(
+                      padding: const EdgeInsets.only(
+                        left: 30,
+                        top: 20,
+                      ),
+                      child: widget.child,
+                    )
+                  : const SizedBox(),
+            ),
+          ],
         ),
       ),
     );

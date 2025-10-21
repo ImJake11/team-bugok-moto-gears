@@ -160,6 +160,8 @@ class PosBloc extends Bloc<PosEvent, PosState> {
 
       List<CartModel> cart = [...s.cart];
 
+      if (cart.isEmpty) return;
+
       emit(PosLoadingState());
 
       await SalesRepository().insertSale(cart);

@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/constants/product_form_keys.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class ActiveToggle extends StatelessWidget {
   const ActiveToggle({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     return BlocBuilder<ProductFormBloc, ProductFormState>(
       builder: (context, state) {

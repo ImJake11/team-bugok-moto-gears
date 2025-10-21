@@ -7,6 +7,7 @@ class ReferencesValuesProviderCache extends ChangeNotifier {
   late List<(int, String)> _brands = [];
   late List<(int, String)> _colors = [];
   late List<(int, String)> _categories = [];
+  late List<(int, String)> _models = [];
 
   final StoreSetupRepository _storeSetupRepository = StoreSetupRepository();
 
@@ -15,9 +16,14 @@ class ReferencesValuesProviderCache extends ChangeNotifier {
   }
 
   List<(int, String)> get sizes => _sizes;
+
   List<(int, String)> get brands => _brands;
+
   List<(int, String)> get colors => _colors;
+
   List<(int, String)> get categories => _categories;
+
+  List<(int, String)> get models => _models;
 
   Future<void> fetchReferenceValues() async => _fetchReferencesValues();
 
@@ -38,6 +44,10 @@ class ReferencesValuesProviderCache extends ChangeNotifier {
 
       _categories = await _storeSetupRepository.getReferencesValues(
         ReferenceType.categories,
+      );
+
+      _models = await _storeSetupRepository.getReferencesValues(
+        ReferenceType.models,
       );
 
       print("Reference Values Fetched");

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:go_router/go_router.dart';
 import 'package:team_bugok_business/ui/pages/auth_page/widgets/auth_page_pin_button.dart';
 import 'package:team_bugok_business/ui/pages/auth_page/widgets/auth_page_pin_input_indicator.dart';
 import 'package:team_bugok_business/utils/provider/auth_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -18,27 +18,6 @@ class _AuthPageState extends State<AuthPage> {
   final _keyboardFocusNode = FocusNode();
 
   String _keyPress = "";
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-    final provider = context.read<AuthProvider>();
-
-    provider.addListener(
-      () async {
-        final isLoggedIn = provider.isLoggedIn;
-
-        if (!isLoggedIn) return;
-
-        Future.delayed(
-          Duration(seconds: 2),
-          () => context.goNamed('dashboard'),
-        );
-      },
-    );
-  }
 
   void _keyEventHandler(KeyEvent event) {
     if (event is! KeyDownEvent) return;
@@ -76,7 +55,7 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     final provider = context.watch<AuthProvider>();
     final password = provider.password;

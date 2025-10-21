@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class ProductViewSizeButton extends StatefulWidget {
   final String label;
@@ -6,6 +8,7 @@ class ProductViewSizeButton extends StatefulWidget {
   final int stock;
   final GestureTapCallback? onTap;
   final bool showHoverAnimation;
+  final bool? isInActive;
 
   const ProductViewSizeButton({
     super.key,
@@ -14,6 +17,7 @@ class ProductViewSizeButton extends StatefulWidget {
     required this.isAvailable,
     required this.stock,
     this.showHoverAnimation = false,
+    this.isInActive = false,
   });
 
   @override
@@ -25,6 +29,10 @@ class _ProductViewSizeButtonState extends State<ProductViewSizeButton> {
 
   @override
   Widget build(BuildContext context) {
+    final  theme = context.watch<MyThemeProvider>();
+
+    if (widget.isInActive ?? false) return const SizedBox();
+
     return GestureDetector(
       onTap: widget.onTap,
       child: MouseRegion(
@@ -41,14 +49,14 @@ class _ProductViewSizeButtonState extends State<ProductViewSizeButton> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: _isHover
-                  ? Theme.of(context).colorScheme.secondary
+                  ? theme.secondary
                   : !widget.showHoverAnimation && widget.isAvailable
-                  ? Theme.of(context).colorScheme.primary
+                  ? theme.primary
                   : Colors.black,
             ),
             color: widget.isAvailable
-                ? Theme.of(context).colorScheme.surface
-                : Theme.of(context).colorScheme.surfaceDim,
+                ? theme.surface
+                : theme.surfaceDim,
           ),
           child: Padding(
             padding: const EdgeInsets.all(10.0),

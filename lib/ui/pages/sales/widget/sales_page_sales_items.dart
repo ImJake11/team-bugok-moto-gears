@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/ui/pages/sales/widget/sales_page_table_header.dart';
 import 'package:team_bugok_business/utils/model/cart_model.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
 class SalesPageSalesItems extends StatelessWidget {
@@ -10,6 +12,8 @@ class SalesPageSalesItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     return Padding(
       padding: const EdgeInsets.only(top: 22),
       child: SizedBox(
@@ -25,7 +29,7 @@ class SalesPageSalesItems extends StatelessWidget {
               Text(
                 'TRANSACTION ITEMS',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: theme.primary,
                   fontSize: 20,
                 ),
               ),

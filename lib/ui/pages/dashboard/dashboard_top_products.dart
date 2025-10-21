@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/animated_text_value_change.dart';
+import 'package:team_bugok_business/utils/enums/reference_types.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/top_products_model.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class DashboardTopProducts extends StatelessWidget {
   const DashboardTopProducts({super.key});
@@ -104,19 +107,38 @@ class _WidgetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     final percentageValue = (product.sales / totalSales) * 100;
+    final brand = referencesGetValueByID(
+      context,
+      ReferenceType.brands,
+      product.brand,
+    );
 
     return Row(
       spacing: 10,
       children: [
         Expanded(
-          child: Text(
-            "${product.brand} ${product.model}",
-            style: TextStyle(
-              color: Colors.grey.shade500,
-              overflow: TextOverflow.fade,
-              fontSize: 12,
-            ),
+          child: Row(
+            spacing: 5,
+            children: [
+              Text(
+                brand,
+                style: TextStyle(
+                  overflow: TextOverflow.fade,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                product.model,
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  overflow: TextOverflow.fade,
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
         ),
         AnimatedTextValueChange(
@@ -140,23 +162,10 @@ class _WidgetTile extends StatelessWidget {
               height: 7,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 1,
-                    spreadRadius: 1,
-                    color: Colors.grey.shade900,
-                    offset: Offset(-1, -1),
-                  ),
-                  BoxShadow(
-                    blurRadius: 1,
-                    spreadRadius: 1,
-                    color: Colors.black,
-                    offset: Offset(1, 1),
-                  ),
-                ],
+                boxShadow: theme.shadow,
               ),
               child: LinearProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.primary,
                 backgroundColor: Colors.grey.shade900,
                 borderRadius: BorderRadius.circular(10),
                 value: value / totalSales,

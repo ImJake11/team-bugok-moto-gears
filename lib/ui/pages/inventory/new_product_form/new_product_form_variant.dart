@@ -5,10 +5,12 @@ import 'package:team_bugok_business/ui/pages/inventory/new_product_form/new_prod
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/toggle_switch.dart';
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
 import 'package:team_bugok_business/ui/widgets/error_button.dart';
+import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_id_by_value.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
 import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/get_available_colors.dart';
 
 class NewProductFormVariant extends StatefulWidget {
@@ -60,55 +62,54 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
     super.dispose();
   }
 
-  Widget addSizeBtn() => MouseRegion(
-    onEnter: (event) => setState(() => isNewSizeButtonHovered = true),
-    onExit: (event) => setState(() => isNewSizeButtonHovered = false),
-    child: GestureDetector(
-      onTap: () => context.read<ProductFormBloc>().add(
-        ProductFormCreateSize(
-          variantIndex: widget.variantIndex,
-        ),
-      ),
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isNewSizeButtonHovered
-                ? Theme.of(context).colorScheme.primary
-                : Colors.transparent,
-          ),
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.black,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 10,
-            horizontal: 15,
-          ),
-          child: Text('New Size'),
-        ),
-      ),
-    ),
-  );
-
   @override
   Widget build(BuildContext context) {
-    final cacheProvider = context.read<ReferencesValuesProviderCache>();
-
-    List<(int, String)> colorsReferences = cacheProvider.colors;
+    final theme = context.watch<MyThemeProvider>();
 
     VariantModel variant = widget.variantModel;
 
     List<VariantSizeModel> sizes = variant.sizes;
 
     final selectedColor = referencesGetValueByID(
-      colorsReferences,
+      context,
+      ReferenceType.colors,
       variant.color,
+    );
+
+    Widget addSizeBtn() => MouseRegion(
+      onEnter: (event) => setState(() => isNewSizeButtonHovered = true),
+      onExit: (event) => setState(() => isNewSizeButtonHovered = false),
+      child: GestureDetector(
+        onTap: () => context.read<ProductFormBloc>().add(
+          ProductFormCreateSize(
+            variantIndex: widget.variantIndex,
+          ),
+        ),
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isNewSizeButtonHovered
+                  ? theme.primary
+                  : Colors.transparent,
+            ),
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.black,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 15,
+            ),
+            child: Text('New Size'),
+          ),
+        ),
+      ),
     );
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: theme.surface,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
@@ -128,7 +129,8 @@ class _NewProductFormVariantState extends State<NewProductFormVariant> {
                   selectedValue: selectedColor,
                   onSelected: (value) {
                     final colorId = referenceGetIdByValue(
-                      colorsReferences,
+                      context,
+                      ReferenceType.colors,
                       value!,
                     );
 

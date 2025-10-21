@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
 import 'package:team_bugok_business/ui/pages/pos/pos_page_selected_product_variants.dart';
+import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/compute_product_stock.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class PosPageTableRow extends StatefulWidget {
   final ProductModel productModel;
@@ -24,7 +27,60 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     final product = widget.productModel;
+    final isActive = product.isActive == 1;
+
+    if (!isActive) return const SizedBox();
+
+    final brand = referencesGetValueByID(
+      context,
+      ReferenceType.brands,
+      product.brand,
+    );
+
+    Widget _addButton(
+      bool isHovered,
+      VoidCallback onAdd,
+    ) => Flexible(
+      child: Center(
+        child: GestureDetector(
+          onTap: onAdd,
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isHovered ? theme.primary : Colors.transparent,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                color: Color(0xFF555555),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 15,
+                vertical: 5,
+              ),
+              child: Text("Add"),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Widget _tableCell(dynamic data) => Flexible(
+      child: SizedBox(
+        height: 55,
+        child: Center(
+          child: Text(
+            "${data}",
+            style: TextStyle(
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ),
+    );
 
     return MouseRegion(
       onEnter: (event) => setState(() => _isHovered = true),
@@ -47,16 +103,14 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
             duration: Duration(milliseconds: 200),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: _isHovered
-                  ? Theme.of(context).colorScheme.surfaceDim
-                  : widget.index.isOdd
-                  ? Colors.grey.shade900
-                  : Theme.of(context).colorScheme.surface,
+              color: widget.index.isOdd
+                  ? Colors.black12
+                  : theme.surfaceDim,
             ),
             child: Flex(
               direction: Axis.horizontal,
               children: [
-                _tableCell(product.brand),
+                _tableCell(brand),
                 _tableCell(product.model),
                 _tableCell(product.variants.length),
                 _tableCell(computeProductStock(product.variants)),
@@ -75,48 +129,4 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
       ),
     );
   }
-
-  Widget _addButton(
-    bool isHovered,
-    VoidCallback onAdd,
-  ) => Flexible(
-    child: Center(
-      child: GestureDetector(
-        onTap: onAdd,
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            color: isHovered
-                ? Theme.of(context).colorScheme.primary
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(
-              color: Color(0xFF555555),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15,
-              vertical: 5,
-            ),
-            child: Text("Add"),
-          ),
-        ),
-      ),
-    ),
-  );
-
-  Widget _tableCell(dynamic data) => Flexible(
-    child: SizedBox(
-      height: 55,
-      child: Center(
-        child: Text(
-          "${data}",
-          style: TextStyle(
-            fontSize: 12,
-          ),
-        ),
-      ),
-    ),
-  );
 }

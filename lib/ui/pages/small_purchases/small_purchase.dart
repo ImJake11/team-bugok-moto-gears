@@ -1,16 +1,17 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
-import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
+import 'package:team_bugok_business/ui/widgets/drop_down.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
 import 'package:team_bugok_business/ui/widgets/snackbar.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
+import 'package:team_bugok_business/utils/constants/expenses_options.dart';
 import 'package:team_bugok_business/utils/database/app_database.dart';
 import 'package:team_bugok_business/utils/database/repositories/expenses_repository.dart';
 import 'package:team_bugok_business/utils/provider/loading_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class SmallPurchase extends StatefulWidget {
   const SmallPurchase({super.key});
@@ -25,11 +26,15 @@ class _SmallPurchaseState extends State<SmallPurchase> {
   final _noteController = TextEditingController();
   final _costController = TextEditingController();
 
+  int _selectedExpenses = -1;
+
   Future<void> _saveExpenses() async {
     try {
+      if (_costController.text.isEmpty || _selectedExpenses < 0) return;
       context.read<LoadingProvider>().showLoading("Saving Data");
 
       final newExpense = ExpensesCompanion.insert(
+        category: Value(_selectedExpenses),
         relatedId: 0,
         total: double.tryParse(_costController.text) ?? 0.00,
         note: Value(_noteController.text),
@@ -59,32 +64,19 @@ class _SmallPurchaseState extends State<SmallPurchase> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     return Center(
       child: Container(
         width: 500,
-        height: 370,
+        height: 400,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: theme.surfaceDim,
           border: Border.all(
-            color: Colors.grey.shade700,
+            color: theme.borderColor,
           ),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 5,
-              spreadRadius: 2,
-              offset: Offset(3, 3),
-              color: Colors.black,
-            ),
-            BoxShadow(
-              blurRadius: 5,
-              spreadRadius: 2,
-              offset: Offset(-3, -3),
-              color: Colors.grey.shade800.withAlpha(120),
-            ),
-          ],
+          boxShadow: theme.shadow,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -94,6 +86,7 @@ class _SmallPurchaseState extends State<SmallPurchase> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
+            spacing: 20,
             children: [
               Text(
                 "Small Expense",
@@ -101,6 +94,16 @@ class _SmallPurchaseState extends State<SmallPurchase> {
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+
+              CustomDropdown(
+                entries: expensesOptions,
+                label: 'Type of expense',
+                onSelected: (value) {
+                  final index = expensesOptions.indexOf(value!);
+
+                  setState(() => _selectedExpenses = index);
+                },
               ),
 
               CustomTextfield(

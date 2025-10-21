@@ -6,6 +6,7 @@ import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dar
 import 'package:team_bugok_business/constants/product_form_keys.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/form_wrapper.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class NewProductFormPricing extends StatelessWidget {
   final TextEditingController costPriceController;
@@ -19,12 +20,14 @@ class NewProductFormPricing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     var child = Row(
       spacing: 20,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         CustomTextfield(
-          fillColor: Theme.of(context).colorScheme.surface,
+          fillColor: theme.surface,
           showShadow: false,
           width: 200,
           textEditingController: costPriceController,
@@ -38,7 +41,7 @@ class NewProductFormPricing extends StatelessWidget {
           ],
         ),
         CustomTextfield(
-          fillColor: Theme.of(context).colorScheme.surface,
+          fillColor: theme.surface,
           showShadow: false,
           width: 200,
           textEditingController: sellingPriceController,

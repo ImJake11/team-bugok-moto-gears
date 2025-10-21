@@ -34,6 +34,7 @@ class _ProductViewState extends State<ProductView> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Column(
       children: [
         CustomAppbar(
@@ -52,7 +53,7 @@ class _ProductViewState extends State<ProductView> {
           child: Padding(
             padding: const EdgeInsets.symmetric(
               vertical: 20,
-              horizontal: 20,
+              horizontal: 50,
             ),
             child: Row(
               spacing: 20,

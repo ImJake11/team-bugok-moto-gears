@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/ui/pages/sales/widget/sales_page_sales_items.dart';
 import 'package:team_bugok_business/utils/model/sales_model.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/convertDateStringToDate.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 import 'package:team_bugok_business/utils/services/extract_time.dart';
@@ -31,6 +33,8 @@ class _SalesPageTableRowState extends State<SalesPageTableRow> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     final viewBtn = Flexible(
       child: GestureDetector(
         onTap: () => widget.isOnView ? widget.onHide() : widget.onView(),
@@ -42,7 +46,7 @@ class _SalesPageTableRowState extends State<SalesPageTableRow> {
               child: Text(
                 widget.isOnView ? "Close" : "Show Items",
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: theme.secondary,
                 ),
               ),
             ),
@@ -62,11 +66,11 @@ class _SalesPageTableRowState extends State<SalesPageTableRow> {
         curve: Curves.ease,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: _isHovered
-              ? Theme.of(context).colorScheme.surfaceDim
+          color: widget.isOnView
+              ? Colors.black
               : widget.index.isEven
-              ? Theme.of(context).colorScheme.surface
-              : Colors.grey.shade900,
+              ? theme.surfaceDim
+              : Colors.black12,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(

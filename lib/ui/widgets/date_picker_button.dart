@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class DatePickerButton extends StatefulWidget {
   final DateTime pickedDate;
@@ -31,7 +33,7 @@ class _DatePickerButtonState extends State<DatePickerButton> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     final formattedDate = DateFormat("MMMM dd, yyyy").format(widget.pickedDate);
 
@@ -45,22 +47,9 @@ class _DatePickerButtonState extends State<DatePickerButton> {
           borderRadius: BorderRadius.circular(10),
           color: theme.surfaceDim,
           border: Border.all(
-            color: Colors.grey.shade600,
+            color: theme.borderColor,
           ),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 3,
-              spreadRadius: 3,
-              offset: Offset(3, 3),
-              color: Colors.black,
-            ),
-            BoxShadow(
-              blurRadius: 3,
-              spreadRadius: 3,
-              offset: Offset(-3, -3),
-              color: Colors.grey.shade800.withAlpha(120),
-            ),
-          ],
+          boxShadow: theme.shadow,
         ),
 
         child: Padding(

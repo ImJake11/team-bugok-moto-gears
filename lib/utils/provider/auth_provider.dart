@@ -13,14 +13,23 @@ class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
 
   List<int> get password => _password;
+
   bool get hasError => _hasError;
+
   bool get isPinRemember => _isPinRemember;
+
   bool get isLoggedIn => _isLoggedIn;
+
   bool get isLoading => _isLoading;
 
   void addInput(int input) => _addInput(input);
+
   void deleteLast() => _deleteLast();
+
   void toggleCheckBox() => _toggleCheckBox();
+
+  void setUserAsLoggedOut() => _setUserAsLoggedOut();
+
   Future<void> checkUserSession() async => _checkUserSession();
 
   // ================== Functions ================== //
@@ -35,14 +44,17 @@ class AuthProvider extends ChangeNotifier {
       final (isLoggedIn, isRememberedPin) = result;
 
       if (isLoggedIn == 1) {
-        for (final p in passwordDigits) {
-          _password.add(int.parse(p));
-          notifyListeners();
-        }
+        // Clear existing password just in case
+        _password.clear();
+        // Add all digits at once
+        _password.addAll(passwordDigits.map((p) => int.parse(p)));
         _isLoggedIn = true;
-      }
+        _isPinRemember = isRememberedPin == 1;
 
-      notifyListeners();
+        // Notify only once
+        await Future.delayed(Duration(seconds: 2));
+        notifyListeners();
+      }
     } catch (e, st) {
       print("Failed to check user session ${e}");
       print(st);
@@ -86,6 +98,17 @@ class AuthProvider extends ChangeNotifier {
 
     _password.removeLast();
     notifyListeners();
+  }
+
+  void _setUserAsLoggedOut() {
+    _resetToDefault();
+  }
+
+  void _resetToDefault() {
+    _isLoading = false;
+    _isLoggedIn = false;
+    _hasError = false;
+    _password.clear();
   }
 
   void _toggleCheckBox() {

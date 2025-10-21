@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:team_bugok_business/utils/provider/auth_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class AuthPagePinInputIndicator extends StatelessWidget {
   final bool isContained;
-  
 
   const AuthPagePinInputIndicator({super.key, required this.isContained});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
     final provider = context.read<AuthProvider>();
 
     final hasError = provider.hasError;

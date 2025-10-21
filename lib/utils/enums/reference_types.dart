@@ -3,4 +3,5 @@ enum ReferenceType {
   sizes,
   categories,
   colors,
+  models,
 }

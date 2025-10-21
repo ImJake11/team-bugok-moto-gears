@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/stock_controller.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/toggle_switch.dart';
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
+import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_id_by_value.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
-import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/services/get_available_sizes.dart';
 
 class NewProductFormSizes extends StatelessWidget {
@@ -27,11 +26,11 @@ class NewProductFormSizes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cacheProvider = context.read<ReferencesValuesProviderCache>();
-
-    List<(int, String)> sizesReferences = cacheProvider.sizes;
-
-    final sizeValue = referencesGetValueByID(sizesReferences, size.sizeValue);
+    final sizeValue = referencesGetValueByID(
+      context,
+      ReferenceType.sizes,
+      size.sizeValue,
+    );
 
     return Padding(
       padding: const EdgeInsets.only(left: 100),
@@ -47,7 +46,11 @@ class NewProductFormSizes extends StatelessWidget {
               sizeValue,
             ),
             onSelected: (value) {
-              final sizeId = referenceGetIdByValue(sizesReferences, value!);
+              final sizeId = referenceGetIdByValue(
+                context,
+                ReferenceType.sizes,
+                value!,
+              );
 
               context.read<ProductFormBloc>().add(
                 ProductFormUpdateSize(

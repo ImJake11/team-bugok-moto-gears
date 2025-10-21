@@ -5,6 +5,7 @@ import 'package:team_bugok_business/ui/pages/pos/widgets/pos_page_cart_tile.dart
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
 import 'package:team_bugok_business/utils/helpers/compute_cart_total.dart';
 import 'package:team_bugok_business/utils/model/cart_model.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
 class PosPageCart extends StatelessWidget {
@@ -12,26 +13,17 @@ class PosPageCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
     
     return Container(
       width: 400,
       height: double.infinity,
       decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 3,
-            spreadRadius: 3,
-            color: Colors.black87,
-            offset: Offset(3, 3),
-          ),
-          BoxShadow(
-            blurRadius: 3,
-            spreadRadius: 3,
-            color: Colors.grey.shade800.withAlpha(120),
-            offset: Offset(-3, -3),
-          ),
-        ],
-        color: Theme.of(context).colorScheme.surfaceDim,
+        border: Border.all(
+          color: theme.borderColor
+        ),
+        boxShadow: theme.shadow,
+        color: theme.surfaceDim,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(

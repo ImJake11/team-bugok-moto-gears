@@ -3,13 +3,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
+import 'package:team_bugok_business/utils/enums/reference_types.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/low_stock_product_model.dart';
+import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class DashbardPageNoStock extends StatelessWidget {
   const DashbardPageNoStock({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.read<ReferencesValuesProviderCache>();
+
+    final brands = provider.brands;
+
     return SizedBox(
       width: double.infinity,
 
@@ -84,11 +92,13 @@ class DashbardPageNoStock extends StatelessWidget {
                             SizedBox(
                               width: 20,
                               child: Center(
-                                child: Text('5'),
+                                child: Text(
+                                  product.totalStock.toString(),
+                                ),
                               ),
                             ),
                             Text(
-                              "${product.brand} ${product.model}",
+                              "${referencesGetValueByID(context, ReferenceType.brands, product.brand)} ${product.model}",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade400,
@@ -138,9 +148,9 @@ class DashbardPageNoStock extends StatelessWidget {
                                       "Restock",
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
+                                        color: context
+                                            .watch<MyThemeProvider>()
+                                            .primary,
                                       ),
                                     ),
                                   ),

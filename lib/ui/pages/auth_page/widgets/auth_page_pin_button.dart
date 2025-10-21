@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/utils/provider/auth_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class AuthPagePinButton extends StatefulWidget {
   final String label;
@@ -45,7 +46,7 @@ class _AuthPagePinButtonState extends State<AuthPagePinButton> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     return GestureDetector(
       onTap: () {

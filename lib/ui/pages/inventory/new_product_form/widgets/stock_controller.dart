@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class StockController extends StatefulWidget {
   final int currentStock;
@@ -66,7 +67,7 @@ class _StockControllerState extends State<StockController> {
           child: CustomTextfield(
             textAlign: TextAlign.center,
             maxLength: 3,
-            fillColor: Theme.of(context).colorScheme.surface,
+            fillColor: context.watch<MyThemeProvider>().surfaceDim,
             showShadow: false,
             textEditingController: _controller,
             width: 200,

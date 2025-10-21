@@ -14,6 +14,7 @@ import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
 import 'package:team_bugok_business/ui/widgets/nav_back_button.dart';
 import 'package:team_bugok_business/ui/widgets/snackbar.dart';
 import 'package:team_bugok_business/utils/provider/loading_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class NewProductForm extends StatefulWidget {
   const NewProductForm({super.key});
@@ -23,7 +24,6 @@ class NewProductForm extends StatefulWidget {
 }
 
 class _NewProductFormState extends State<NewProductForm> {
-  final _modelController = TextEditingController();
   final _sellingPriceController = TextEditingController();
   final _costPriceController = TextEditingController();
 
@@ -31,7 +31,6 @@ class _NewProductFormState extends State<NewProductForm> {
 
   @override
   void dispose() {
-    _modelController.dispose();
     _costPriceController.dispose();
     _sellingPriceController.dispose();
     super.dispose();
@@ -39,6 +38,8 @@ class _NewProductFormState extends State<NewProductForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     final appbar = Padding(
       padding: const EdgeInsets.only(
         right: 30,
@@ -73,7 +74,7 @@ class _NewProductFormState extends State<NewProductForm> {
           ? context.read<ProductFormBloc>().add(ProductFormResetForm())
           : null,
       child: Container(
-        color: Theme.of(context).colorScheme.surface,
+        color: theme.surface,
         child: Column(
           spacing: 20,
           children: [
@@ -86,8 +87,6 @@ class _NewProductFormState extends State<NewProductForm> {
                   if (!_isInitialized && state is ProductFormInitial) {
                     final sellingPrice = state.productData.sellingPrice;
                     final costPrice = state.productData.costPrice;
-
-                    _modelController.text = state.productData.model;
 
                     _sellingPriceController.text = sellingPrice <= 0
                         ? ""
@@ -198,7 +197,7 @@ class _NewProductFormState extends State<NewProductForm> {
                                   isFirst: false,
                                   child: NewProductFormName(
                                     selectedBrand: brand,
-                                    modelController: _modelController,
+                                    model: model,
                                   ),
                                 );
                               },

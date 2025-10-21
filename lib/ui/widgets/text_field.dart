@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class CustomTextfield extends StatefulWidget {
   final double width;
@@ -55,26 +57,13 @@ class _CustomTextfieldState extends State<CustomTextfield> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    final theme = context.watch<MyThemeProvider>();
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         boxShadow: widget.showShadow ?? false
-            ? [
-                BoxShadow(
-                  blurRadius: 5,
-                  spreadRadius: 2,
-                  offset: Offset(3, 3),
-                  color: Colors.black54,
-                ),
-                BoxShadow(
-                  blurRadius: 5,
-                  spreadRadius: 2,
-                  offset: Offset(-3, -3),
-                  color: Colors.grey.shade800.withAlpha(120),
-                ),
-              ]
+            ? theme.shadow
             : [],
       ),
       width: widget.width,
@@ -97,13 +86,13 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary.withAlpha(200),
+              color: theme.primary.withAlpha(200),
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary,
+              color: theme.primary,
             ),
           ),
           hintText: widget.placeholder,

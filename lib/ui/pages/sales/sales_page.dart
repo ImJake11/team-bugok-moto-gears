@@ -54,8 +54,8 @@ class _SalesPageState extends State<SalesPage> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 40,
-        vertical: 10,
+        horizontal: 50,
+        vertical: 20,
       ),
       child: Column(
         spacing: 20,
@@ -63,6 +63,26 @@ class _SalesPageState extends State<SalesPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Sales History",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "Track all your recent transactions",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
               DatePickerButton(
                 pickedDate: _referenceDate,
                 onPicked: (pickedDate) {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class CustomSnackBar {
   final String message;
@@ -49,7 +51,7 @@ class CustomSnackBar {
                   decoration: BoxDecoration(
                     color: Colors.black,
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: context.watch<MyThemeProvider>().primary,
                     ),
                     borderRadius: BorderRadius.circular(10),
                   ),

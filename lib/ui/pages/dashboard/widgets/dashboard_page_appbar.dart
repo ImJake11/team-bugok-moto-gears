@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/date_picker_button.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class DashboardPageAppbar extends StatelessWidget {
   const DashboardPageAppbar({super.key});
@@ -23,7 +24,7 @@ class DashboardPageAppbar extends StatelessWidget {
               "Hello, Welcome back!",
               style: TextStyle(
                 fontSize: 14,
-                color: Theme.of(context).colorScheme.primary,
+                color: context.watch<MyThemeProvider>().primary,
               ),
             ),
           ],

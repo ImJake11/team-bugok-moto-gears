@@ -14,7 +14,7 @@ class ProductRepository {
       _insertProduct(productData);
 
   Future<List<ProductModel>> retrieveAllProduct() async =>
-      _retrieveAllProduct(db);
+      _retrieveAllProduct();
 
   Future<void> updateProduct(ProductModel productModel) async =>
       _updateProduct(productModel);
@@ -168,7 +168,7 @@ class ProductRepository {
     }
   }
 
-  Future<List<ProductModel>> _retrieveAllProduct(db) async {
+  Future<List<ProductModel>> _retrieveAllProduct() async {
     try {
       final query = db.select(db.products).join([
         leftOuterJoin(
@@ -219,6 +219,7 @@ class ProductRepository {
 
           // insert sizes if existing
           if (size != null) {
+       
             existingVariant.sizes.add(
               VariantSizeModel(
                 id: size.id,

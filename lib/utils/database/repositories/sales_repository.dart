@@ -122,7 +122,7 @@ class SalesRepository {
       for (final row in result) {
         final sale = row.readTable(db.sales);
         final item = row.readTableOrNull(db.saleItems);
-
+        
         groupedSales.putIfAbsent(
           sale.id,
           () => SalesModel(

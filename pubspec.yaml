@@ -98,6 +98,7 @@ flutter:
     - assets/images/price-tag.png
     - assets/images/expand.png
     - assets/images/apps.png
+    - assets/images/padlock.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:team_bugok_business/utils/provider/loading_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class LoadingOverlay extends StatelessWidget {
   const LoadingOverlay({super.key});
@@ -9,6 +10,7 @@ class LoadingOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loadingProvider = context.watch<LoadingProvider>();
+    final theme = context.watch<MyThemeProvider>();
 
     bool isShow = loadingProvider.isLoading;
     String message = loadingProvider.message;
@@ -18,13 +20,13 @@ class LoadingOverlay extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.width,
-      color: Theme.of(context).colorScheme.surfaceDim.withAlpha(220),
+      color: theme.surfaceDim.withAlpha(220),
       child: Center(
         child: Container(
           width: 300,
           height: 200,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceDim,
+            color: theme.surfaceDim,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: Colors.grey.shade500,
@@ -35,7 +37,7 @@ class LoadingOverlay extends StatelessWidget {
             spacing: 10,
             children: [
               SpinKitFadingCircle(
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.primary,
                 size: 50,
               ),
               Text(

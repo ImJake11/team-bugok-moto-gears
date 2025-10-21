@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class DateTimeDisplay extends StatefulWidget {
   const DateTimeDisplay({super.key});
@@ -42,12 +44,14 @@ class _DateTimeDisplayState extends State<DateTimeDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     return Row(
       children: [
         Icon(
           Icons.calendar_today,
           size: 20,
-          color: Theme.of(context).colorScheme.primary,
+          color: theme.primary,
         ),
         const SizedBox(width: 6),
         Text(
@@ -58,7 +62,7 @@ class _DateTimeDisplayState extends State<DateTimeDisplay> {
         Icon(
           Icons.access_time,
           size: 22,
-          color: Theme.of(context).colorScheme.primary,
+          color: theme.primary,
         ),
         const SizedBox(width: 6),
         Text(

@@ -6,8 +6,10 @@ import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dar
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_color_button.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_size_button.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/utils/helpers/compute_product_stock.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
 class ProductViewPreview extends StatelessWidget {
@@ -24,6 +26,7 @@ class ProductViewPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
     final cacheProvider = context.read<ReferencesValuesProviderCache>();
 
     final brands = cacheProvider.brands;
@@ -32,6 +35,8 @@ class ProductViewPreview extends StatelessWidget {
 
     final brand = brands.where((e) => e.$1 == productModel.brand).first.$2;
 
+    final isLowStock = computeProductStock(productModel.variants) <= 3;
+
     return Expanded(
       child: Center(
         child: Container(
@@ -39,23 +44,10 @@ class ProductViewPreview extends StatelessWidget {
           height: double.infinity,
           decoration: BoxDecoration(
             border: Border.all(
-              color: Color(0xFF555555),
+              color: theme.borderColor,
             ),
-            color: Theme.of(context).colorScheme.surfaceDim,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black54,
-                blurRadius: 3,
-                spreadRadius: 5,
-                offset: Offset(3, 3),
-              ),
-              BoxShadow(
-                color: Colors.grey.shade800.withAlpha(120),
-                blurRadius: 3,
-                spreadRadius: 3,
-                offset: Offset(-3, -3),
-              ),
-            ],
+            color: theme.surfaceDim,
+            boxShadow: theme.shadow,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Padding(
@@ -63,119 +55,140 @@ class ProductViewPreview extends StatelessWidget {
               vertical: 20,
               horizontal: 30,
             ),
-            child: Column(
-              spacing: 15,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
-                _titleWidget(productModel.model, "Model"),
-                _titleWidget(brand, "Brand"),
-                Divider(
-                  color: Colors.grey.shade600,
-                  thickness: 3,
-                  radius: BorderRadius.circular(10),
-                ),
-
-                // list of colors available
-                Text(
-                  'COLOR',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  direction: Axis.horizontal,
-                  children: productModel.variants.asMap().entries.map(
-                    (e) {
-                      final color = colors
-                          .where((c) => c.$1 == e.value.color)
-                          .first
-                          .$2;
-
-                      return ProductViewColorButton(
-                        onTap: () => onTap(e.key),
-                        isSelected: selectedColor == e.key,
-                        label: color,
-                      );
-                    },
-                  ).toList(),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'SIZE',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                Wrap(
-                  spacing: 10,
-                  children: List.from(sizes).map(
-                    (s) {
-                      final (id, value) = s;
-
-                      final variantSizes =
-                          productModel.variants[selectedColor].sizes;
-
-                      final stocks = variantSizes.where(
-                        (element) => element.sizeValue == id,
-                      );
-
-                      final size = sizes.where((e) => e.$1 == id).first.$2;
-
-                      return ProductViewSizeButton(
-                        stock: stocks.isEmpty ? 0 : stocks.first.stock,
-                        isAvailable: variantSizes.any((e) => e.sizeValue == id),
-                        label: size,
-                      );
-                    },
-                  ).toList(),
-                ),
-                Spacer(),
-                Row(
-                  spacing: 10,
+                Column(
+                  spacing: 15,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomButton(
-                      width: 150,
-                      height: 40,
-                      onTap: () {
-                        context.read<PosBloc>().add(
-                          PosSelectProduct(
-                            productID: productModel.id!,
-                          ),
-                        );
-                        GoRouter.of(context).goNamed("pos");
-                      },
-                      borderRadius: 50,
-                      child: Center(
-                        child: Text("Place in Order"),
+                    _titleWidget(productModel.model, "Model"),
+                    _titleWidget(brand, "Brand"),
+                    Divider(
+                      color: Colors.grey.shade600,
+                      thickness: 3,
+                      radius: BorderRadius.circular(10),
+                    ),
+
+                    // list of colors available
+                    Text(
+                      'COLOR',
+                      style: TextStyle(
+                        fontSize: 16,
                       ),
                     ),
-                    CustomButton(
-                      height: 40,
-                      borderRadius: 50,
-                      width: 100,
-                      onTap: () {
-                        context.read<ProductFormBloc>().add(
-                          ProductFormUpdateExistingProduct(
-                            productId: productModel.id!,
-                          ),
-                        );
-                        GoRouter.of(context).pushNamed('new-product-form');
-                      },
-                      child: Center(
-                        child: Text("Edit"),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      direction: Axis.horizontal,
+                      children: productModel.variants.asMap().entries.map(
+                        (e) {
+                          final color = colors
+                              .where((c) => c.$1 == e.value.color)
+                              .first
+                              .$2;
+
+                          return ProductViewColorButton(
+                            onTap: () => onTap(e.key),
+                            isSelected: selectedColor == e.key,
+                            label: color,
+                          );
+                        },
+                      ).toList(),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'SIZE',
+                      style: TextStyle(
+                        fontSize: 16,
                       ),
+                    ),
+                    Wrap(
+                      spacing: 10,
+                      children: List.from(sizes).map(
+                        (s) {
+                          final (id, value) = s;
+
+                          final variantSizes =
+                              productModel.variants[selectedColor].sizes;
+
+                          final stocks = variantSizes.where(
+                            (element) => element.sizeValue == id,
+                          );
+
+                          final size = sizes.where((e) => e.$1 == id).first.$2;
+
+                          return ProductViewSizeButton(
+                            stock: stocks.isEmpty ? 0 : stocks.first.stock,
+                            isAvailable: variantSizes.any(
+                              (e) => e.sizeValue == id,
+                            ),
+                            label: size,
+                          );
+                        },
+                      ).toList(),
                     ),
                     Spacer(),
-                    Text(
-                      currencyFormatter(productModel.sellingPrice),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      spacing: 10,
+                      children: [
+                        if (productModel.isActive == 1)
+                          CustomButton(
+                            width: 150,
+                            height: 40,
+                            onTap: () {
+                              context.read<PosBloc>().add(
+                                PosSelectProduct(
+                                  productID: productModel.id!,
+                                ),
+                              );
+                              GoRouter.of(context).goNamed("pos");
+                            },
+                            borderRadius: 50,
+                            child: Center(
+                              child: Text("Place in Order"),
+                            ),
+                          ),
+                        CustomButton(
+                          height: 40,
+                          borderRadius: 50,
+                          width: 100,
+                          onTap: () {
+                            context.read<ProductFormBloc>().add(
+                              ProductFormUpdateExistingProduct(
+                                productId: productModel.id!,
+                              ),
+                            );
+                            GoRouter.of(context).pushNamed('new-product-form');
+                          },
+                          child: Center(
+                            child: Text("Edit"),
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          currencyFormatter(productModel.sellingPrice),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
+                ),
+
+                // IN ACTIVE INDICATOR
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Row(
+                    spacing: 10,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (productModel.isActive == 0) _indicator("Inactive"),
+                      if (isLowStock) _indicator("Low stock"),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -185,6 +198,29 @@ class ProductViewPreview extends StatelessWidget {
     );
   }
 }
+
+Widget _indicator(String label) => Container(
+  decoration: BoxDecoration(
+    color: Colors.red.withAlpha(20),
+    borderRadius: BorderRadius.circular(10),
+    border: Border.all(
+      color: Colors.red,
+    ),
+  ),
+  child: Padding(
+    padding: const EdgeInsets.symmetric(
+      vertical: 10,
+      horizontal: 20,
+    ),
+    child: Text(
+      label,
+      style: TextStyle(
+        fontSize: 12,
+        color: Colors.red,
+      ),
+    ),
+  ),
+);
 
 Widget _titleWidget(String content, String title) {
   return Column(

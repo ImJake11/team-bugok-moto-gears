@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
 import 'package:team_bugok_business/ui/pages/pos/widgets/pos_page_table_row.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class PosPageProducts extends StatefulWidget {
   const PosPageProducts({super.key});
@@ -12,22 +13,22 @@ class PosPageProducts extends StatefulWidget {
 }
 
 class _PosPageProductsState extends State<PosPageProducts> {
-  Widget tableHeader(String label) {
-    return Flexible(
-      child: Container(
-        height: 50,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceDim,
-        ),
-        child: Center(
-          child: Text(label),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    Widget tableHeader(String label) {
+      return Flexible(
+        child: Container(
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.black,
+          ),
+          child: Center(
+            child: Text(label),
+          ),
+        ),
+      );
+    }
+
     return Expanded(
       child: Column(
         spacing: 10,
@@ -98,6 +99,8 @@ class __PlaceOrderButtonState extends State<_PlaceOrderButton> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     return SizedBox(
       height: 60,
       child: Center(
@@ -108,9 +111,7 @@ class __PlaceOrderButtonState extends State<_PlaceOrderButton> {
             duration: Duration(milliseconds: 200),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: _isHovered
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.surface,
+              color: _isHovered ? theme.primary : theme.surface,
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(

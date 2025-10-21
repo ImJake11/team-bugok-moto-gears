@@ -2,33 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
+import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class PosPageSearchbar extends StatelessWidget {
   const PosPageSearchbar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<MyThemeProvider>();
+
     return Container(
       height: 50,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceDim,
+        color: theme.surfaceDim,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 3,
-            spreadRadius: 3,
-            color: Colors.black87,
-            offset: Offset(3, 3),
-          ),
-          BoxShadow(
-            blurRadius: 3,
-            spreadRadius: 3,
-            color: Colors.grey.shade800.withAlpha(120),
-            offset: Offset(-3, -3),
-          ),
-        ],
+        boxShadow: theme.shadow,
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary,
+          color: theme.primary,
         ),
       ),
       child: LayoutBuilder(
@@ -38,7 +28,7 @@ class PosPageSearchbar extends StatelessWidget {
                 context.read<PosBloc>().add(PosSearch(query: value)),
             suffixIcon: Icons.search,
             placeholder: "Search Model",
-            fillColor: Theme.of(context).colorScheme.surfaceDim,
+            fillColor: theme.surfaceDim,
             width: constraints.maxWidth,
           );
         },
