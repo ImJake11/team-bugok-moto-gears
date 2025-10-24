@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:team_bugok_business/ui/pages/dashboard/dashbard_page_no_stock.dart';
+import 'package:team_bugok_business/ui/pages/dashboard/dashboard_page_chart.dart';
 import 'package:team_bugok_business/ui/pages/dashboard/dashboard_page_no_transactions.dart';
-import 'package:team_bugok_business/ui/pages/dashboard/dashboard_total_expenses.dart';
 import 'package:team_bugok_business/ui/pages/dashboard/dashboard_page_today_sales.dart';
 import 'package:team_bugok_business/ui/pages/dashboard/dashboard_top_products.dart';
-import 'package:team_bugok_business/ui/pages/dashboard/widgets/dashboard_page_component_wrapper.dart';
+import 'package:team_bugok_business/ui/pages/dashboard/dashboard_total_expenses.dart';
 import 'package:team_bugok_business/ui/pages/dashboard/widgets/dashboard_page_appbar.dart';
-
-import 'package:team_bugok_business/ui/pages/dashboard/dashboard_page_chart.dart';
+import 'package:team_bugok_business/ui/pages/dashboard/widgets/dashboard_page_component_wrapper.dart';
+import 'package:team_bugok_business/ui/widgets/padding_wrapper.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 20,
-      ),
+    return PaddingWrapper(
       child: Column(
         spacing: 20,
         children: [
@@ -33,13 +29,13 @@ class DashboardPage extends StatelessWidget {
                   spacing: 20,
                   children: [
                     DashboardComponentWrapper(
-                      title: "Today Sales",
+                      title: "Today's Sales",
                       height: constraints.maxHeight,
                       width: maxWidth,
                       child: DashboardPageTodaySales(),
                     ),
                     DashboardComponentWrapper(
-                      title: "Month Expenses",
+                      title: "This Month Expenses",
                       height: constraints.maxHeight,
                       width: maxWidth,
                       child: DashboardTotalExpenses(),

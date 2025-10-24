@@ -1,4 +1,3 @@
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,36 +13,42 @@ import 'package:team_bugok_business/utils/provider/loading_provider.dart';
 import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/router/config.dart';
+import 'package:window_manager/window_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScreenUtil.ensureScreenSize();
+  await windowManager.ensureInitialized();
 
-  appWindow.size = Size(1280, 720);
+  const minSize = Size(1280, 720);
+
+  const windowOptions = WindowOptions(
+    size: minSize,
+    center: true,
+    title: "Team Bugok Moto Gears",
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.normal,
+  );
+
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+    await windowManager.setSize(minSize);
+    await windowManager.setMinimumSize(minSize);
+    await windowManager.setAsFrameless();
+  });
 
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
+
   runApp(const MyApp());
-
-  appWindow.show();
-  doWhenWindowReady(
-    () {
-      final win = appWindow;
-      const initialize = Size(1280, 720);
-
-      win.minSize = initialize;
-      win.size = initialize;
-      win.alignment = Alignment.center;
-      win.title = "Team Bugok Moto Gears";
-      win.show();
-    },
-  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  // This widget is the root of your application.d
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -54,7 +59,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       builder: (context, child) {
- 
         return MultiBlocProvider(
           providers: [
             BlocProvider(create: (_) => ProductFormBloc()),

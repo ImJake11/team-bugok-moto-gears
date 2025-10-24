@@ -5,6 +5,7 @@ import 'package:team_bugok_business/ui/pages/sales/widget/sales_page_table_heade
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
 import 'package:team_bugok_business/ui/widgets/line_chart.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
+import 'package:team_bugok_business/ui/widgets/padding_wrapper.dart';
 import 'package:team_bugok_business/utils/constants/expenses_options.dart';
 import 'package:team_bugok_business/utils/database/repositories/expenses_repository.dart';
 import 'package:team_bugok_business/utils/model/chart_model.dart';
@@ -146,11 +147,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
         List<String> tableHeader = ["ID", "Type", "Date", "Note", "Total"];
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 20,
-            horizontal: 50,
-          ),
+        return PaddingWrapper(
           child: Column(
             spacing: 20,
             children: [

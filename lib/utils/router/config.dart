@@ -11,25 +11,19 @@ import 'package:team_bugok_business/ui/pages/pos/pos_page.dart';
 import 'package:team_bugok_business/ui/pages/sales/sales_page.dart';
 import 'package:team_bugok_business/ui/pages/settings/settings_page.dart';
 import 'package:team_bugok_business/ui/pages/small_purchases/small_purchase.dart';
+import 'package:team_bugok_business/ui/splash_screen.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 
 GoRouter router = GoRouter(
-  initialLocation: "/",
-  // refreshListenable: authProvider,
-  // redirect: (context, state) {
-  //   final auth = authProvider;
-  //   final isAuthPage = state.matchedLocation == '/auth_page';
-
-  //   if (!auth.isLoggedIn && !isAuthPage) {
-  //     return '/auth_page';
-  //   }
-  //   if (auth.isLoggedIn && isAuthPage) {
-  //     return '/';
-  //   }
-
-  //   return null;
-  // },
+  initialLocation: "/splash_screen",
   routes: [
+    GoRoute(
+      path: "/splash_screen",
+      name: 'splash-screen',
+      pageBuilder: (context, state) => const MaterialPage(
+        child: SplashScreen(),
+      ),
+    ),
     GoRoute(
       path: "/auth_page",
       name: 'auth-page',

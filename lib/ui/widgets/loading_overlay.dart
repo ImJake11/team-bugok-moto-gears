@@ -20,7 +20,10 @@ class LoadingOverlay extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.width,
-      color: theme.surfaceDim.withAlpha(220),
+      decoration: BoxDecoration(
+        color: theme.surfaceDim.withAlpha(220),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Center(
         child: Container(
           width: 300,
@@ -29,7 +32,7 @@ class LoadingOverlay extends StatelessWidget {
             color: theme.surfaceDim,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: Colors.grey.shade500,
+              color: theme.primary,
             ),
           ),
           child: Column(

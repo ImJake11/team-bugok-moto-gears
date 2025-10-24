@@ -1,0 +1,4 @@
+enum DatePickerActions {
+  dashboard,
+  sales,
+}

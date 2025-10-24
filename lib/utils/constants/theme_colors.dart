@@ -65,11 +65,12 @@ final List<ColorProp> colorAccents = [
     ],
   ),
   ColorProp(
-    name: "Yellow Harmony",
+    name: "Violet Echo",
     colors: [
-      Color(0xFFF9A825), // Primary - Golden Yellow
-      Color(0xFFFFD54F), // Secondary - Bright Amber
-      Color(0xFFFFF59D), // Tertiary - Soft Pastel Yellow
+      Color(0xFF6A1B9A), // Deep Violet (cool)
+      Color(0xFFAB47BC), // Mid Orchid (neutral)
+      Color(0xFFE1BEE7), // Soft Lavender (warm tint)
     ],
-  ),
+  )
+
 ];

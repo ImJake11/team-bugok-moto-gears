@@ -3,6 +3,7 @@ import 'package:team_bugok_business/ui/pages/sales/widget/sales_page_table_heade
 import 'package:team_bugok_business/ui/pages/sales/widget/sales_page_table_row.dart';
 import 'package:team_bugok_business/ui/widgets/date_picker_button.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
+import 'package:team_bugok_business/ui/widgets/padding_wrapper.dart';
 import 'package:team_bugok_business/utils/database/repositories/sales_repository.dart';
 import 'package:team_bugok_business/utils/model/sales_model.dart';
 
@@ -52,11 +53,7 @@ class _SalesPageState extends State<SalesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 50,
-        vertical: 20,
-      ),
+    return PaddingWrapper(
       child: Column(
         spacing: 20,
         children: [

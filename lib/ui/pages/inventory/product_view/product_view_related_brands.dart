@@ -101,7 +101,7 @@ class _ProductViewRelatedBrandsState extends State<ProductViewRelatedBrands> {
                             ),
                             CustomButton(
                               onTap: () {
-                                GoRouter.of(context).go('inventory');
+                                GoRouter.of(context).goNamed('inventory');
                               },
                               child: Center(
                                 child: Text(

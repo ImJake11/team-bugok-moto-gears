@@ -52,7 +52,7 @@ class _AuthPagePinButtonState extends State<AuthPagePinButton> {
       onTap: () {
         final auth = context.read<AuthProvider>();
 
-        widget.index == 9
+        widget.index == 10
             ? auth.deleteLast()
             : auth.addInput(int.parse(widget.label));
       },
@@ -70,43 +70,31 @@ class _AuthPagePinButtonState extends State<AuthPagePinButton> {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(10),
               color: _isHovered
                   ? theme.primary.withAlpha(50)
                   : theme.surfaceDim,
               border: Border.all(
-                color: Colors.grey.shade800,
+                color: theme.borderColor,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade900,
-                  blurRadius: 5,
-                  spreadRadius: 3,
-                  offset: Offset(-3, -3),
-                ),
-                BoxShadow(
-                  color: Colors.black,
-                  blurRadius: 5,
-                  spreadRadius: 3,
-                  offset: Offset(3, 3),
-                ),
-              ],
+              boxShadow: theme.shadow,
             ),
             child: Center(
               child: TweenAnimationBuilder<double>(
                 tween: Tween(begin: 1, end: _isHovered ? 1.3 : 1),
                 duration: Duration(milliseconds: 250),
-                builder: (context, value, child) => Transform.scale(
-                  scale: value,
-                  child: Text(
-                    widget.label,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
+                builder: (context, value, child) =>
+                    Transform.scale(
+                      scale: value,
+                      child: Text(
+                        widget.label,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
               ),
             ),
           ),

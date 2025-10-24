@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:team_bugok_business/ui/widgets/custom_date_picker.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class DatePickerButton extends StatefulWidget {
@@ -18,17 +19,14 @@ class DatePickerButton extends StatefulWidget {
 }
 
 class _DatePickerButtonState extends State<DatePickerButton> {
-  Future<void> _pickDate() async {
-    final DateTime? picked = await showDatePicker(
+  void _pickDate() {
+    CustomDatePicker(
+      initialDate: widget.pickedDate,
       context: context,
-      currentDate: widget.pickedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-
-    if (picked != null) {
-      widget.onPicked(picked);
-    }
+      onDateSelected: (value) {
+        widget.onPicked(value!);
+      },
+    ).show();
   }
 
   @override

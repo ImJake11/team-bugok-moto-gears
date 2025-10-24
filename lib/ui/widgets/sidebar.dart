@@ -52,47 +52,34 @@ class Sidebar extends StatelessWidget {
     ];
 
     return Container(
-      color: theme.surfaceDim,
       width: sidebarWidth,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: theme.surfaceDim,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          bottomLeft: Radius.circular(10),
+        ),
+      ),
       height: MediaQuery.of(context).size.height,
-      child: Stack(
+      child: Column(
+        spacing: 10,
         children: [
-          Image.asset(
-            "assets/images/carbon.png",
-            height: double.infinity,
-            fit: BoxFit.cover,
+          SizedBox(
+            height: 100,
+            child: Image.asset(
+              width: sidebarWidth * .65,
+              "assets/images/moto-gears-icon-no-bg.png",
+              fit: BoxFit.cover,
+            ),
           ),
-          Container(
-            width: sidebarWidth,
-            height: double.infinity,
-            color: theme.surfaceDim.withAlpha(252),
-          ),
-          Column(
-            spacing: 10,
-            children: [
-              SizedBox(
-                height: 150,
-                child: Image.asset(
-                  width: sidebarWidth * .65,
-                  "assets/images/moto-gears-icon-no-bg.png",
-                  fit: BoxFit.cover,
-                ),
-              ),
-              ...List.generate(
-                buttonsData.length,
-                (index) => GestureDetector(
-                  onTap: () {
-                    GoRouter.of(context).goNamed(
-                      buttonsData[index].routeName,
-                    );
-                  },
-                  child: SidebarButton(
-                    data: buttonsData[index],
-                    isSelected: buttonsData[index].routeName == routeName,
-                  ),
-                ),
-              ),
-            ],
+          const SizedBox(height: 20),
+          ...List.generate(
+            buttonsData.length,
+            (index) => SidebarButton(
+              data: buttonsData[index],
+              isSelected: buttonsData[index].routeName == routeName,
+            ),
           ),
         ],
       ),
@@ -120,67 +107,72 @@ class _SidebarButtonState extends State<SidebarButton> {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<MyThemeProvider>();
+    final isSelected = widget.isSelected;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return GestureDetector(
+      onTap: () => GoRouter.of(context).goNamed(widget.data.routeName),
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          curve: Curves.linear,
-          height: 50,
-          decoration: widget.isSelected
-              ? BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade900,
-                      blurRadius: 5,
-                      offset: Offset(2, 2),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            curve: Curves.easeIn,
+            height: 50,
+            decoration: isSelected
+                ? BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: theme.primary.withAlpha(30),
+                    border: Border.all(
+                      color: theme.primary,
                     ),
-                  ],
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: _isHovered ? [0.0, 0.5, 1.0] : [0.1, 0.3, 0.6],
-                    colors: [
-                      theme.tertiary,
-                      theme.secondary,
-                      theme.primary,
-                    ],
-                  ),
-                )
-              : BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: _isHovered ? theme.surface : Colors.transparent,
-                ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              spacing: 10,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset(
-                  widget.data.icon,
-                  color: Colors.white,
-                  height: 20,
-                  colorBlendMode: BlendMode.srcIn,
-                ),
-                Text(
-                  widget.data.name,
-                  style: TextStyle(
-                    fontSize: 12,
-                    overflow: TextOverflow.fade,
-                  ),
-                ),
-              ],
+                  )
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: _iconTextTweenBuilder(isSelected || _isHovered, theme),
             ),
           ),
         ),
       ),
     );
   }
+
+  Widget _iconTextTweenBuilder(
+    bool isSelected,
+    MyThemeProvider theme,
+  ) => TweenAnimationBuilder<Color?>(
+    tween: ColorTween(
+      begin: Colors.grey.shade200,
+      end: isSelected ? theme.primary : Colors.grey.shade200,
+    ),
+    duration: Duration(milliseconds: 250),
+    curve: Curves.easeIn,
+    builder: (context, value, _) {
+      return Row(
+        spacing: 10,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Image.asset(
+            widget.data.icon,
+            color: value,
+            height: 20,
+            colorBlendMode: BlendMode.srcIn,
+          ),
+          Text(
+            widget.data.name,
+            style: TextStyle(
+              fontSize: 14,
+              overflow: TextOverflow.fade,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: value,
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class ButtonProp {

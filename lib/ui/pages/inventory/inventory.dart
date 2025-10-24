@@ -8,6 +8,7 @@ import 'package:team_bugok_business/bloc/inventory_bloc/inventory_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/inventoryTable.dart';
 import 'package:team_bugok_business/ui/widgets/appbar.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
+import 'package:team_bugok_business/ui/widgets/padding_wrapper.dart';
 import 'package:team_bugok_business/ui/widgets/primary_button.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
@@ -69,70 +70,56 @@ class _InventoryPageState extends State<InventoryPage> {
       ),
     );
 
-    var appbar = Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 15,
-        vertical: 10,
-      ),
-      child: Row(
-        spacing: 10,
-        children: [
-          CustomTextfield(
-            textEditingController: _searchController,
-            suffixIcon: LucideIcons.search,
-            placeholder: "Search Model",
-            fillColor: context.watch<MyThemeProvider>().surfaceDim,
-            onChange: (value) {
-              _searchQuery();
-            },
-          ),
-          const Spacer(),
-          newGearButton,
-        ],
-      ),
+    var appbar = Row(
+      spacing: 10,
+      children: [
+        CustomTextfield(
+          textEditingController: _searchController,
+          suffixIcon: LucideIcons.search,
+          placeholder: "Search Model",
+          fillColor: context.watch<MyThemeProvider>().surfaceDim,
+          onChange: (value) {
+            _searchQuery();
+          },
+        ),
+        const Spacer(),
+        newGearButton,
+      ],
     );
 
     var body = Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-        ),
-        child: BlocBuilder<InventoryBloc, InventoryState>(
-          builder: (context, state) {
-            if (state is InventoryLoadingState) {
-              return Center(
-                child: LoadingWidget(),
-              );
-            } else if (state is InventoryInitial) {
-              final isFiltering = state.isFiltering;
-              final searchResults = state.searchResults;
-              final products = state.products;
+      child: BlocBuilder<InventoryBloc, InventoryState>(
+        builder: (context, state) {
+          if (state is InventoryLoadingState) {
+            return Center(
+              child: LoadingWidget(),
+            );
+          } else if (state is InventoryInitial) {
+            final isFiltering = state.isFiltering;
+            final searchResults = state.searchResults;
+            final products = state.products;
 
-              if (products.isEmpty) {
-                return Center(
-                  child: Text("No products found"),
-                );
-              }
-
-              return InventoryTable(
-                products: isFiltering ? searchResults : products,
-              );
-            } else {
+            if (products.isEmpty) {
               return Center(
-                child: Text('Something went wrong'),
+                child: Text("No products found"),
               );
             }
-          },
-        ),
+
+            return InventoryTable(
+              products: isFiltering ? searchResults : products,
+            );
+          } else {
+            return Center(
+              child: Text('Something went wrong'),
+            );
+          }
+        },
       ),
     );
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 20,
-      ),
+    return PaddingWrapper(
       child: Column(
+        spacing: 10,
         children: [
           CustomAppbar(child: appbar),
           body,

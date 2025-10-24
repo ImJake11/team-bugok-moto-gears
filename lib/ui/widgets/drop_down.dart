@@ -6,6 +6,7 @@ class CustomDropdown extends StatelessWidget {
   final List<String> entries;
   final String label;
   final double? width;
+  final double? height;
   final ValueChanged<String?>? onSelected;
   final String? selectedValue;
   final bool showDecoration;
@@ -18,6 +19,7 @@ class CustomDropdown extends StatelessWidget {
     this.onSelected,
     this.selectedValue,
     this.showDecoration = false,
+    this.height,
   });
 
   @override
@@ -63,7 +65,7 @@ class CustomDropdown extends StatelessWidget {
         width: width,
         enableSearch: true,
         enableFilter: true,
-        menuHeight: 400,
+        menuHeight: height ?? 400,
         dropdownMenuEntries: entries.map((etnry) {
           return DropdownMenuEntry(
             value: etnry,

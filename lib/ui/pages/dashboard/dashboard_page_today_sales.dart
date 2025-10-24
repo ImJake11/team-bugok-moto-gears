@@ -55,18 +55,7 @@ class DashboardPageTodaySales extends StatelessWidget {
                     value: sales,
                     textStyle: TextStyle(
                       fontSize: responsiveFontSize(context, 14),
-                      shadows: [
-                        Shadow(
-                          blurRadius: 5,
-                          color: Colors.black,
-                          offset: Offset(3, 3),
-                        ),
-                        Shadow(
-                          blurRadius: 5,
-                          color: Colors.grey.shade800.withAlpha(120),
-                          offset: Offset(-3, -3),
-                        ),
-                      ],
+                      shadows: context.watch<MyThemeProvider>().shadow,
                       fontWeight: FontWeight.bold,
                       color: context.watch<MyThemeProvider>().primary,
                     ),

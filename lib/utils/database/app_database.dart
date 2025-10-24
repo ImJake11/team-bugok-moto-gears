@@ -77,7 +77,7 @@ class SaleItems extends Table {
 
   IntColumn get brand => integer().references(Brands, #id)();
 
-  TextColumn get model => text().references(Models, #values)();
+  TextColumn get model => text().references(Models, #value)();
 
   IntColumn get size => integer().references(AvailableSizes, #id)();
 
@@ -213,11 +213,11 @@ class AppDatabase extends _$AppDatabase {
             );
       }
     },
-    /*   onUpgrade: (Migrator m, int from, int to) async {
-      if (from == 21) {
-        await m.createTable(models);
-      }
-    },*/
+    // onUpgrade: (Migrator m, int from, int to) async {
+    //   if (from == 21) {
+    //     await m.alterTable(migration);
+    //   }
+    // },
   );
 }
 
