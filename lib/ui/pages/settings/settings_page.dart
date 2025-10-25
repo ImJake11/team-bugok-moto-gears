@@ -4,6 +4,7 @@ import 'package:team_bugok_business/ui/pages/settings/settings_page_theme_accent
 import 'package:team_bugok_business/ui/pages/settings/settings_page_wrapper.dart';
 import 'package:team_bugok_business/ui/pages/settings/settins_references_value.dart';
 import 'package:team_bugok_business/ui/pages/settings/widgets/setting_page_logout_button.dart';
+import 'package:team_bugok_business/ui/pages/settings/widgets/settings_page_backup.dart';
 import 'package:team_bugok_business/ui/widgets/appbar.dart';
 import 'package:team_bugok_business/utils/enums/reference_types.dart';
 
@@ -45,6 +46,7 @@ class SettingsPage extends StatelessWidget {
               child: Column(
                 spacing: 20,
                 children: [
+                  SettingsPageBackup(),
                   SettingsPageWrapper(
                     icon: 'assets/images/palette.png',
                     title: "Color Accents",
@@ -102,7 +104,7 @@ class SettingsPage extends StatelessWidget {
                     subTitle: "Update your pin to keep your system secure",
                     child: SettingsPageChangePassword(),
                   ),
-                
+
                   const SizedBox(height: 100),
                   SettingPageLogoutButton(),
                 ],

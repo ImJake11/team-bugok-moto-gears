@@ -39,6 +39,8 @@ class _SalesPageState extends State<SalesPage> {
         referenceDate: _referenceDate,
       );
 
+      if (!mounted) return;
+
       await Future.delayed(Duration(seconds: 1));
       setState(() {
         _sales = result;

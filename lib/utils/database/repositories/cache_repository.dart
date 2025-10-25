@@ -19,7 +19,39 @@ class CacheRepository {
 
   Future<void> logOut() async => _logOut();
 
+  Future<void> setLastSync() async => _setLastSync();
+
+  Future<DateTime?> getLatestSync() async => _getLatestSync();
+
   // ============================================= //
+Future<DateTime?> _getLatestSync() async {
+  try {
+
+    final result = await db.select(db.caches).getSingle();
+
+    return result.lastSync;
+  } catch(e, st){
+    print("Failed to get latest sync record");
+    print(st);
+    rethrow;
+  }
+}
+  Future<void> _setLastSync() async {
+    try {
+      await db
+          .update(db.caches)
+          .write(
+            CachesCompanion(
+              lastSync: Value(DateTime.now()),
+            ),
+          );
+    } catch (e, st) {
+      print('Failed to set sync ${e}');
+      print(st);
+      rethrow;
+    }
+  }
+
   Future<int> _getTheme() async {
     try {
       final result = await db.select(db.caches).getSingle();
@@ -54,7 +86,7 @@ class CacheRepository {
           .update(db.caches)
           .write(
             CachesCompanion(
-              passaword: Value(newPin),
+              password: Value(newPin),
             ),
           );
     } catch (e, st) {
@@ -95,10 +127,7 @@ class CacheRepository {
 
   Future<int> _getPassword() async {
     try {
-      final query = db
-          .select(db.caches)
-          .map((row) => row.passaword)
-          .getSingle();
+      final query = db.select(db.caches).map((row) => row.password).getSingle();
 
       final password = await query;
 

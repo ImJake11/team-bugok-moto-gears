@@ -1,57 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:team_bugok_business/utils/provider/sidebar_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
-class Sidebar extends StatelessWidget {
+class Sidebar extends StatefulWidget {
   const Sidebar({super.key});
 
+  @override
+  State<Sidebar> createState() => _SidebarState();
+}
+
+class _SidebarState extends State<Sidebar> {
   @override
   Widget build(BuildContext context) {
     final routeName = GoRouter.of(context).state.name;
     final theme = context.watch<MyThemeProvider>();
+    final sidebar = context.watch<SidebarProvider>();
 
-    final double sidebarWidth = 270;
+    bool isMinimized = sidebar.isMinimized;
+    final buttonsData = sidebar.buttonsData;
 
-    List<ButtonProp> buttonsData = [
-      ButtonProp(
-        routeName: "dashboard",
-        name: "Dashboard",
-        icon: "assets/images/dashboard.png",
-      ),
-      ButtonProp(
-        routeName: "inventory",
-        name: "Inventory Management",
-        icon: "assets/images/box.png",
-      ),
-      ButtonProp(
-        routeName: "pos",
-        name: "New Sale",
-        icon: "assets/images/pos-terminal.png",
-      ),
-      ButtonProp(
-        name: "Small Expense",
-        icon: "assets/images/shopping-bag.png",
-        routeName: "small-purchase",
-      ),
-      ButtonProp(
-        name: "Sales History",
-        icon: "assets/images/sales.png",
-        routeName: 'sales',
-      ),
-      ButtonProp(
-        name: "Expense Summary",
-        icon: "assets/images/expenses.png",
-        routeName: 'expenses',
-      ),
-      ButtonProp(
-        name: "Store Setup",
-        icon: "assets/images/settings.png",
-        routeName: 'settings',
-      ),
-    ];
+    final double sidebarWidth = isMinimized ? 100 : 270;
 
-    return Container(
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 200),
       width: sidebarWidth,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
@@ -62,23 +35,45 @@ class Sidebar extends StatelessWidget {
         ),
       ),
       height: MediaQuery.of(context).size.height,
-      child: Column(
-        spacing: 10,
+      child: Stack(
         children: [
-          SizedBox(
-            height: 100,
-            child: Image.asset(
-              width: sidebarWidth * .65,
-              "assets/images/moto-gears-icon-no-bg.png",
-              fit: BoxFit.cover,
-            ),
+          Column(
+            spacing: 10,
+            children: [
+              if (!isMinimized)
+                SizedBox(
+                  height: 100,
+                  child: Image.asset(
+                    width: sidebarWidth * .65,
+                    "assets/images/moto-gears-icon-no-bg.png",
+                    fit: BoxFit.cover,
+                  ),
+                )
+              else
+                const SizedBox(height: 35),
+              const SizedBox(height: 20),
+              ...List.generate(
+                buttonsData.length,
+                (index) => SidebarButton(
+                  isMinimized: isMinimized,
+                  data: buttonsData[index],
+                  isSelected: buttonsData[index].routeName == routeName,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-          ...List.generate(
-            buttonsData.length,
-            (index) => SidebarButton(
-              data: buttonsData[index],
-              isSelected: buttonsData[index].routeName == routeName,
+          Positioned(
+            right: 0,
+            top: 0,
+            child: IconButton(
+              tooltip: isMinimized ? 'Maximize Sidebar' : 'Minimize Sidebar',
+              onPressed: () => context.read<SidebarProvider>().toggleSidebar(),
+              icon: Icon(
+                isMinimized
+                    ? Icons.arrow_forward_ios_rounded
+                    : Icons.arrow_back_ios_rounded,
+                size: 15,
+              ),
             ),
           ),
         ],
@@ -90,11 +85,13 @@ class Sidebar extends StatelessWidget {
 class SidebarButton extends StatefulWidget {
   final ButtonProp data;
   final bool isSelected;
+  final bool isMinimized;
 
   const SidebarButton({
     super.key,
     required this.data,
     required this.isSelected,
+    required this.isMinimized,
   });
 
   @override
@@ -117,18 +114,21 @@ class _SidebarButtonState extends State<SidebarButton> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: AnimatedContainer(
+            clipBehavior: Clip.antiAlias,
+
             duration: Duration(milliseconds: 200),
             curve: Curves.easeIn,
             height: 50,
             decoration: isSelected
                 ? BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: theme.primary.withAlpha(30),
+                    color: theme.primary.withAlpha(20),
+
                     border: Border.all(
                       color: theme.primary,
                     ),
                   )
-                : null,
+                : BoxDecoration(),
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: _iconTextTweenBuilder(isSelected || _isHovered, theme),
@@ -153,6 +153,9 @@ class _SidebarButtonState extends State<SidebarButton> {
       return Row(
         spacing: 10,
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: widget.isMinimized
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.start,
         children: [
           Image.asset(
             widget.data.icon,
@@ -160,25 +163,20 @@ class _SidebarButtonState extends State<SidebarButton> {
             height: 20,
             colorBlendMode: BlendMode.srcIn,
           ),
-          Text(
-            widget.data.name,
-            style: TextStyle(
-              fontSize: 14,
-              overflow: TextOverflow.fade,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: value,
+          if (!widget.isMinimized)
+            Expanded(
+              child: Text(
+                widget.data.name,
+                style: TextStyle(
+                  fontSize: 14,
+                  overflow: TextOverflow.ellipsis,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: value,
+                ),
+              ),
             ),
-          ),
         ],
       );
     },
   );
-}
-
-class ButtonProp {
-  final String name;
-  final String icon;
-  final String routeName;
-
-  ButtonProp({required this.name, required this.icon, required this.routeName});
 }

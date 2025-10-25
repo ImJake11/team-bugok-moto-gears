@@ -189,6 +189,192 @@ class BrandsCompanion extends UpdateCompanion<Brand> {
   }
 }
 
+class $ModelsTable extends Models with TableInfo<$ModelsTable, Model> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ModelsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'models';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Model> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Model map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Model(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+    );
+  }
+
+  @override
+  $ModelsTable createAlias(String alias) {
+    return $ModelsTable(attachedDatabase, alias);
+  }
+}
+
+class Model extends DataClass implements Insertable<Model> {
+  final int id;
+  final String value;
+  const Model({required this.id, required this.value});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['value'] = Variable<String>(value);
+    return map;
+  }
+
+  ModelsCompanion toCompanion(bool nullToAbsent) {
+    return ModelsCompanion(id: Value(id), value: Value(value));
+  }
+
+  factory Model.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Model(
+      id: serializer.fromJson<int>(json['id']),
+      value: serializer.fromJson<String>(json['value']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'value': serializer.toJson<String>(value),
+    };
+  }
+
+  Model copyWith({int? id, String? value}) =>
+      Model(id: id ?? this.id, value: value ?? this.value);
+  Model copyWithCompanion(ModelsCompanion data) {
+    return Model(
+      id: data.id.present ? data.id.value : this.id,
+      value: data.value.present ? data.value.value : this.value,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Model(')
+          ..write('id: $id, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, value);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Model && other.id == this.id && other.value == this.value);
+}
+
+class ModelsCompanion extends UpdateCompanion<Model> {
+  final Value<int> id;
+  final Value<String> value;
+  const ModelsCompanion({
+    this.id = const Value.absent(),
+    this.value = const Value.absent(),
+  });
+  ModelsCompanion.insert({
+    this.id = const Value.absent(),
+    required String value,
+  }) : value = Value(value);
+  static Insertable<Model> custom({
+    Expression<int>? id,
+    Expression<String>? value,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (value != null) 'value': value,
+    });
+  }
+
+  ModelsCompanion copyWith({Value<int>? id, Value<String>? value}) {
+    return ModelsCompanion(id: id ?? this.id, value: value ?? this.value);
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ModelsCompanion(')
+          ..write('id: $id, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $CategoriesTable extends Categories
     with TableInfo<$CategoriesTable, Category> {
   @override
@@ -414,6 +600,9 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES models (value)',
+    ),
   );
   static const VerificationMeta _categoryMeta = const VerificationMeta(
     'category',
@@ -2281,6 +2470,9 @@ class $SaleItemsTable extends SaleItems
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES models (value)',
+    ),
   );
   static const VerificationMeta _sizeMeta = const VerificationMeta('size');
   @override
@@ -3629,12 +3821,12 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
     requiredDuringInsert: false,
     defaultValue: Constant(0),
   );
-  static const VerificationMeta _passawordMeta = const VerificationMeta(
-    'passaword',
+  static const VerificationMeta _passwordMeta = const VerificationMeta(
+    'password',
   );
   @override
-  late final GeneratedColumn<int> passaword = GeneratedColumn<int>(
-    'passaword',
+  late final GeneratedColumn<int> password = GeneratedColumn<int>(
+    'password',
     aliasedName,
     false,
     type: DriftSqlType.int,
@@ -3665,13 +3857,25 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
     requiredDuringInsert: false,
     defaultValue: Constant(0),
   );
+  static const VerificationMeta _lastSyncMeta = const VerificationMeta(
+    'lastSync',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastSync = GeneratedColumn<DateTime>(
+    'last_sync',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     theme,
-    passaword,
+    password,
     isRememberedPin,
     isLoggedIn,
+    lastSync,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3694,10 +3898,10 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
         theme.isAcceptableOrUnknown(data['theme']!, _themeMeta),
       );
     }
-    if (data.containsKey('passaword')) {
+    if (data.containsKey('password')) {
       context.handle(
-        _passawordMeta,
-        passaword.isAcceptableOrUnknown(data['passaword']!, _passawordMeta),
+        _passwordMeta,
+        password.isAcceptableOrUnknown(data['password']!, _passwordMeta),
       );
     }
     if (data.containsKey('is_remembered_pin')) {
@@ -3718,6 +3922,12 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
         ),
       );
     }
+    if (data.containsKey('last_sync')) {
+      context.handle(
+        _lastSyncMeta,
+        lastSync.isAcceptableOrUnknown(data['last_sync']!, _lastSyncMeta),
+      );
+    }
     return context;
   }
 
@@ -3735,9 +3945,9 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
         DriftSqlType.int,
         data['${effectivePrefix}theme'],
       )!,
-      passaword: attachedDatabase.typeMapping.read(
+      password: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}passaword'],
+        data['${effectivePrefix}password'],
       )!,
       isRememberedPin: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -3747,6 +3957,10 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
         DriftSqlType.int,
         data['${effectivePrefix}is_logged_in'],
       )!,
+      lastSync: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_sync'],
+      ),
     );
   }
 
@@ -3759,24 +3973,29 @@ class $CachesTable extends Caches with TableInfo<$CachesTable, Cache> {
 class Cache extends DataClass implements Insertable<Cache> {
   final int id;
   final int theme;
-  final int passaword;
+  final int password;
   final int isRememberedPin;
   final int isLoggedIn;
+  final DateTime? lastSync;
   const Cache({
     required this.id,
     required this.theme,
-    required this.passaword,
+    required this.password,
     required this.isRememberedPin,
     required this.isLoggedIn,
+    this.lastSync,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['theme'] = Variable<int>(theme);
-    map['passaword'] = Variable<int>(passaword);
+    map['password'] = Variable<int>(password);
     map['is_remembered_pin'] = Variable<int>(isRememberedPin);
     map['is_logged_in'] = Variable<int>(isLoggedIn);
+    if (!nullToAbsent || lastSync != null) {
+      map['last_sync'] = Variable<DateTime>(lastSync);
+    }
     return map;
   }
 
@@ -3784,9 +4003,12 @@ class Cache extends DataClass implements Insertable<Cache> {
     return CachesCompanion(
       id: Value(id),
       theme: Value(theme),
-      passaword: Value(passaword),
+      password: Value(password),
       isRememberedPin: Value(isRememberedPin),
       isLoggedIn: Value(isLoggedIn),
+      lastSync: lastSync == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSync),
     );
   }
 
@@ -3798,9 +4020,10 @@ class Cache extends DataClass implements Insertable<Cache> {
     return Cache(
       id: serializer.fromJson<int>(json['id']),
       theme: serializer.fromJson<int>(json['theme']),
-      passaword: serializer.fromJson<int>(json['passaword']),
+      password: serializer.fromJson<int>(json['password']),
       isRememberedPin: serializer.fromJson<int>(json['isRememberedPin']),
       isLoggedIn: serializer.fromJson<int>(json['isLoggedIn']),
+      lastSync: serializer.fromJson<DateTime?>(json['lastSync']),
     );
   }
   @override
@@ -3809,36 +4032,40 @@ class Cache extends DataClass implements Insertable<Cache> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'theme': serializer.toJson<int>(theme),
-      'passaword': serializer.toJson<int>(passaword),
+      'password': serializer.toJson<int>(password),
       'isRememberedPin': serializer.toJson<int>(isRememberedPin),
       'isLoggedIn': serializer.toJson<int>(isLoggedIn),
+      'lastSync': serializer.toJson<DateTime?>(lastSync),
     };
   }
 
   Cache copyWith({
     int? id,
     int? theme,
-    int? passaword,
+    int? password,
     int? isRememberedPin,
     int? isLoggedIn,
+    Value<DateTime?> lastSync = const Value.absent(),
   }) => Cache(
     id: id ?? this.id,
     theme: theme ?? this.theme,
-    passaword: passaword ?? this.passaword,
+    password: password ?? this.password,
     isRememberedPin: isRememberedPin ?? this.isRememberedPin,
     isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+    lastSync: lastSync.present ? lastSync.value : this.lastSync,
   );
   Cache copyWithCompanion(CachesCompanion data) {
     return Cache(
       id: data.id.present ? data.id.value : this.id,
       theme: data.theme.present ? data.theme.value : this.theme,
-      passaword: data.passaword.present ? data.passaword.value : this.passaword,
+      password: data.password.present ? data.password.value : this.password,
       isRememberedPin: data.isRememberedPin.present
           ? data.isRememberedPin.value
           : this.isRememberedPin,
       isLoggedIn: data.isLoggedIn.present
           ? data.isLoggedIn.value
           : this.isLoggedIn,
+      lastSync: data.lastSync.present ? data.lastSync.value : this.lastSync,
     );
   }
 
@@ -3847,76 +4074,85 @@ class Cache extends DataClass implements Insertable<Cache> {
     return (StringBuffer('Cache(')
           ..write('id: $id, ')
           ..write('theme: $theme, ')
-          ..write('passaword: $passaword, ')
+          ..write('password: $password, ')
           ..write('isRememberedPin: $isRememberedPin, ')
-          ..write('isLoggedIn: $isLoggedIn')
+          ..write('isLoggedIn: $isLoggedIn, ')
+          ..write('lastSync: $lastSync')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, theme, passaword, isRememberedPin, isLoggedIn);
+      Object.hash(id, theme, password, isRememberedPin, isLoggedIn, lastSync);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Cache &&
           other.id == this.id &&
           other.theme == this.theme &&
-          other.passaword == this.passaword &&
+          other.password == this.password &&
           other.isRememberedPin == this.isRememberedPin &&
-          other.isLoggedIn == this.isLoggedIn);
+          other.isLoggedIn == this.isLoggedIn &&
+          other.lastSync == this.lastSync);
 }
 
 class CachesCompanion extends UpdateCompanion<Cache> {
   final Value<int> id;
   final Value<int> theme;
-  final Value<int> passaword;
+  final Value<int> password;
   final Value<int> isRememberedPin;
   final Value<int> isLoggedIn;
+  final Value<DateTime?> lastSync;
   const CachesCompanion({
     this.id = const Value.absent(),
     this.theme = const Value.absent(),
-    this.passaword = const Value.absent(),
+    this.password = const Value.absent(),
     this.isRememberedPin = const Value.absent(),
     this.isLoggedIn = const Value.absent(),
+    this.lastSync = const Value.absent(),
   });
   CachesCompanion.insert({
     this.id = const Value.absent(),
     this.theme = const Value.absent(),
-    this.passaword = const Value.absent(),
+    this.password = const Value.absent(),
     this.isRememberedPin = const Value.absent(),
     this.isLoggedIn = const Value.absent(),
+    this.lastSync = const Value.absent(),
   });
   static Insertable<Cache> custom({
     Expression<int>? id,
     Expression<int>? theme,
-    Expression<int>? passaword,
+    Expression<int>? password,
     Expression<int>? isRememberedPin,
     Expression<int>? isLoggedIn,
+    Expression<DateTime>? lastSync,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (theme != null) 'theme': theme,
-      if (passaword != null) 'passaword': passaword,
+      if (password != null) 'password': password,
       if (isRememberedPin != null) 'is_remembered_pin': isRememberedPin,
       if (isLoggedIn != null) 'is_logged_in': isLoggedIn,
+      if (lastSync != null) 'last_sync': lastSync,
     });
   }
 
   CachesCompanion copyWith({
     Value<int>? id,
     Value<int>? theme,
-    Value<int>? passaword,
+    Value<int>? password,
     Value<int>? isRememberedPin,
     Value<int>? isLoggedIn,
+    Value<DateTime?>? lastSync,
   }) {
     return CachesCompanion(
       id: id ?? this.id,
       theme: theme ?? this.theme,
-      passaword: passaword ?? this.passaword,
+      password: password ?? this.password,
       isRememberedPin: isRememberedPin ?? this.isRememberedPin,
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+      lastSync: lastSync ?? this.lastSync,
     );
   }
 
@@ -3929,14 +4165,17 @@ class CachesCompanion extends UpdateCompanion<Cache> {
     if (theme.present) {
       map['theme'] = Variable<int>(theme.value);
     }
-    if (passaword.present) {
-      map['passaword'] = Variable<int>(passaword.value);
+    if (password.present) {
+      map['password'] = Variable<int>(password.value);
     }
     if (isRememberedPin.present) {
       map['is_remembered_pin'] = Variable<int>(isRememberedPin.value);
     }
     if (isLoggedIn.present) {
       map['is_logged_in'] = Variable<int>(isLoggedIn.value);
+    }
+    if (lastSync.present) {
+      map['last_sync'] = Variable<DateTime>(lastSync.value);
     }
     return map;
   }
@@ -3946,195 +4185,10 @@ class CachesCompanion extends UpdateCompanion<Cache> {
     return (StringBuffer('CachesCompanion(')
           ..write('id: $id, ')
           ..write('theme: $theme, ')
-          ..write('passaword: $passaword, ')
+          ..write('password: $password, ')
           ..write('isRememberedPin: $isRememberedPin, ')
-          ..write('isLoggedIn: $isLoggedIn')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $ModelsTable extends Models with TableInfo<$ModelsTable, Model> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ModelsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _valueMeta = const VerificationMeta('value');
-  @override
-  late final GeneratedColumn<String> value = GeneratedColumn<String>(
-    'value',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [id, value];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'models';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<Model> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('value')) {
-      context.handle(
-        _valueMeta,
-        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_valueMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Model map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Model(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      value: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}value'],
-      )!,
-    );
-  }
-
-  @override
-  $ModelsTable createAlias(String alias) {
-    return $ModelsTable(attachedDatabase, alias);
-  }
-}
-
-class Model extends DataClass implements Insertable<Model> {
-  final int id;
-  final String value;
-  const Model({required this.id, required this.value});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['value'] = Variable<String>(value);
-    return map;
-  }
-
-  ModelsCompanion toCompanion(bool nullToAbsent) {
-    return ModelsCompanion(id: Value(id), value: Value(value));
-  }
-
-  factory Model.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Model(
-      id: serializer.fromJson<int>(json['id']),
-      value: serializer.fromJson<String>(json['value']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'value': serializer.toJson<String>(value),
-    };
-  }
-
-  Model copyWith({int? id, String? value}) =>
-      Model(id: id ?? this.id, value: value ?? this.value);
-  Model copyWithCompanion(ModelsCompanion data) {
-    return Model(
-      id: data.id.present ? data.id.value : this.id,
-      value: data.value.present ? data.value.value : this.value,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Model(')
-          ..write('id: $id, ')
-          ..write('value: $value')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, value);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Model && other.id == this.id && other.value == this.value);
-}
-
-class ModelsCompanion extends UpdateCompanion<Model> {
-  final Value<int> id;
-  final Value<String> value;
-  const ModelsCompanion({
-    this.id = const Value.absent(),
-    this.value = const Value.absent(),
-  });
-  ModelsCompanion.insert({
-    this.id = const Value.absent(),
-    required String value,
-  }) : value = Value(value);
-  static Insertable<Model> custom({
-    Expression<int>? id,
-    Expression<String>? value,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (value != null) 'value': value,
-    });
-  }
-
-  ModelsCompanion copyWith({Value<int>? id, Value<String>? value}) {
-    return ModelsCompanion(id: id ?? this.id, value: value ?? this.value);
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (value.present) {
-      map['value'] = Variable<String>(value.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ModelsCompanion(')
-          ..write('id: $id, ')
-          ..write('value: $value')
+          ..write('isLoggedIn: $isLoggedIn, ')
+          ..write('lastSync: $lastSync')
           ..write(')'))
         .toString();
   }
@@ -4144,6 +4198,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $BrandsTable brands = $BrandsTable(this);
+  late final $ModelsTable models = $ModelsTable(this);
   late final $CategoriesTable categories = $CategoriesTable(this);
   late final $ProductsTable products = $ProductsTable(this);
   late final $AvailableColorsTable availableColors = $AvailableColorsTable(
@@ -4157,13 +4212,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ExpensesTable expenses = $ExpensesTable(this);
   late final $ExpensesItemsTable expensesItems = $ExpensesItemsTable(this);
   late final $CachesTable caches = $CachesTable(this);
-  late final $ModelsTable models = $ModelsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     brands,
+    models,
     categories,
     products,
     availableColors,
@@ -4175,7 +4230,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     expenses,
     expensesItems,
     caches,
-    models,
   ];
 }
 
@@ -4493,6 +4547,320 @@ typedef $$BrandsTableProcessedTableManager =
       Brand,
       PrefetchHooks Function({bool productsRefs, bool saleItemsRefs})
     >;
+typedef $$ModelsTableCreateCompanionBuilder =
+    ModelsCompanion Function({Value<int> id, required String value});
+typedef $$ModelsTableUpdateCompanionBuilder =
+    ModelsCompanion Function({Value<int> id, Value<String> value});
+
+final class $$ModelsTableReferences
+    extends BaseReferences<_$AppDatabase, $ModelsTable, Model> {
+  $$ModelsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$ProductsTable, List<Product>> _productsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.products,
+    aliasName: $_aliasNameGenerator(db.models.value, db.products.model),
+  );
+
+  $$ProductsTableProcessedTableManager get productsRefs {
+    final manager = $$ProductsTableTableManager(
+      $_db,
+      $_db.products,
+    ).filter((f) => f.model.value.sqlEquals($_itemColumn<String>('value')!));
+
+    final cache = $_typedResult.readTableOrNull(_productsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$SaleItemsTable, List<SaleItem>>
+  _saleItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.saleItems,
+    aliasName: $_aliasNameGenerator(db.models.value, db.saleItems.model),
+  );
+
+  $$SaleItemsTableProcessedTableManager get saleItemsRefs {
+    final manager = $$SaleItemsTableTableManager(
+      $_db,
+      $_db.saleItems,
+    ).filter((f) => f.model.value.sqlEquals($_itemColumn<String>('value')!));
+
+    final cache = $_typedResult.readTableOrNull(_saleItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ModelsTableFilterComposer
+    extends Composer<_$AppDatabase, $ModelsTable> {
+  $$ModelsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> productsRefs(
+    Expression<bool> Function($$ProductsTableFilterComposer f) f,
+  ) {
+    final $$ProductsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.value,
+      referencedTable: $db.products,
+      getReferencedColumn: (t) => t.model,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductsTableFilterComposer(
+            $db: $db,
+            $table: $db.products,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> saleItemsRefs(
+    Expression<bool> Function($$SaleItemsTableFilterComposer f) f,
+  ) {
+    final $$SaleItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.value,
+      referencedTable: $db.saleItems,
+      getReferencedColumn: (t) => t.model,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SaleItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.saleItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ModelsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ModelsTable> {
+  $$ModelsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ModelsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ModelsTable> {
+  $$ModelsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  Expression<T> productsRefs<T extends Object>(
+    Expression<T> Function($$ProductsTableAnnotationComposer a) f,
+  ) {
+    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.value,
+      referencedTable: $db.products,
+      getReferencedColumn: (t) => t.model,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.products,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> saleItemsRefs<T extends Object>(
+    Expression<T> Function($$SaleItemsTableAnnotationComposer a) f,
+  ) {
+    final $$SaleItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.value,
+      referencedTable: $db.saleItems,
+      getReferencedColumn: (t) => t.model,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SaleItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.saleItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ModelsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ModelsTable,
+          Model,
+          $$ModelsTableFilterComposer,
+          $$ModelsTableOrderingComposer,
+          $$ModelsTableAnnotationComposer,
+          $$ModelsTableCreateCompanionBuilder,
+          $$ModelsTableUpdateCompanionBuilder,
+          (Model, $$ModelsTableReferences),
+          Model,
+          PrefetchHooks Function({bool productsRefs, bool saleItemsRefs})
+        > {
+  $$ModelsTableTableManager(_$AppDatabase db, $ModelsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ModelsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ModelsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ModelsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> value = const Value.absent(),
+              }) => ModelsCompanion(id: id, value: value),
+          createCompanionCallback:
+              ({Value<int> id = const Value.absent(), required String value}) =>
+                  ModelsCompanion.insert(id: id, value: value),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) =>
+                    (e.readTable(table), $$ModelsTableReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({productsRefs = false, saleItemsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (productsRefs) db.products,
+                    if (saleItemsRefs) db.saleItems,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (productsRefs)
+                        await $_getPrefetchedData<Model, $ModelsTable, Product>(
+                          currentTable: table,
+                          referencedTable: $$ModelsTableReferences
+                              ._productsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ModelsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).productsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.model == item.value,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (saleItemsRefs)
+                        await $_getPrefetchedData<
+                          Model,
+                          $ModelsTable,
+                          SaleItem
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ModelsTableReferences
+                              ._saleItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ModelsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).saleItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.model == item.value,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ModelsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ModelsTable,
+      Model,
+      $$ModelsTableFilterComposer,
+      $$ModelsTableOrderingComposer,
+      $$ModelsTableAnnotationComposer,
+      $$ModelsTableCreateCompanionBuilder,
+      $$ModelsTableUpdateCompanionBuilder,
+      (Model, $$ModelsTableReferences),
+      Model,
+      PrefetchHooks Function({bool productsRefs, bool saleItemsRefs})
+    >;
 typedef $$CategoriesTableCreateCompanionBuilder =
     CategoriesCompanion Function({Value<int> id, required String value});
 typedef $$CategoriesTableUpdateCompanionBuilder =
@@ -4763,6 +5131,24 @@ final class $$ProductsTableReferences
     );
   }
 
+  static $ModelsTable _modelTable(_$AppDatabase db) => db.models.createAlias(
+    $_aliasNameGenerator(db.products.model, db.models.value),
+  );
+
+  $$ModelsTableProcessedTableManager get model {
+    final $_column = $_itemColumn<String>('model')!;
+
+    final manager = $$ModelsTableTableManager(
+      $_db,
+      $_db.models,
+    ).filter((f) => f.value.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_modelTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
   static $CategoriesTable _categoryTable(_$AppDatabase db) =>
       db.categories.createAlias(
         $_aliasNameGenerator(db.products.category, db.categories.id),
@@ -4816,11 +5202,6 @@ class $$ProductsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get model => $composableBuilder(
-    column: $table.model,
-    builder: (column) => ColumnFilters(column),
-  );
-
   ColumnFilters<double> get costPrice => $composableBuilder(
     column: $table.costPrice,
     builder: (column) => ColumnFilters(column),
@@ -4855,6 +5236,29 @@ class $$ProductsTableFilterComposer
           }) => $$BrandsTableFilterComposer(
             $db: $db,
             $table: $db.brands,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ModelsTableFilterComposer get model {
+    final $$ModelsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.model,
+      referencedTable: $db.models,
+      getReferencedColumn: (t) => t.value,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelsTableFilterComposer(
+            $db: $db,
+            $table: $db.models,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4927,11 +5331,6 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get model => $composableBuilder(
-    column: $table.model,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<double> get costPrice => $composableBuilder(
     column: $table.costPrice,
     builder: (column) => ColumnOrderings(column),
@@ -4966,6 +5365,29 @@ class $$ProductsTableOrderingComposer
           }) => $$BrandsTableOrderingComposer(
             $db: $db,
             $table: $db.brands,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ModelsTableOrderingComposer get model {
+    final $$ModelsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.model,
+      referencedTable: $db.models,
+      getReferencedColumn: (t) => t.value,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelsTableOrderingComposer(
+            $db: $db,
+            $table: $db.models,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5011,9 +5433,6 @@ class $$ProductsTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get model =>
-      $composableBuilder(column: $table.model, builder: (column) => column);
-
   GeneratedColumn<double> get costPrice =>
       $composableBuilder(column: $table.costPrice, builder: (column) => column);
 
@@ -5042,6 +5461,29 @@ class $$ProductsTableAnnotationComposer
           }) => $$BrandsTableAnnotationComposer(
             $db: $db,
             $table: $db.brands,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ModelsTableAnnotationComposer get model {
+    final $$ModelsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.model,
+      referencedTable: $db.models,
+      getReferencedColumn: (t) => t.value,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.models,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5113,7 +5555,12 @@ class $$ProductsTableTableManager
           $$ProductsTableUpdateCompanionBuilder,
           (Product, $$ProductsTableReferences),
           Product,
-          PrefetchHooks Function({bool brand, bool category, bool variantsRefs})
+          PrefetchHooks Function({
+            bool brand,
+            bool model,
+            bool category,
+            bool variantsRefs,
+          })
         > {
   $$ProductsTableTableManager(_$AppDatabase db, $ProductsTable table)
     : super(
@@ -5175,7 +5622,12 @@ class $$ProductsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({brand = false, category = false, variantsRefs = false}) {
+              ({
+                brand = false,
+                model = false,
+                category = false,
+                variantsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [if (variantsRefs) db.variants],
@@ -5205,6 +5657,19 @@ class $$ProductsTableTableManager
                                     referencedColumn: $$ProductsTableReferences
                                         ._brandTable(db)
                                         .id,
+                                  )
+                                  as T;
+                        }
+                        if (model) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.model,
+                                    referencedTable: $$ProductsTableReferences
+                                        ._modelTable(db),
+                                    referencedColumn: $$ProductsTableReferences
+                                        ._modelTable(db)
+                                        .value,
                                   )
                                   as T;
                         }
@@ -5267,7 +5732,12 @@ typedef $$ProductsTableProcessedTableManager =
       $$ProductsTableUpdateCompanionBuilder,
       (Product, $$ProductsTableReferences),
       Product,
-      PrefetchHooks Function({bool brand, bool category, bool variantsRefs})
+      PrefetchHooks Function({
+        bool brand,
+        bool model,
+        bool category,
+        bool variantsRefs,
+      })
     >;
 typedef $$AvailableColorsTableCreateCompanionBuilder =
     AvailableColorsCompanion Function({Value<int> id, required String value});
@@ -7312,6 +7782,24 @@ final class $$SaleItemsTableReferences
     );
   }
 
+  static $ModelsTable _modelTable(_$AppDatabase db) => db.models.createAlias(
+    $_aliasNameGenerator(db.saleItems.model, db.models.value),
+  );
+
+  $$ModelsTableProcessedTableManager get model {
+    final $_column = $_itemColumn<String>('model')!;
+
+    final manager = $$ModelsTableTableManager(
+      $_db,
+      $_db.models,
+    ).filter((f) => f.value.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_modelTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
   static $AvailableSizesTable _sizeTable(_$AppDatabase db) =>
       db.availableSizes.createAlias(
         $_aliasNameGenerator(db.saleItems.size, db.availableSizes.id),
@@ -7375,11 +7863,6 @@ class $$SaleItemsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get model => $composableBuilder(
-    column: $table.model,
-    builder: (column) => ColumnFilters(column),
-  );
-
   ColumnFilters<int> get productId => $composableBuilder(
     column: $table.productId,
     builder: (column) => ColumnFilters(column),
@@ -7427,6 +7910,29 @@ class $$SaleItemsTableFilterComposer
           }) => $$BrandsTableFilterComposer(
             $db: $db,
             $table: $db.brands,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ModelsTableFilterComposer get model {
+    final $$ModelsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.model,
+      referencedTable: $db.models,
+      getReferencedColumn: (t) => t.value,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelsTableFilterComposer(
+            $db: $db,
+            $table: $db.models,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7507,11 +8013,6 @@ class $$SaleItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get model => $composableBuilder(
-    column: $table.model,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<int> get productId => $composableBuilder(
     column: $table.productId,
     builder: (column) => ColumnOrderings(column),
@@ -7559,6 +8060,29 @@ class $$SaleItemsTableOrderingComposer
           }) => $$BrandsTableOrderingComposer(
             $db: $db,
             $table: $db.brands,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ModelsTableOrderingComposer get model {
+    final $$ModelsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.model,
+      referencedTable: $db.models,
+      getReferencedColumn: (t) => t.value,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelsTableOrderingComposer(
+            $db: $db,
+            $table: $db.models,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7633,9 +8157,6 @@ class $$SaleItemsTableAnnotationComposer
   GeneratedColumn<int> get quantity =>
       $composableBuilder(column: $table.quantity, builder: (column) => column);
 
-  GeneratedColumn<String> get model =>
-      $composableBuilder(column: $table.model, builder: (column) => column);
-
   GeneratedColumn<int> get productId =>
       $composableBuilder(column: $table.productId, builder: (column) => column);
 
@@ -7679,6 +8200,29 @@ class $$SaleItemsTableAnnotationComposer
           }) => $$BrandsTableAnnotationComposer(
             $db: $db,
             $table: $db.brands,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ModelsTableAnnotationComposer get model {
+    final $$ModelsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.model,
+      referencedTable: $db.models,
+      getReferencedColumn: (t) => t.value,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.models,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7751,6 +8295,7 @@ class $$SaleItemsTableTableManager
           PrefetchHooks Function({
             bool saleId,
             bool brand,
+            bool model,
             bool size,
             bool color,
           })
@@ -7823,7 +8368,13 @@ class $$SaleItemsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({saleId = false, brand = false, size = false, color = false}) {
+              ({
+                saleId = false,
+                brand = false,
+                model = false,
+                size = false,
+                color = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [],
@@ -7866,6 +8417,19 @@ class $$SaleItemsTableTableManager
                                     referencedColumn: $$SaleItemsTableReferences
                                         ._brandTable(db)
                                         .id,
+                                  )
+                                  as T;
+                        }
+                        if (model) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.model,
+                                    referencedTable: $$SaleItemsTableReferences
+                                        ._modelTable(db),
+                                    referencedColumn: $$SaleItemsTableReferences
+                                        ._modelTable(db)
+                                        .value,
                                   )
                                   as T;
                         }
@@ -7919,7 +8483,13 @@ typedef $$SaleItemsTableProcessedTableManager =
       $$SaleItemsTableUpdateCompanionBuilder,
       (SaleItem, $$SaleItemsTableReferences),
       SaleItem,
-      PrefetchHooks Function({bool saleId, bool brand, bool size, bool color})
+      PrefetchHooks Function({
+        bool saleId,
+        bool brand,
+        bool model,
+        bool size,
+        bool color,
+      })
     >;
 typedef $$ExpensesTableCreateCompanionBuilder =
     ExpensesCompanion Function({
@@ -8758,17 +9328,19 @@ typedef $$CachesTableCreateCompanionBuilder =
     CachesCompanion Function({
       Value<int> id,
       Value<int> theme,
-      Value<int> passaword,
+      Value<int> password,
       Value<int> isRememberedPin,
       Value<int> isLoggedIn,
+      Value<DateTime?> lastSync,
     });
 typedef $$CachesTableUpdateCompanionBuilder =
     CachesCompanion Function({
       Value<int> id,
       Value<int> theme,
-      Value<int> passaword,
+      Value<int> password,
       Value<int> isRememberedPin,
       Value<int> isLoggedIn,
+      Value<DateTime?> lastSync,
     });
 
 class $$CachesTableFilterComposer
@@ -8790,8 +9362,8 @@ class $$CachesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get passaword => $composableBuilder(
-    column: $table.passaword,
+  ColumnFilters<int> get password => $composableBuilder(
+    column: $table.password,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8802,6 +9374,11 @@ class $$CachesTableFilterComposer
 
   ColumnFilters<int> get isLoggedIn => $composableBuilder(
     column: $table.isLoggedIn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastSync => $composableBuilder(
+    column: $table.lastSync,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -8825,8 +9402,8 @@ class $$CachesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get passaword => $composableBuilder(
-    column: $table.passaword,
+  ColumnOrderings<int> get password => $composableBuilder(
+    column: $table.password,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -8837,6 +9414,11 @@ class $$CachesTableOrderingComposer
 
   ColumnOrderings<int> get isLoggedIn => $composableBuilder(
     column: $table.isLoggedIn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastSync => $composableBuilder(
+    column: $table.lastSync,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -8856,8 +9438,8 @@ class $$CachesTableAnnotationComposer
   GeneratedColumn<int> get theme =>
       $composableBuilder(column: $table.theme, builder: (column) => column);
 
-  GeneratedColumn<int> get passaword =>
-      $composableBuilder(column: $table.passaword, builder: (column) => column);
+  GeneratedColumn<int> get password =>
+      $composableBuilder(column: $table.password, builder: (column) => column);
 
   GeneratedColumn<int> get isRememberedPin => $composableBuilder(
     column: $table.isRememberedPin,
@@ -8868,6 +9450,9 @@ class $$CachesTableAnnotationComposer
     column: $table.isLoggedIn,
     builder: (column) => column,
   );
+
+  GeneratedColumn<DateTime> get lastSync =>
+      $composableBuilder(column: $table.lastSync, builder: (column) => column);
 }
 
 class $$CachesTableTableManager
@@ -8900,29 +9485,33 @@ class $$CachesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> theme = const Value.absent(),
-                Value<int> passaword = const Value.absent(),
+                Value<int> password = const Value.absent(),
                 Value<int> isRememberedPin = const Value.absent(),
                 Value<int> isLoggedIn = const Value.absent(),
+                Value<DateTime?> lastSync = const Value.absent(),
               }) => CachesCompanion(
                 id: id,
                 theme: theme,
-                passaword: passaword,
+                password: password,
                 isRememberedPin: isRememberedPin,
                 isLoggedIn: isLoggedIn,
+                lastSync: lastSync,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> theme = const Value.absent(),
-                Value<int> passaword = const Value.absent(),
+                Value<int> password = const Value.absent(),
                 Value<int> isRememberedPin = const Value.absent(),
                 Value<int> isLoggedIn = const Value.absent(),
+                Value<DateTime?> lastSync = const Value.absent(),
               }) => CachesCompanion.insert(
                 id: id,
                 theme: theme,
-                passaword: passaword,
+                password: password,
                 isRememberedPin: isRememberedPin,
                 isLoggedIn: isLoggedIn,
+                lastSync: lastSync,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -8946,129 +9535,14 @@ typedef $$CachesTableProcessedTableManager =
       Cache,
       PrefetchHooks Function()
     >;
-typedef $$ModelsTableCreateCompanionBuilder =
-    ModelsCompanion Function({Value<int> id, required String value});
-typedef $$ModelsTableUpdateCompanionBuilder =
-    ModelsCompanion Function({Value<int> id, Value<String> value});
-
-class $$ModelsTableFilterComposer
-    extends Composer<_$AppDatabase, $ModelsTable> {
-  $$ModelsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get value => $composableBuilder(
-    column: $table.value,
-    builder: (column) => ColumnFilters(column),
-  );
-}
-
-class $$ModelsTableOrderingComposer
-    extends Composer<_$AppDatabase, $ModelsTable> {
-  $$ModelsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get value => $composableBuilder(
-    column: $table.value,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$ModelsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ModelsTable> {
-  $$ModelsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get value =>
-      $composableBuilder(column: $table.value, builder: (column) => column);
-}
-
-class $$ModelsTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $ModelsTable,
-          Model,
-          $$ModelsTableFilterComposer,
-          $$ModelsTableOrderingComposer,
-          $$ModelsTableAnnotationComposer,
-          $$ModelsTableCreateCompanionBuilder,
-          $$ModelsTableUpdateCompanionBuilder,
-          (Model, BaseReferences<_$AppDatabase, $ModelsTable, Model>),
-          Model,
-          PrefetchHooks Function()
-        > {
-  $$ModelsTableTableManager(_$AppDatabase db, $ModelsTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$ModelsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ModelsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ModelsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> value = const Value.absent(),
-              }) => ModelsCompanion(id: id, value: value),
-          createCompanionCallback:
-              ({Value<int> id = const Value.absent(), required String value}) =>
-                  ModelsCompanion.insert(id: id, value: value),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ),
-      );
-}
-
-typedef $$ModelsTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $ModelsTable,
-      Model,
-      $$ModelsTableFilterComposer,
-      $$ModelsTableOrderingComposer,
-      $$ModelsTableAnnotationComposer,
-      $$ModelsTableCreateCompanionBuilder,
-      $$ModelsTableUpdateCompanionBuilder,
-      (Model, BaseReferences<_$AppDatabase, $ModelsTable, Model>),
-      Model,
-      PrefetchHooks Function()
-    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$BrandsTableTableManager get brands =>
       $$BrandsTableTableManager(_db, _db.brands);
+  $$ModelsTableTableManager get models =>
+      $$ModelsTableTableManager(_db, _db.models);
   $$CategoriesTableTableManager get categories =>
       $$CategoriesTableTableManager(_db, _db.categories);
   $$ProductsTableTableManager get products =>
@@ -9091,6 +9565,4 @@ class $AppDatabaseManager {
       $$ExpensesItemsTableTableManager(_db, _db.expensesItems);
   $$CachesTableTableManager get caches =>
       $$CachesTableTableManager(_db, _db.caches);
-  $$ModelsTableTableManager get models =>
-      $$ModelsTableTableManager(_db, _db.models);
 }

@@ -54,6 +54,8 @@ dependencies:
   bitsdojo_window: ^0.1.6
   flutter_screenutil: ^5.9.3
   window_manager: ^0.3.8
+  supabase_flutter: ^2.10.3
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -100,6 +102,7 @@ flutter:
     - assets/images/expand.png
     - assets/images/apps.png
     - assets/images/padlock.png
+    - .env
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

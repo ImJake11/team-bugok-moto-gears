@@ -32,12 +32,17 @@ class _CustomWindowButtonState extends State<CustomWindowButton> {
           height: 35,
           width: 35,
           decoration: BoxDecoration(
+            border: Border.all(
+              color: _isHover ? widget.hoverColor : Colors.transparent,
+            ),
             borderRadius: BorderRadius.circular(10),
-            color: _isHover ? widget.hoverColor : Colors.transparent,
+            color: _isHover
+                ? widget.hoverColor.withAlpha(30)
+                : Colors.transparent,
           ),
           child: Icon(
             widget.icon,
-            size: 20,
+            size: 16,
             color: Colors.grey.shade400,
           ),
         ),

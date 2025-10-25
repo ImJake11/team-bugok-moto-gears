@@ -25,31 +25,18 @@ class PosCartTile extends StatelessWidget {
         spacing: 10,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: Color(0xFF555555),
-              ),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.remove),
-              onPressed: onRemove,
-              iconSize: 22,
-            ),
+          IconButton(
+            icon: const Icon(Icons.remove),
+            onPressed: onRemove,
+            iconSize: 22,
           ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: theme.primary,
-              ),
+          IconButton(
+            icon: Icon(
+              Icons.add,
+              color: theme.primary,
             ),
-            child: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: onAdd,
-              iconSize: 22,
-            ),
+            onPressed: onAdd,
+            iconSize: 22,
           ),
         ],
       );
@@ -64,9 +51,7 @@ class PosCartTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               color: theme.surfaceDim,
               border: Border.all(
-                color: Color(
-                  0xFF555555,
-                ),
+                color: theme.borderColor,
               ),
             ),
             child: Padding(
@@ -156,16 +141,14 @@ class PosCartTile extends StatelessWidget {
             ),
           ),
         ),
-        GestureDetector(
-          onTap: () => context.read<PosBloc>().add(
+        IconButton(
+          tooltip: "Remove Item",
+          onPressed: () => context.read<PosBloc>().add(
             PosDeleteCartItem(id: cartModel.id),
           ),
-          child: Tooltip(
-            message: "Delete",
-            child: Icon(
-              Icons.delete,
-              color: Colors.grey.shade700,
-            ),
+          icon: Icon(
+            Icons.delete_rounded,
+            color: Colors.grey.shade600,
           ),
         ),
       ],

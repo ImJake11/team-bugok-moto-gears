@@ -46,7 +46,6 @@ class AuthProvider extends ChangeNotifier {
       final (isLoggedIn, isRememberedPin) = result;
 
       if (isLoggedIn == 1) {
-
         _password = password;
 
         _isLoggedIn = true;

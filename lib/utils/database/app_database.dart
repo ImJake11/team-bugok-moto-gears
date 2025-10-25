@@ -157,6 +157,8 @@ class Caches extends Table {
   IntColumn get isRememberedPin => integer().withDefault(Constant(0))();
 
   IntColumn get isLoggedIn => integer().withDefault(Constant(0))();
+
+  DateTimeColumn get lastSync => dateTime().nullable()();
 }
 
 @DataClassName("Model")
@@ -165,6 +167,7 @@ class Models extends Table {
 
   TextColumn get value => text()();
 }
+
 // ---------------------------
 // DATABASE CLASS
 // ---------------------------
@@ -191,7 +194,7 @@ class AppDatabase extends _$AppDatabase {
 
   // Increment this when you change your schema
   @override
-  int get schemaVersion => 22;
+  int get schemaVersion => 24;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -207,17 +210,18 @@ class AppDatabase extends _$AppDatabase {
               CachesCompanion.insert(
                 isRememberedPin: Value(0),
                 isLoggedIn: Value(0),
-                passaword: Value(102025),
+                password: Value(102025),
+                
                 theme: Value(0),
               ),
             );
       }
     },
-    // onUpgrade: (Migrator m, int from, int to) async {
-    //   if (from == 21) {
-    //     await m.alterTable(migration);
-    //   }
-    // },
+    onUpgrade: (Migrator m, int from, int to) async {
+      if (from == 22) {
+        await m.addColumn(caches, caches.lastSync);
+      }
+    },
   );
 }
 
