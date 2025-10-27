@@ -6,6 +6,9 @@ import 'package:team_bugok_business/utils/model/product_model.dart';
 class ExpensesRepository {
   final db = appDatabase;
 
+  Future<List<EpxenseItemModel>> retriveExpensesItem(int expenseId) async =>
+      _retriveExpensesItem(expenseId);
+
   Future<double> computExpensesTotal(ProductModel product) async =>
       _computeExpensesTotal(product);
 
@@ -46,7 +49,9 @@ class ExpensesRepository {
 
   Future<void> _insertExpenseItem(ExpensesItemsCompanion item) async {
     try {
-      await db.into(db.expensesItems).insert(item);
+      final id = await db.into(db.expensesItems).insert(item);
+      print(id);
+      print(item.expenseId);
     } catch (e, st) {
       print("🔥 [ExpensesRepository] _insertExpenseItem error: $e");
       print("📜 Stack trace: $st");
@@ -168,6 +173,70 @@ class ExpensesRepository {
     } catch (e, st) {
       print("🔥 [ExpensesRepository] _retrieveAllExpenses error: $e");
       print("📜 Stack trace: $st");
+      rethrow;
+    }
+  }
+
+  Future<List<EpxenseItemModel>> _retriveExpensesItem(int expenseId) async {
+    try {
+      final query = db.select(db.expensesItems)
+        ..where(
+          (tbl) => tbl.expenseId.equals(expenseId),
+        );
+
+      final rows = await query.get();
+
+      if (rows.isEmpty) return [];
+
+      List<EpxenseItemModel> items = [];
+
+      for (var row in rows) {
+        // the variant model and brand
+        final variantQuery = db.select(db.variants)
+          ..where(
+            (tbl) => tbl.id.equals(row.variantId),
+          );
+
+        final variant = await variantQuery.getSingleOrNull();
+
+        // skip current iteration if variant is null
+        if (variant == null) continue;
+
+        final productQuery = db.select(db.products)
+          ..where((tbl) => tbl.id.equals(variant.productId));
+
+        final product = await productQuery.getSingleOrNull();
+
+        // skip
+        if (product == null) continue;
+
+        //get the size value
+
+        final sizeQuery = db.select(db.sizes)
+          ..where(
+            (tbl) => tbl.id.equals(row.sizeId),
+          );
+
+        final size = await sizeQuery.getSingleOrNull();
+
+        if (size == null) continue;
+
+        items.add(
+          EpxenseItemModel(
+            brand: product.brand,
+            model: product.model,
+            color: variant.color,
+            size: size.sizeValues,
+            price: row.price,
+            quantity: row.quantity,
+          ),
+        );
+      }
+
+      return items;
+    } catch (e, st) {
+      print("Failed to get expenses items ${e}");
+      print(st);
       rethrow;
     }
   }

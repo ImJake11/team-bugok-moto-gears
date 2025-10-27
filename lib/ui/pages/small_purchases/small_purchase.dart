@@ -89,7 +89,7 @@ class _SmallPurchaseState extends State<SmallPurchase> {
             spacing: 20,
             children: [
               Text(
-                "Small Expense",
+                "Add Expense",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -110,7 +110,7 @@ class _SmallPurchaseState extends State<SmallPurchase> {
                 maxLines: 5,
                 height: 100,
                 textEditingController: _noteController,
-                maxLength: 200,
+                maxLength: 60,
                 fillColor: theme.surfaceDim,
                 placeholder: "Note (Optional)",
                 showShadow: false,

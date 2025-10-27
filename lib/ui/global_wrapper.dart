@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:team_bugok_business/ui/widgets/loading_overlay.dart';
 import 'package:team_bugok_business/ui/widgets/sidebar.dart';
 import 'package:team_bugok_business/ui/widgets/title_bar.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../utils/provider/references_values_cache_provider.dart';
 import '../utils/provider/theme_provider.dart';
@@ -34,16 +35,21 @@ class _GlobalWrapperState extends State<GlobalWrapper> {
     final theme = context.watch<MyThemeProvider>();
     final size = MediaQuery.of(context).size;
 
+    final isMaximize = theme.isWindowMaximized;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
+      body: AnimatedContainer(
+        duration: Duration(microseconds: 300),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: theme.surfaceDim,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: theme.primary,
-          ),
+          borderRadius: BorderRadius.circular(isMaximize ? 0 : 10),
+          border: isMaximize
+              ? null
+              : Border.all(
+                  color: theme.primary,
+                ),
         ),
         child: Stack(
           children: [

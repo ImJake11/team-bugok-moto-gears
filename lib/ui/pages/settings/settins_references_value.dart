@@ -7,6 +7,7 @@ import 'package:team_bugok_business/ui/widgets/text_field.dart';
 import 'package:team_bugok_business/utils/database/repositories/store_setup_repository.dart';
 import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
+import 'package:team_bugok_business/utils/provider/settings_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class SettingsReferencesValue extends StatefulWidget {
@@ -64,9 +65,12 @@ class _SettingsReferencesValueState extends State<SettingsReferencesValue> {
   }
 
   Future<void> _saveValues() async {
+    final setting = context.read<SettingsProvider>();
+
     try {
       bool isValid = _references.every((e) => e.$2.isNotEmpty);
 
+      setting.toggleViewContentButton();
       if (!isValid) {
         CustomSnackBar(
           context: context,
@@ -86,6 +90,8 @@ class _SettingsReferencesValueState extends State<SettingsReferencesValue> {
       print("Failed to save values ${e}");
       print(st);
       setState(() => _hasError = true);
+    } finally {
+      setting.toggleViewContentButton();
     }
   }
 

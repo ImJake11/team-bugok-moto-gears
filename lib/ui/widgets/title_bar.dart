@@ -31,6 +31,7 @@ class _TitleBarState extends State<TitleBar> {
     }
 
     setState(() => _isMaximize = !_isMaximize);
+    context.read<MyThemeProvider>().changeWindowValue(_isMaximize);
   }
 
   void _setClose() async {

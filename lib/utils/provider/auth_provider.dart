@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:team_bugok_business/utils/database/repositories/cache_repository.dart';
 import 'package:team_bugok_business/utils/provider/loading_provider.dart';
@@ -5,6 +7,7 @@ import 'package:team_bugok_business/utils/provider/loading_provider.dart';
 class AuthProvider extends ChangeNotifier {
   final CacheRepository cacheRepository = CacheRepository();
   final LoadingProvider loadingProvider = LoadingProvider();
+  Timer? _countdown;
 
   int? _password;
   bool _hasError = false;
@@ -13,6 +16,10 @@ class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _hasMessage = false;
   String _message = "";
+  int _attempt = 0;
+  int _warning = 0;
+  int _currentDur = 0;
+  final int _countdownDur = 60;
 
   bool get hasError => _hasError;
 
@@ -35,6 +42,8 @@ class AuthProvider extends ChangeNotifier {
   Future<void> checkUserSession() async => _checkUserSession();
 
   Future<void> checkPassword() async => _checkPassword();
+
+  int get currentDur => _currentDur;
 
   // ================== Functions ================== //
 
@@ -89,9 +98,20 @@ class AuthProvider extends ChangeNotifier {
         _isLoggedIn = true;
         _message = "Logged in successfully";
         await cacheRepository.loginUser(_isPinRemember);
+        _warning = 0;
+        _attempt = 0;
       } else {
+        _attempt += 1;
         _hasError = true;
-        _message = "Wrong PIN";
+
+        if (_attempt >= 3) {
+          // increase warning
+          _warning += 1;
+          _message = "Too many attempts try again later";
+          _startTimer();
+        } else {
+          _message = "Wrong PIN";
+        }
       }
     } catch (e, st) {
       print('❌ Failed to sign in: $e');
@@ -103,6 +123,29 @@ class AuthProvider extends ChangeNotifier {
       _hasMessage = true;
       notifyListeners();
     }
+  }
+
+  void _startTimer() {
+    _currentDur = _countdownDur * _warning;
+
+    _countdown = Timer.periodic(
+      Duration(seconds: 1),
+      (timer) {
+        if (_currentDur <= 0) {
+          cancelTimer();
+          _attempt = 0;
+          notifyListeners();
+          return;
+        }
+
+        _currentDur -= 1;
+        notifyListeners();
+      },
+    );
+  }
+
+  void cancelTimer() {
+    _countdown?.cancel();
   }
 
   void _addInput(int input) {

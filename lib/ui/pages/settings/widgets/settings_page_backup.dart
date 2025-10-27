@@ -154,7 +154,7 @@ class _SettingsPageBackupState extends State<SettingsPageBackup>
           Text(
             _latestSync == null
                 ? "- No record found"
-                : "- $formattedDate @ $formattedTime",
+                : "- Last sync $formattedDate @ $formattedTime",
             style: TextStyle(
               fontSize: 14,
             ),

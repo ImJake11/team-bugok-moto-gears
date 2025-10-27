@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:team_bugok_business/utils/provider/settings_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class SettingsPageWrapper extends StatefulWidget {
@@ -30,6 +31,9 @@ class _SettingsPageWrapperState extends State<SettingsPageWrapper> {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<MyThemeProvider>();
+    final settings = context.watch<SettingsProvider>();
+
+    bool isOnAsyncOperation = settings.isOnAsyncOperation;
 
     final borderColor = widget.borderColor ?? theme.borderColor;
 
@@ -64,7 +68,8 @@ class _SettingsPageWrapperState extends State<SettingsPageWrapper> {
                       Text(
                         widget.title,
                         style: TextStyle(
-                          fontSize: 14,
+                          letterSpacing: 2,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -78,47 +83,48 @@ class _SettingsPageWrapperState extends State<SettingsPageWrapper> {
                     ],
                   ),
                   const Spacer(),
-                  TweenAnimationBuilder<double>(
-                    tween: Tween(
-                      begin: 0,
-                      end: _isCollapsed ? 3.2 : 0,
-                    ),
-                    duration: Duration(milliseconds: 300),
-                    builder: (context, value, child) {
-                      return Transform.rotate(
-                        angle: value,
-                        child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _isCollapsed = !_isCollapsed),
-                          child: MouseRegion(
-                            onEnter: (_) =>
-                                setState(() => _isArrowButtonHovered = true),
-                            onExit: (_) =>
-                                setState(() => _isArrowButtonHovered = false),
-                            child: Tooltip(
-                              message: "View Content",
-                              child: AnimatedContainer(
-                                width: 40,
-                                height: 40,
-                                duration: Duration(milliseconds: 200),
-                                decoration: BoxDecoration(
-                                  color: _isArrowButtonHovered
-                                      ? Colors.grey.shade900
-                                      : Colors.transparent,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  size: 30,
-                                  color: theme.primary,
+                  if (!isOnAsyncOperation)
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(
+                        begin: 0,
+                        end: _isCollapsed ? 3.2 : 0,
+                      ),
+                      duration: Duration(milliseconds: 300),
+                      builder: (context, value, child) {
+                        return Transform.rotate(
+                          angle: value,
+                          child: GestureDetector(
+                            onTap: () =>
+                                setState(() => _isCollapsed = !_isCollapsed),
+                            child: MouseRegion(
+                              onEnter: (_) =>
+                                  setState(() => _isArrowButtonHovered = true),
+                              onExit: (_) =>
+                                  setState(() => _isArrowButtonHovered = false),
+                              child: Tooltip(
+                                message: "View Content",
+                                child: AnimatedContainer(
+                                  width: 40,
+                                  height: 40,
+                                  duration: Duration(milliseconds: 200),
+                                  decoration: BoxDecoration(
+                                    color: _isArrowButtonHovered
+                                        ? Colors.grey.shade900
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.keyboard_arrow_down_rounded,
+                                    size: 30,
+                                    color: theme.primary,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
                 ],
               ),
               AnimatedSwitcher(

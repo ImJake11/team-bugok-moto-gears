@@ -21,8 +21,7 @@ class _ProductViewRelatedButtonState extends State<ProductViewRelatedButton> {
 
   @override
   Widget build(BuildContext context) {
-    final theme =  context.watch<MyThemeProvider>();
-    final shadowColor =theme.primary.withAlpha(60);
+    final theme = context.watch<MyThemeProvider>();
 
     return MouseRegion(
       onEnter: (event) => setState(() => _isHovered = true),
@@ -34,33 +33,10 @@ class _ProductViewRelatedButtonState extends State<ProductViewRelatedButton> {
         decoration: BoxDecoration(
           color: theme.surfaceDim,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: _isHovered
-              ? [
-                  BoxShadow(
-                    blurRadius: 3,
-                    color: shadowColor,
-                    offset: Offset(3, 3),
-                  ),
-                  BoxShadow(
-                    blurRadius: 3,
-                    spreadRadius: 2,
-                    color: shadowColor,
-                    offset: Offset(-3, -3),
-                  ),
-                  BoxShadow(
-                    blurRadius: 3,
-                    spreadRadius: 2,
-                    color: shadowColor,
-                    offset: Offset(3, -4),
-                  ),
-                  BoxShadow(
-                    blurRadius: 3,
-                    spreadRadius: 2,
-                    color: shadowColor,
-                    offset: Offset(-5, 4),
-                  ),
-                ]
-              : [],
+          border: Border.all(
+            color: _isHovered ? theme.primary : theme.borderColor,
+          ),
+          boxShadow: theme.shadow,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(

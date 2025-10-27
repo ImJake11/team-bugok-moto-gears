@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:team_bugok_business/ui/pages/auth_page/widgets/auth_page_countdown_time.dart';
+import 'package:team_bugok_business/ui/pages/auth_page/widgets/auth_page_login_btn.dart';
 import 'package:team_bugok_business/ui/pages/auth_page/widgets/auth_page_message.dart';
 import 'package:team_bugok_business/ui/widgets/title_bar.dart';
 import 'package:team_bugok_business/utils/provider/auth_provider.dart';
@@ -23,7 +25,7 @@ class _AuthPageRightSideState extends State<AuthPageRightSide> {
     final theme = context.watch<MyThemeProvider>();
     final provider = context.watch<AuthProvider>();
     final hasError = provider.hasError;
-    final isLoading = provider.isLoading;
+    final currentDur = provider.currentDur;
     final isLoggedIn = provider.isLoggedIn;
     final message = provider.message;
 
@@ -31,6 +33,8 @@ class _AuthPageRightSideState extends State<AuthPageRightSide> {
       width: 300,
       height: 50,
       child: TextFormField(
+        onFieldSubmitted: (_) =>
+            Provider.of<AuthProvider>(context, listen: false).checkPassword(),
         onChanged: (value) {
           Provider.of<AuthProvider>(
             context,
@@ -71,35 +75,17 @@ class _AuthPageRightSideState extends State<AuthPageRightSide> {
       ),
     );
 
-    var loginButton = GestureDetector(
-      onTap: () =>
-          Provider.of<AuthProvider>(context, listen: false).checkPassword(),
-      child: MouseRegion(
-        onEnter: (event) => setState(() => _isLoginBtnHovered = true),
-        onExit: (event) => setState(() => _isLoginBtnHovered = false),
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          width: 300,
-          height: 50,
-          decoration: BoxDecoration(
-            color: _isLoginBtnHovered ? theme.secondary : theme.primary,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: isLoading
-              ? Row(
-                  spacing: 20,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Logging in'),
-                    SpinKitFadingCircle(
-                      size: 25,
-                      color: Colors.white,
-                    ),
-                  ],
-                )
-              : Center(child: Text('Login')),
-        ),
-      ),
+    var button = AnimatedSwitcher(
+      duration: Duration(milliseconds: 400),
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
+      child: currentDur <= 0
+          ? authPageLoginButton()
+          : authPageCountDownTime(context),
     );
 
     return SizedBox(
@@ -127,7 +113,7 @@ class _AuthPageRightSideState extends State<AuthPageRightSide> {
                   ),
                 ),
                 textField,
-                loginButton,
+                button,
                 const Spacer(),
                 AuthPageMessage(
                   hasError: hasError,

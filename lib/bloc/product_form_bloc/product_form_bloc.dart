@@ -430,15 +430,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     ProductFormResetForm event,
     Emitter<ProductFormState> emit,
   ) {
-    if (state is! ProductFormInitial) return;
-
-    final s = state as ProductFormInitial;
-
-    emit(
-      s.copyWith(
-        productData: null,
-      ),
-    );
+    emit(ProductFormInitial());
   }
 
   void _productFormSaveUpdateProduct(

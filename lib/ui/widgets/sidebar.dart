@@ -23,6 +23,12 @@ class _SidebarState extends State<Sidebar> {
 
     final double sidebarWidth = isMinimized ? 100 : 270;
 
+    final route = GoRouter.of(context).state.name;
+
+    bool isHide = route == 'new-product-form';
+
+    if (isHide) return const SizedBox();
+
     return AnimatedContainer(
       duration: Duration(milliseconds: 200),
       width: sidebarWidth,
@@ -62,17 +68,36 @@ class _SidebarState extends State<Sidebar> {
               ),
             ],
           ),
-          Positioned(
-            right: 0,
-            top: 0,
-            child: IconButton(
-              tooltip: isMinimized ? 'Maximize Sidebar' : 'Minimize Sidebar',
-              onPressed: () => context.read<SidebarProvider>().toggleSidebar(),
-              icon: Icon(
-                isMinimized
-                    ? Icons.arrow_forward_ios_rounded
-                    : Icons.arrow_back_ios_rounded,
-                size: 15,
+          Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 5,
+              ),
+              child: Opacity(
+                opacity: .6,
+                child: Tooltip(
+                  message: isMinimized
+                      ? 'Maximize Sidebar'
+                      : 'Minimize Sidebar',
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(
+                        Colors.transparent,
+                      ),
+                    ),
+                    onPressed: () =>
+                        context.read<SidebarProvider>().toggleSidebar(),
+                    child: Container(
+                      width: 5,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: theme.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -104,34 +129,38 @@ class _SidebarButtonState extends State<SidebarButton> {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<MyThemeProvider>();
+    final sidebar = context.read<SidebarProvider>();
     final isSelected = widget.isSelected;
 
     return GestureDetector(
-      onTap: () => GoRouter.of(context).goNamed(widget.data.routeName),
+      onTap: () => GoRouter.of(context).replaceNamed(widget.data.routeName),
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: AnimatedContainer(
-            clipBehavior: Clip.antiAlias,
+          child: Tooltip(
+            message: sidebar.isMinimized ? widget.data.name : "",
+            child: AnimatedContainer(
+              clipBehavior: Clip.antiAlias,
 
-            duration: Duration(milliseconds: 200),
-            curve: Curves.easeIn,
-            height: 50,
-            decoration: isSelected
-                ? BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: theme.primary.withAlpha(20),
+              duration: Duration(milliseconds: 200),
+              curve: Curves.easeIn,
+              height: 50,
+              decoration: isSelected
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: theme.primary.withAlpha(20),
 
-                    border: Border.all(
-                      color: theme.primary,
-                    ),
-                  )
-                : BoxDecoration(),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: _iconTextTweenBuilder(isSelected || _isHovered, theme),
+                      border: Border.all(
+                        color: theme.primary,
+                      ),
+                    )
+                  : BoxDecoration(),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: _iconTextTweenBuilder(isSelected || _isHovered, theme),
+              ),
             ),
           ),
         ),

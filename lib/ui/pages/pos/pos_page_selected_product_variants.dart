@@ -24,7 +24,7 @@ class PosPageSelectedProductVariants extends StatefulWidget {
 
 class _PosPageSelectedProductVariantsState
     extends State<PosPageSelectedProductVariants> {
-  int _selectedVariantId = 0;
+  int _selectedVariantColor = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +59,11 @@ class _PosPageSelectedProductVariantsState
 
     // find available sizes based on selected variant color
     final queryAvailableSizes = variants.where(
-      (e) => e.color == _selectedVariantId,
+      (e) => e.color == _selectedVariantColor,
     );
 
     List<VariantSizeModel> variantSizes =
-        _selectedVariantId > 0 && queryAvailableSizes.isNotEmpty
+        _selectedVariantColor > 0 && queryAvailableSizes.isNotEmpty
         ? queryAvailableSizes.first.sizes
         : [];
 
@@ -157,12 +157,12 @@ class _PosPageSelectedProductVariantsState
 
                       final variantId = query.first.$1;
 
-                      setState(() => _selectedVariantId = variantId);
+                      setState(() => _selectedVariantColor = variantId);
                     },
                     selectedValue: referencesGetValueByID(
                       context,
                       ReferenceType.colors,
-                      _selectedVariantId,
+                      _selectedVariantColor,
                     ),
                     width: 250,
                     entries: dropdownEntries,
@@ -181,13 +181,13 @@ class _PosPageSelectedProductVariantsState
                 children: List.generate(
                   availableSizes.length,
                   (index) {
-                    final sizeId = availableSizes[index].id;
+                    final sizeId = availableSizes[index].sizeValue;
 
                     // get the value of the size value of available sizes
                     final sizeLabel = referencesGetValueByID(
                       context,
                       ReferenceType.sizes,
-                      sizeId!,
+                      sizeId,
                     );
                     final isInActive = availableSizes[index].isActive == 0;
 
@@ -196,7 +196,7 @@ class _PosPageSelectedProductVariantsState
                       onTap: () => context.read<PosBloc>().add(
                         PosAddProductCart(
                           cartModel: CartModel(
-                            color: _selectedVariantId,
+                            color: _selectedVariantColor,
                             size: sizeId,
                             id: availableSizes[index].id!,
                             price: widget.productModel.sellingPrice,
@@ -214,7 +214,7 @@ class _PosPageSelectedProductVariantsState
                 ),
               ),
 
-            if (availableSizes.isEmpty && _selectedVariantId > 0)
+            if (availableSizes.isEmpty && _selectedVariantColor > 0)
               Text(
                 'No available sizes for this product',
               ),

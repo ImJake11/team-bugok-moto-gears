@@ -140,7 +140,9 @@ class _NewProductFormState extends State<NewProductForm> {
                   builder: (context, state) {
                     if (state is ProductFormLoadingState) {
                       return Center(
-                        child: LoadingWidget(),
+                        child: LoadingWidget(
+                          message: "Please wait while we ready the form",
+                        ),
                       );
                     }
 

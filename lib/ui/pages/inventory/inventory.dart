@@ -63,7 +63,7 @@ class _InventoryPageState extends State<InventoryPage> {
             colorBlendMode: BlendMode.srcIn,
           ),
           Text(
-            "New Gear",
+            "Add Product",
             style: const TextStyle(fontSize: 14, color: Colors.white),
           ),
         ],

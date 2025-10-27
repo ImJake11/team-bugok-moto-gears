@@ -11,32 +11,37 @@ class ButtonProp {
 class SidebarProvider extends ChangeNotifier {
   final List<ButtonProp> _buttonsData = [
     ButtonProp(
+      name: "Add Product",
+      icon: "assets/images/helmet.png",
+      routeName: 'new-product-form',
+    ),
+    ButtonProp(
       routeName: "dashboard",
       name: "Dashboard",
       icon: "assets/images/dashboard.png",
     ),
     ButtonProp(
       routeName: "inventory",
-      name: "Inventory Management",
+      name: "Inventory",
       icon: "assets/images/box.png",
     ),
     ButtonProp(
       routeName: "pos",
-      name: "New Sale",
+      name: "Create Sale",
       icon: "assets/images/pos-terminal.png",
     ),
     ButtonProp(
-      name: "Small Expense",
+      name: "Add Expense",
       icon: "assets/images/shopping-bag.png",
       routeName: "small-purchase",
     ),
     ButtonProp(
-      name: "Sales History",
+      name: "Sales",
       icon: "assets/images/sales.png",
       routeName: 'sales',
     ),
     ButtonProp(
-      name: "Expense Summary",
+      name: "Expenses",
       icon: "assets/images/expenses.png",
       routeName: 'expenses',
     ),

@@ -13,6 +13,7 @@ import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dar
 import 'package:team_bugok_business/utils/provider/auth_provider.dart';
 import 'package:team_bugok_business/utils/provider/loading_provider.dart';
 import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
+import 'package:team_bugok_business/utils/provider/settings_provider.dart';
 import 'package:team_bugok_business/utils/provider/sidebar_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/router/config.dart';
@@ -66,11 +67,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LoadingProvider()),
         ChangeNotifierProvider(create: (_) => ReferencesValuesProviderCache()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(
           create: (_) => SidebarProvider(),
         ),
       ],
       builder: (context, child) {
+        final theme = context.watch<MyThemeProvider>();
+
         return MultiBlocProvider(
           providers: [
             BlocProvider(create: (_) => ProductFormBloc()),
@@ -96,11 +100,17 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Team Bugok',
             theme: ThemeData(
+              scrollbarTheme: ScrollbarThemeData(
+                thumbColor: WidgetStatePropertyAll(theme.primary),
+                thickness: WidgetStatePropertyAll(4),
+                radius: Radius.circular(20),
+              ),
               textTheme: GoogleFonts.manropeTextTheme(
                 ThemeData.dark().textTheme,
               ),
-
-              colorScheme: ColorScheme.dark(),
+              colorScheme: ColorScheme.dark(
+                primary: theme.primary,
+              ),
               useMaterial3: true,
             ),
             themeMode: ThemeMode.dark,

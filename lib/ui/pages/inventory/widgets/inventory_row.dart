@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/widgets/inventory_stock_status_icon.dart';
 import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/compute_product_stock.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
-import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
 
@@ -91,13 +91,12 @@ class _InventoryRowState extends State<InventoryRow> {
                   : Colors.transparent,
             ),
             borderRadius: BorderRadius.circular(10),
-            color: widget.index.isEven ? Colors.black12: theme.surfaceDim,
+            color: widget.index.isEven ? Colors.black12 : theme.surfaceDim,
           ),
           width: double.infinity,
           child: Flex(
             direction: Axis.horizontal,
             children: [
-              tableCell(1, id),
               tableCell(2, brand),
               tableCell(2, model),
               tableCell(2, category),
@@ -106,10 +105,32 @@ class _InventoryRowState extends State<InventoryRow> {
               tableCell(2, variants),
               tableCell(1, stock),
               Flexible(
-                flex: 2,
+                flex: 1,
                 child: Center(
                   child: InventoryStatusIcon(
                     isActive: isActive,
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 2,
+                child: Center(
+                  child: IconButton(
+                    onPressed: () {
+                      context.read<ProductFormBloc>().add(
+                        ProductFormUpdateExistingProduct(
+                          productId: widget.productModel.id!,
+                        ),
+                      );
+                      GoRouter.of(context).goNamed(
+                        'new-product-form',
+                        extra: widget.productModel,
+                      );
+                    },
+                    icon: Icon(
+                      Icons.edit_rounded,
+                      color: context.read<MyThemeProvider>().primary,
+                    ),
                   ),
                 ),
               ),

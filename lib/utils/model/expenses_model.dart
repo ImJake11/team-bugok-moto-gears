@@ -13,3 +13,21 @@ class ExpensesModel {
     required this.total,
   });
 }
+
+class EpxenseItemModel {
+  final int brand;
+  final String model;
+  final int color;
+  final int size;
+  final double price;
+  final int quantity;
+
+  EpxenseItemModel({
+    required this.brand,
+    required this.model,
+    required this.color,
+    required this.size,
+    required this.price,
+    required this.quantity,
+  });
+}

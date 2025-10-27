@@ -4,7 +4,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class LoadingWidget extends StatelessWidget {
-  const LoadingWidget({super.key});
+  final String? message;
+  const LoadingWidget({super.key, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class LoadingWidget extends StatelessWidget {
           color: context.watch<MyThemeProvider>().primary,
           size: 50,
         ),
-        Text("Please wait..."),
+        Text(message ?? "Please wait..."),
       ],
     );
   }

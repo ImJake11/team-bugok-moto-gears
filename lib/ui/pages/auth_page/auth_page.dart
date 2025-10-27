@@ -51,13 +51,13 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<MyThemeProvider>();
-    
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          border: Border.all(
+          border: Border.all( 
             color: theme.primary,
           ),
           borderRadius: BorderRadius.circular(10),

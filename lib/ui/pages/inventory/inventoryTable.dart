@@ -14,13 +14,9 @@ class InventoryTable extends StatefulWidget {
 }
 
 class _InventoryTableState extends State<InventoryTable> {
- 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<MyThemeProvider>();
-
     final List<String> tableHeaders = [
-      "ID",
       "Brand",
       "Model",
       "Category",
@@ -29,16 +25,17 @@ class _InventoryTableState extends State<InventoryTable> {
       "Variants",
       "Stock",
       "Status",
+      "Action",
     ];
 
     final Map<int, TableColumnWidth> columnWidths = const {
-      0: FlexColumnWidth(1),
+      0: FlexColumnWidth(2),
       1: FlexColumnWidth(2),
       2: FlexColumnWidth(2),
       3: FlexColumnWidth(2),
       4: FlexColumnWidth(2),
       5: FlexColumnWidth(2),
-      6: FlexColumnWidth(2),
+      6: FlexColumnWidth(1),
       7: FlexColumnWidth(1),
       8: FlexColumnWidth(2),
     };

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/ui/pages/sales/widget/sales_page_table_header.dart';
+import 'package:team_bugok_business/utils/enums/reference_types.dart';
+import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/cart_model.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 import 'package:team_bugok_business/utils/services/currency_formetter.dart';
@@ -69,13 +71,29 @@ class SalesPageSalesItems extends StatelessWidget {
                 (index) {
                   final item = items[index];
 
+                  final brand = referencesGetValueByID(
+                    context,
+                    ReferenceType.brands,
+                    item.brand,
+                  );
+                  final color = referencesGetValueByID(
+                    context,
+                    ReferenceType.colors,
+                    item.color,
+                  );
+                  final size = referencesGetValueByID(
+                    context,
+                    ReferenceType.sizes,
+                    item.size,
+                  );
+
                   return Flex(
                     direction: Axis.horizontal,
                     children: [
-                      _cell(item.brand),
+                      _cell(brand),
                       _cell(item.model),
-                      _cell(item.color),
-                      _cell(item.size),
+                      _cell(color),
+                      _cell(size),
                       _cell(item.quantity),
                       _cell(currencyFormatter(item.price)),
                     ],

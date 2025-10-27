@@ -117,7 +117,7 @@ class _ProductViewRelatedBrandsState extends State<ProductViewRelatedBrands> {
                       )
                     : SingleChildScrollView(
                         child: Column(
-                          spacing: 10,
+                          spacing: 15,
                           children: filteredList
                               .map(
                                 (e) => GestureDetector(

@@ -40,7 +40,7 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
       product.brand,
     );
 
-    Widget _addButton(
+    Widget addButton(
       bool isHovered,
       VoidCallback onAdd,
     ) => Flexible(
@@ -53,7 +53,7 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
               color: isHovered ? theme.primary : Colors.transparent,
               borderRadius: BorderRadius.circular(5),
               border: Border.all(
-                color: Color(0xFF555555),
+                color: theme.borderColor,
               ),
             ),
             child: Padding(
@@ -68,7 +68,7 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
       ),
     );
 
-    Widget _tableCell(dynamic data) => Flexible(
+    Widget tableCell(dynamic data) => Flexible(
       child: SizedBox(
         height: 55,
         child: Center(
@@ -103,18 +103,16 @@ class _PosPageTableRowState extends State<PosPageTableRow> {
             duration: Duration(milliseconds: 200),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: widget.index.isOdd
-                  ? Colors.black12
-                  : theme.surfaceDim,
+              color: widget.index.isOdd ? Colors.black12 : theme.surfaceDim,
             ),
             child: Flex(
               direction: Axis.horizontal,
               children: [
-                _tableCell(brand),
-                _tableCell(product.model),
-                _tableCell(product.variants.length),
-                _tableCell(computeProductStock(product.variants)),
-                _addButton(
+                tableCell(brand),
+                tableCell(product.model),
+                tableCell(product.variants.length),
+                tableCell(computeProductStock(product.variants)),
+                addButton(
                   _isHovered,
                   () => context.read<PosBloc>().add(
                     PosSelectProduct(

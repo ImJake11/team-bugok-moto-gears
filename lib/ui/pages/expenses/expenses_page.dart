@@ -78,11 +78,18 @@ class _ExpensesPageState extends State<ExpensesPage> {
 
         // year entries of past 10 years
         List<String> entries = List.generate(
-          10,
+          5,
           (index) => "${_currentYear - index}",
         );
 
-        List<String> tableHeader = ["ID", "Type", "Date", "Note", "Total"];
+        List<String> tableHeader = [
+          "ID",
+          "Type",
+          "Date",
+          "Note",
+          "Total",
+          "Action",
+        ];
 
         var appBar = Row(
           spacing: 10,

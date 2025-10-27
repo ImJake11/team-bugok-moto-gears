@@ -71,16 +71,6 @@ class SizeRepository {
     double costPrice,
   ) async {
     try {
-      await (db.update(
-        db.sizes,
-      )..where((tbl) => tbl.id.equals(size.id!))).write(
-        SizesCompanion(
-          isActive: Value(size.isActive),
-          sizeValues: Value(size.sizeValue),
-          stock: Value(size.stock),
-        ),
-      );
-
       // Fetch current data to calculate stock difference
       final currentData = await (db.select(
         db.sizes,
@@ -102,6 +92,16 @@ class SizeRepository {
           );
         }
       }
+
+      await (db.update(
+        db.sizes,
+      )..where((tbl) => tbl.id.equals(size.id!))).write(
+        SizesCompanion(
+          isActive: Value(size.isActive),
+          sizeValues: Value(size.sizeValue),
+          stock: Value(size.stock),
+        ),
+      );
     } catch (e, st) {
       print(
         "🔥 [SizeRepository._updateSize] Failed to update size id=${size.id}",

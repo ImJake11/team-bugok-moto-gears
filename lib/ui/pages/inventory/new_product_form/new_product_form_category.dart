@@ -23,13 +23,13 @@ class NewProductFormCategory extends StatelessWidget {
 
     List<(int, String)> categoryReferences = cacheProvider.categories;
 
+    final categoryEntries = categoryReferences.map((e) => e.$2).toList();
+
     final category = referencesGetValueByID(
       context,
       ReferenceType.categories,
       selectedCategory,
     );
-
-    final categoryEntries = categoryReferences.map((e) => e.$2).toList();
 
     var child = Row(
       children: [
@@ -44,6 +44,7 @@ class NewProductFormCategory extends StatelessWidget {
               ReferenceType.categories,
               value!,
             );
+            
             context.read<ProductFormBloc>().add(
               ProductFormUpdateData(
                 key: ProductFormKeys.category,

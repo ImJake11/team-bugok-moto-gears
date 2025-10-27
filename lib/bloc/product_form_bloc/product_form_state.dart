@@ -11,7 +11,7 @@ final class ProductFormInitial extends ProductFormState {
            productData ??
            ProductModel(
              brand: 0,
-             category: 0,
+             category: 1,
              model: '',
              costPrice: 0,
              sellingPrice: 0,
