@@ -5,7 +5,7 @@ This system helps manage product sales, track expenses, monitor inventory, and v
 
 🚀 Overview
 
-Team Bugok Business is a cross-platform Flutter application designed to simplify daily business operations.
+Team Bugok Business is a Flutter application designed to simplify daily business operations.
 It allows users to manage products, record sales, track expenses, and analyze performance through an interactive dashboard.
 Built with an offline-first approach using Drift (SQLite) and structured with MVVM architecture for scalability and maintainability.
 
@@ -47,3 +47,6 @@ Architecture: MVVM
 
 This project was created as a free initiative to help Team Bugok improve their business operations through a custom-made, easy-to-use POS and expense tracking system.
 It also serves as a portfolio project to demonstrate real-world full-stack Flutter development skills.
+
+Developed by: Jake Juguilon
+Role: Full-Stack Flutter Developer
