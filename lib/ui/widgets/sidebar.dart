@@ -50,7 +50,7 @@ class _SidebarState extends State<Sidebar> {
                 SizedBox(
                   height: 100,
                   child: Image.asset(
-                    width: sidebarWidth * .65,
+                    width: sidebarWidth * .55,
                     "assets/images/moto-gears-icon-no-bg.png",
                     fit: BoxFit.cover,
                   ),
@@ -146,7 +146,7 @@ class _SidebarButtonState extends State<SidebarButton> {
 
               duration: Duration(milliseconds: 200),
               curve: Curves.easeIn,
-              height: 50,
+              height: 40,
               decoration: isSelected
                   ? BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -189,7 +189,7 @@ class _SidebarButtonState extends State<SidebarButton> {
           Image.asset(
             widget.data.icon,
             color: value,
-            height: 20,
+            height: 16,
             colorBlendMode: BlendMode.srcIn,
           ),
           if (!widget.isMinimized)
@@ -197,7 +197,7 @@ class _SidebarButtonState extends State<SidebarButton> {
               child: Text(
                 widget.data.name,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 13,
                   overflow: TextOverflow.ellipsis,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   color: value,

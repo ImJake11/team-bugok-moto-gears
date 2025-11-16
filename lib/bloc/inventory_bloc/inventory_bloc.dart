@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
-import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 
@@ -11,32 +9,11 @@ part 'inventory_event.dart';
 part 'inventory_state.dart';
 
 class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
-  late final StreamSubscription posBlocSub;
-  late final StreamSubscription formBlocSub;
-
-  InventoryBloc({
-    required PosBloc posBloc,
-    required ProductFormBloc formBloc,
-  }) : super(InventoryInitial(products: [])) {
-    // SUBSCRIPTIONS
-    posBlocSub = posBloc.stream.listen(
-      (PosState s) {
-        if (s is PosCheckOutSuccessful) {
-          add(InventoryLoadInitialData());
-        }
-      },
-    );
-
-    formBlocSub = formBloc.stream.listen((ProductFormState s) {
-      if (s is ProductFormSaveProduct) {
-        add(InventoryLoadInitialData());
-      }
-    });
-
+  InventoryBloc() : super(InventoryInitial(products: [])) {
     on<InventoryLoadInitialData>(_inventoryLoadInitialData);
     on<InventoryFilteringList>(_inventoryFilteringList);
-
-    add(InventoryLoadInitialData());
+    on<InventoryErrorOccurs>(_inventoryErrorOccurs);
+    on<InventoryToggleLoadingState>(_inventoryToggleLoadingState);
   }
 
   Future<void> _inventoryLoadInitialData(
@@ -44,12 +21,7 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     Emitter<InventoryState> emit,
   ) async {
     try {
-      emit(InventoryLoadingState());
-
-      final List<ProductModel> products = await ProductRepository()
-          .retrieveAllProduct();
-
-      await Future.delayed(Duration(seconds: 2));
+      final products = event.products;
       emit(
         InventoryInitial(
           products: products,
@@ -94,5 +66,19 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
         searchResults: searchResult,
       ),
     );
+  }
+
+  void _inventoryErrorOccurs(
+    InventoryErrorOccurs event,
+    Emitter<InventoryState> emit,
+  ) {
+    emit(InventoryErrorState());
+  }
+
+  void _inventoryToggleLoadingState(
+    InventoryToggleLoadingState event,
+    Emitter<InventoryState> emit,
+  ) {
+    emit(InventoryLoadingState());
   }
 }

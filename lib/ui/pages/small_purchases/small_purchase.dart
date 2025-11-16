@@ -1,15 +1,14 @@
-import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
-import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/ui/widgets/custom_button.dart';
 import 'package:team_bugok_business/ui/widgets/snackbar.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
 import 'package:team_bugok_business/utils/constants/expenses_options.dart';
-import 'package:team_bugok_business/utils/database/app_database.dart';
 import 'package:team_bugok_business/utils/database/repositories/expenses_repository.dart';
+import 'package:team_bugok_business/utils/model/expenses_model.dart';
 import 'package:team_bugok_business/utils/provider/loading_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
@@ -21,26 +20,32 @@ class SmallPurchase extends StatefulWidget {
 }
 
 class _SmallPurchaseState extends State<SmallPurchase> {
-  final ExpensesRepository _expensesRepository = ExpensesRepository();
+  late final ExpensesRepository _expensesRepository;
 
   final _noteController = TextEditingController();
   final _costController = TextEditingController();
 
   int _selectedExpenses = -1;
 
+  @override
+  void initState() {
+    super.initState();
+    _expensesRepository = ExpensesRepository();
+  }
+
   Future<void> _saveExpenses() async {
     try {
       if (_costController.text.isEmpty || _selectedExpenses < 0) return;
       context.read<LoadingProvider>().showLoading("Saving Data");
 
-      final newExpense = ExpensesCompanion.insert(
-        category: Value(_selectedExpenses),
-        relatedId: 0,
-        total: double.tryParse(_costController.text) ?? 0.00,
-        note: Value(_noteController.text),
+      _expensesRepository.insertExpenses(
+        ExpensesModel(
+          category: _selectedExpenses,
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+          total: double.parse(_costController.text),
+        ),
       );
-
-      await _expensesRepository.insertExpenses(newExpense);
+      // await _expensesRepository.insertExpenses(newExpense);
       context.read<DashboardBloc>().add(DashboardLoadData());
       await Future.delayed(Duration(seconds: 1));
 

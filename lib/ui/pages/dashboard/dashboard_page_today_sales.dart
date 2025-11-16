@@ -27,11 +27,7 @@ class DashboardPageTodaySales extends StatelessWidget {
               999,
             );
 
-            final filteredSales = state.sales.where(
-              (e) =>
-                  e.createdAt.isAfter(startOfDay) &&
-                  e.createdAt.isBefore(endOfDay),
-            );
+            final filteredSales = state.sales.where((e) => false);
 
             final todaySales = filteredSales.fold<double>(
               0.00,

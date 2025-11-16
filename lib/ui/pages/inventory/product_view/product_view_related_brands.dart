@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:team_bugok_business/bloc/inventory_bloc/inventory_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_related_button.dart';
-import 'package:team_bugok_business/ui/widgets/primary_button.dart';
-import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
+import 'package:team_bugok_business/ui/widgets/custom_button.dart';
 import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
@@ -25,24 +26,34 @@ class ProductViewRelatedBrands extends StatefulWidget {
 }
 
 class _ProductViewRelatedBrandsState extends State<ProductViewRelatedBrands> {
-  late Future<List<ProductModel>> _products;
+  late List<ProductModel> _products;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getRelatedProducts();
+  }
 
   @override
   void didUpdateWidget(covariant ProductViewRelatedBrands oldWidget) {
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentProductId != widget.currentProductId) {
-      setState(() {
-        _products = ProductRepository().retrieveAllProduct();
-      });
+      _getRelatedProducts();
     }
   }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _products = ProductRepository().retrieveAllProduct();
+  void _getRelatedProducts() {
+    final s = context.read<InventoryBloc>().state as InventoryInitial;
+
+    _products = s.products
+        .where(
+          (element) => widget.currentProductId != element.id,
+        )
+        .toList();
+
+    setState(() {});
   }
 
   @override
@@ -60,85 +71,58 @@ class _ProductViewRelatedBrandsState extends State<ProductViewRelatedBrands> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          FutureBuilder(
-            key: ValueKey(widget.currentProductId),
-            future: _products,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: SizedBox(),
-                );
-              }
-
-              if (snapshot.hasError) {
-                return Text("Error");
-              }
-
-              if (snapshot.hasData && snapshot.data == null) {
-                return Text("Error ");
-              }
-
-              // filter based on current product on preview
-              final filteredList = snapshot.data!.where(
-                (p) =>
-                    (p.brand == widget.currentBrand &&
-                    p.id != widget.currentProductId),
-              );
-
-              return Expanded(
-                child: filteredList.isEmpty
-                    ? Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          spacing: 15,
-                          children: [
-                            Text(
-                              'No related product found',
+          Expanded(
+            child: _products.isEmpty
+                ? Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 15,
+                      children: [
+                        Text(
+                          'No related product found',
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
+                        CustomButton(
+                          onTap: () {
+                            GoRouter.of(context).goNamed('inventory');
+                          },
+                          child: Center(
+                            child: Text(
+                              "Go to inventory",
                               style: TextStyle(
                                 fontSize: 12,
                               ),
                             ),
-                            CustomButton(
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : SingleChildScrollView(
+                    child: Column(
+                      spacing: 15,
+                      children: _products
+                          .map(
+                            (e) => GestureDetector(
                               onTap: () {
-                                GoRouter.of(context).goNamed('inventory');
+                                widget.onTap(e);
                               },
-                              child: Center(
-                                child: Text(
-                                  "Go to inventory",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                  ),
+                              child: ProductViewRelatedButton(
+                                brand: referencesGetValueByID(
+                                  context,
+                                  ReferenceType.brands,
+                                  widget.currentBrand,
                                 ),
+                                model: e.model,
                               ),
                             ),
-                          ],
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        child: Column(
-                          spacing: 15,
-                          children: filteredList
-                              .map(
-                                (e) => GestureDetector(
-                                  onTap: () {
-                                    widget.onTap(e);
-                                  },
-                                  child: ProductViewRelatedButton(
-                                    brand: referencesGetValueByID(
-                                      context,
-                                      ReferenceType.brands,
-                                      widget.currentBrand,
-                                    ),
-                                    model: e.model,
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ),
-              );
-            },
+                          )
+                          .toList(),
+                    ),
+                  ),
           ),
         ],
       ),

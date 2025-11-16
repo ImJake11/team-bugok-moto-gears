@@ -27,7 +27,10 @@ class PosQuantityAction extends PosEvent {
   final int id;
   final bool isAdd;
 
-  PosQuantityAction({required this.id, required this.isAdd});
+  PosQuantityAction({
+    required this.id,
+    required this.isAdd,
+  });
 }
 
 class PosDeleteCartItem extends PosEvent {
@@ -37,3 +40,5 @@ class PosDeleteCartItem extends PosEvent {
 }
 
 class PosCheckOutItems extends PosEvent {}
+
+class PosSearchBarSuffixIconClicked extends PosEvent{}

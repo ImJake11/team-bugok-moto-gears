@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
 import 'package:team_bugok_business/ui/pages/pos/widgets/pos_page_cart_tile.dart';
-import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/ui/widgets/custom_button.dart';
 import 'package:team_bugok_business/utils/helpers/compute_cart_total.dart';
 import 'package:team_bugok_business/utils/model/cart_model.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';

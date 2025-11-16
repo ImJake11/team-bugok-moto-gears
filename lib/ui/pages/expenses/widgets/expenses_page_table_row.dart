@@ -29,7 +29,7 @@ Widget _showBtn(
   ),
 );
 
-Widget _itemsCard(BuildContext context, List<EpxenseItemModel> items) {
+Widget _itemsCard(BuildContext context, List<ExpenseItemModel> items) {
   final theme = context.watch<MyThemeProvider>();
 
   final labels = [
@@ -121,7 +121,7 @@ Widget expensesTableRow(
   bool isShowed = false;
   bool hasError = false;
   bool isLoading = false;
-  List<EpxenseItemModel> items = [];
+  List<ExpenseItemModel> items = [];
 
   return StatefulBuilder(
     builder: (BuildContext context, setState) {
@@ -130,7 +130,7 @@ Widget expensesTableRow(
           final ExpensesRepository expensesRepository = ExpensesRepository();
 
           final result = await expensesRepository.retriveExpensesItem(
-            expenses.id,
+            expenses.id!,
           );
 
           setState(() => items = result);
@@ -176,7 +176,7 @@ Widget expensesTableRow(
                   children: [
                     _cell(expenses.id),
                     _cell(expensesOptions[expenses.category]),
-                    _cell(convertDateStringToDate(expenses.createdAt)),
+                    _cell(expenses.createdAt),
                     _cell(
                       (expenses.note?.isNotEmpty ?? false)
                           ? expenses.note

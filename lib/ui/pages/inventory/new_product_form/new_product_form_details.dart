@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/new_product_form_variant.dart';
 import 'package:team_bugok_business/ui/pages/inventory/new_product_form/widgets/form_wrapper.dart';
-import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/ui/widgets/custom_button.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
 
 class NewProductFormDetails extends StatelessWidget {

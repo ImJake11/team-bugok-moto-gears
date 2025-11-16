@@ -46,9 +46,10 @@ import 'package:team_bugok_business/utils/model/sales_model.dart';
 
       final salesPerDay = sales.where((element) {
         final created = element.createdAt;
-        return created.year == day.year &&
-            created.month == day.month &&
-            created.day == day.day;
+        return false;
+        // return created.year == day.year &&
+        //     created.month == day.month &&
+        //     created.day == day.day;
       }).toList();
 
       final totalSales = salesPerDay.fold<double>(
@@ -70,7 +71,7 @@ import 'package:team_bugok_business/utils/model/sales_model.dart';
 
         // get the sales based on index
         final salesPerDay = sales
-            .where((element) => element.createdAt.day - 1 == index)
+            .where((element) => element.createdAt - 1 == index)
             .toList();
 
         final totalSales = salesPerDay.isEmpty

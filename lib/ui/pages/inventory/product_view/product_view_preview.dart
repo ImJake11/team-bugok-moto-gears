@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
-import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_color_button.dart';
 import 'package:team_bugok_business/ui/pages/inventory/product_view/widgets/product_view_size_button.dart';
-import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/ui/widgets/custom_button.dart';
 import 'package:team_bugok_business/utils/helpers/compute_product_stock.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
@@ -153,12 +152,12 @@ class ProductViewPreview extends StatelessWidget {
                           borderRadius: 50,
                           width: 100,
                           onTap: () {
-                            context.read<ProductFormBloc>().add(
-                              ProductFormUpdateExistingProduct(
-                                productId: productModel.id!,
-                              ),
+                            GoRouter.of(context).pushNamed(
+                              'new-product-form',
+                              queryParameters: {
+                                "id": productModel.id.toString(),
+                              },
                             );
-                            GoRouter.of(context).pushNamed('new-product-form');
                           },
                           child: Center(
                             child: Text("Edit"),

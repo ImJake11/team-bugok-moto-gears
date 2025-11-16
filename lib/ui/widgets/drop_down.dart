@@ -27,6 +27,8 @@ class CustomDropdown extends StatelessWidget {
     final theme = context.watch<MyThemeProvider>();
 
     return Container(
+      height: 40,
+      clipBehavior: Clip.antiAlias,
       decoration: showDecoration
           ? BoxDecoration(
               color: theme.surfaceDim,
@@ -36,9 +38,10 @@ class CustomDropdown extends StatelessWidget {
           : null,
       child: DropdownMenu(
         textStyle: TextStyle(
-          fontSize: 13,
+          fontSize: 12,
         ),
         menuStyle: MenuStyle(
+          
           side: WidgetStatePropertyAll(
             BorderSide(
               color: Color(0xFF555555),

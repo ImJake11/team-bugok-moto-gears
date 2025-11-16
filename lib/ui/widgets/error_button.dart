@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 class CustomErrorButton extends StatefulWidget {
   final Widget child;
   final double height;
+  final double width;
+  final Color color;
+  final Color hoverColor;
   final GestureTapCallback? ontap;
 
   const CustomErrorButton({
     super.key,
     required this.child,
     this.height = 50,
+    this.color = Colors.black,
+    this.width = 100,
+    this.hoverColor = Colors.red,
     this.ontap,
   });
 
@@ -28,12 +34,13 @@ class _CustomErrorButtonState extends State<CustomErrorButton> {
         onTap: widget.ontap,
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
+          width: widget.width,
           height: widget.height,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: Colors.black,
+            color: widget.color,
             border: Border.all(
-              color: isHovered ? Colors.red : Colors.black,
+              color: isHovered ? widget.hoverColor : widget.color,
             ),
           ),
           child: Padding(

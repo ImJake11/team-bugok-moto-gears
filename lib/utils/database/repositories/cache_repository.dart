@@ -1,15 +1,16 @@
-import 'package:drift/drift.dart';
-import 'package:team_bugok_business/utils/database/app_database.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CacheRepository {
-  final db = appDatabase;
+  late final SupabaseClient supabase;
+
+  CacheRepository() : supabase = Supabase.instance.client;
 
   Future<int> getPassword() async => _getPassword();
 
   Future<void> loginUser(bool isRememberedPin) async =>
       _logInUser(isRememberedPin);
 
-  Future<(int, int)> checkUserSession() async => _checkUserSession();
+  Future<bool> checkUserSession() async => _checkUserSession();
 
   Future<int> getTheme() async => _getTheme();
 
@@ -19,44 +20,16 @@ class CacheRepository {
 
   Future<void> logOut() async => _logOut();
 
-  Future<void> setLastSync() async => _setLastSync();
-
-  Future<DateTime?> getLatestSync() async => _getLatestSync();
-
-  // ============================================= //
-Future<DateTime?> _getLatestSync() async {
-  try {
-
-    final result = await db.select(db.caches).getSingle();
-
-    return result.lastSync;
-  } catch(e, st){
-    print("Failed to get latest sync record");
-    print(st);
-    rethrow;
-  }
-}
-  Future<void> _setLastSync() async {
-    try {
-      await db
-          .update(db.caches)
-          .write(
-            CachesCompanion(
-              lastSync: Value(DateTime.now()),
-            ),
-          );
-    } catch (e, st) {
-      print('Failed to set sync ${e}');
-      print(st);
-      rethrow;
-    }
-  }
-
   Future<int> _getTheme() async {
     try {
-      final result = await db.select(db.caches).getSingle();
+      final result = await supabase.from('cache').select('theme');
 
-      return result.theme;
+      if (result.isEmpty) return 0;
+
+      final theme = result.first['theme'];
+
+      print('✅ Theme is set to $theme');
+      return theme;
     } catch (e, st) {
       print("Failed to get current theme ${e}");
       print(st);
@@ -66,13 +39,14 @@ Future<DateTime?> _getLatestSync() async {
 
   Future<void> _setTheme(int index) async {
     try {
-      await db
-          .update(db.caches)
-          .write(
-            CachesCompanion(
-              theme: Value(index),
-            ),
-          );
+      await supabase
+          .from('cache')
+          .update({
+            'theme': index,
+          })
+          .eq('id', 1);
+
+      print('✅ Theme updated');
     } catch (e, st) {
       print("Failed to set theme ${e}");
       print(st);
@@ -82,13 +56,13 @@ Future<DateTime?> _getLatestSync() async {
 
   Future<void> _saveNewPin(int newPin) async {
     try {
-      await db
-          .update(db.caches)
-          .write(
-            CachesCompanion(
-              password: Value(newPin),
-            ),
-          );
+      await supabase
+          .from('cache')
+          .update({
+            'password': newPin,
+          })
+          .eq('id', 1);
+      print('✅ New PIN saved');
     } catch (e, st) {
       print("Failed to save new pin ${e}");
       print(st);
@@ -96,11 +70,15 @@ Future<DateTime?> _getLatestSync() async {
     }
   }
 
-  Future<(int, int)> _checkUserSession() async {
+  Future<bool> _checkUserSession() async {
     try {
-      Cache cache = await db.select(db.caches).getSingle();
+      final res = await supabase.from('cache').select('is_logged_in');
 
-      return (cache.isLoggedIn, cache.isRememberedPin);
+      if (res.isEmpty) return false;
+
+      final isLoggedIn = res.first['is_logged_in'] == 1;
+
+      return isLoggedIn;
     } catch (e, st) {
       print("Failed to check user session ${e}");
       print(st);
@@ -110,14 +88,13 @@ Future<DateTime?> _getLatestSync() async {
 
   Future<void> _logInUser(bool isRememberedPin) async {
     try {
-      await db
-          .update(db.caches)
-          .write(
-            CachesCompanion(
-              isLoggedIn: Value(1),
-              isRememberedPin: Value(isRememberedPin ? 1 : 0),
-            ),
-          );
+      await supabase
+          .from('cache')
+          .update({
+            'is_logged_in': 1,
+          })
+          .eq('id', 1);
+      print('✅ User logged in successfully');
     } catch (e, st) {
       print("Failed to logged in user ${e}");
       print(st);
@@ -127,10 +104,13 @@ Future<DateTime?> _getLatestSync() async {
 
   Future<int> _getPassword() async {
     try {
-      final query = db.select(db.caches).map((row) => row.password).getSingle();
+      final res = await supabase.from('cache').select('password');
 
-      final password = await query;
+      if (res.isEmpty) return 10242025;
 
+      final password = res.first['password'];
+
+      print('✅ Password retrieved');
       return password;
     } catch (e, st) {
       print("Failed to get password ${e}");
@@ -141,13 +121,16 @@ Future<DateTime?> _getLatestSync() async {
 
   Future<void> _logOut() async {
     try {
-      await db
-          .update(db.caches)
-          .write(
-            CachesCompanion(
-              isLoggedIn: Value(0),
-            ),
+      await supabase
+          .from('cache')
+          .update({
+            'is_logged_in': 0,
+          })
+          .eq(
+            'id',
+            1,
           );
+      print("✅ User logged out successfully");
     } catch (e, st) {
       print("Failed to log out ${e}");
       print(st);

@@ -14,6 +14,11 @@ class DashboardTotalExpenses extends StatelessWidget {
       selector: (state) {
         if (state is! DashboardInitial) return 0.00;
 
+        state.expenses.forEach(
+          (element) {
+            print(element.total);
+          },
+        );
         return state.expenses.fold<double>(
           0.00,
           (acc, cur) => acc + cur.total,

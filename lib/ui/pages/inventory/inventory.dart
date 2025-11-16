@@ -7,10 +7,12 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:team_bugok_business/bloc/inventory_bloc/inventory_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/inventoryTable.dart';
 import 'package:team_bugok_business/ui/widgets/appbar.dart';
+import 'package:team_bugok_business/ui/widgets/error_button.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
 import 'package:team_bugok_business/ui/widgets/padding_wrapper.dart';
-import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/ui/widgets/custom_button.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
+import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class InventoryPage extends StatefulWidget {
@@ -21,8 +23,35 @@ class InventoryPage extends StatefulWidget {
 }
 
 class _InventoryPageState extends State<InventoryPage> {
+  late final ProductRepository _productRepository;
+
   final _searchController = TextEditingController();
   Timer? _debounce;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _productRepository = ProductRepository();
+    final state = context.read<InventoryBloc>().state;
+
+    if (state is InventoryInitial) {
+      if (state.products.isEmpty) _loadProducts();
+    }
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      context.read<InventoryBloc>().add(InventoryToggleLoadingState());
+      final products = await _productRepository.retrieveAllProduct();
+
+      context.read<InventoryBloc>().add(
+        InventoryLoadInitialData(products: products),
+      );
+    } catch (e) {
+      context.read<InventoryBloc>().add(InventoryErrorOccurs());
+    }
+  }
 
   void _searchQuery() {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
@@ -58,13 +87,13 @@ class _InventoryPageState extends State<InventoryPage> {
         children: [
           Image.asset(
             "assets/images/helmet.png",
-            width: 20,
+            width: 16,
             color: Colors.white,
             colorBlendMode: BlendMode.srcIn,
           ),
           Text(
             "Add Product",
-            style: const TextStyle(fontSize: 14, color: Colors.white),
+            style: const TextStyle(fontSize: 12, color: Colors.white),
           ),
         ],
       ),
@@ -109,8 +138,23 @@ class _InventoryPageState extends State<InventoryPage> {
               products: isFiltering ? searchResults : products,
             );
           } else {
-            return Center(
-              child: Text('Something went wrong'),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 10,
+              children: [
+                Text('Something went wrong'),
+                SizedBox(
+                  child: CustomErrorButton(
+                    ontap: () => _loadProducts(),
+                    color: Colors.red,
+                    width: 100,
+                    child: Center(
+                      child: Text("Retry"),
+                    ),
+                  ),
+                ),
+              ],
             );
           }
         },

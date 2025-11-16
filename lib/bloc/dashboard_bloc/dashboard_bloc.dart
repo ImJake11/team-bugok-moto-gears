@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:team_bugok_business/bloc/pos_bloc/pos_bloc.dart';
-import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/utils/database/repositories/expenses_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
 import 'package:team_bugok_business/utils/database/repositories/sales_repository.dart';
@@ -17,10 +15,12 @@ part 'dashboard_event.dart';
 part 'dashboard_state.dart';
 
 class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
-  late final StreamSubscription posBlocSub;
-  late final StreamSubscription formBlocSub;
+  late final SalesRepository salesRepository;
+  late final ProductRepository productRepository;
+  late final SizeRepository sizeRepository;
+  late final ExpensesRepository expensesRepository;
 
-  DashboardBloc({required PosBloc posBloc, required ProductFormBloc formBloc})
+  DashboardBloc()
     : super(
         DashboardInitial(
           expenses: [],
@@ -30,20 +30,10 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
           sizes: [],
         ),
       ) {
-    // ======== SUBSCRIPTIONS ====== //
-    posBlocSub = posBloc.stream.listen(
-      (PosState s) {
-        if (s is PosCheckOutSuccessful) {
-          add(DashboardLoadData());
-        }
-      },
-    );
-
-    formBlocSub = formBloc.stream.listen((ProductFormState state) {
-      if (state is ProductFormSaveProduct) {
-        add(DashboardLoadData());
-      }
-    });
+    salesRepository = SalesRepository();
+    expensesRepository = ExpensesRepository();
+    productRepository = ProductRepository();
+    sizeRepository = SizeRepository();
 
     // =========== FUNCTIONS ====== //
     on<DashboardLoadData>(_dashboardLoadData);
@@ -57,15 +47,15 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardLoadData event,
     Emitter<DashboardState> emit,
   ) async {
-    final List<SalesModel> sales = await SalesRepository().retrieveSales(
+    final List<SalesModel> sales = await salesRepository.retrieveSales(
       isFilterInCurrentMonth: true,
     );
-    final List<ProductModel> products = await ProductRepository()
+    final List<ProductModel> products = await productRepository
         .retrieveAllProduct();
 
-    final sizes = await SizeRepository().retrieveAllSizes();
+    final sizes = await sizeRepository.retrieveAllSizes();
 
-    final expenses = await ExpensesRepository().retriveAllExpenses(
+    final expenses = await expensesRepository.retriveAllExpenses(
       isMonthOnly: true,
     );
 
@@ -88,16 +78,17 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
     final referenceDate = event.referenceDate;
 
-    final List<SalesModel> sales = await SalesRepository().retrieveSales(
+    final List<SalesModel> sales = await salesRepository.retrieveSales(
       isFilterInCurrentMonth: true,
       referenceDate: referenceDate,
     );
-    final List<ProductModel> products = await ProductRepository()
+
+    final List<ProductModel> products = await productRepository
         .retrieveAllProduct();
 
-    final sizes = await SizeRepository().retrieveAllSizes();
+    final sizes = await sizeRepository.retrieveAllSizes();
 
-    final expenses = await ExpensesRepository().retriveAllExpenses(
+    final expenses = await expensesRepository.retriveAllExpenses(
       isMonthOnly: true,
       referenceDate: referenceDate,
     );
@@ -112,5 +103,4 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       ),
     );
   }
-
 }

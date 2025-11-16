@@ -7,12 +7,14 @@ final class PosInitial extends PosState {}
 
 class PosProductInitialized extends PosState {
   final String query;
+  final bool isSearching;
   final List<ProductModel> products;
   final List<ProductModel> searchResults;
   final List<CartModel> cart;
   final int selectedProductID;
 
   PosProductInitialized({
+    this.isSearching = false,
     required this.products,
     this.searchResults = const [],
     this.query = '',
@@ -21,6 +23,7 @@ class PosProductInitialized extends PosState {
   });
 
   PosProductInitialized copyWith({
+    bool? isSearching,
     List<ProductModel>? products,
     List<ProductModel>? searchResults,
     String? query,
@@ -30,6 +33,7 @@ class PosProductInitialized extends PosState {
     return PosProductInitialized(
       products: products ?? this.products,
       query: query ?? this.query,
+      isSearching: isSearching ?? this.isSearching,
       searchResults: searchResults ?? this.searchResults,
       cart: cart ?? this.cart,
       selectedProductID: selectedProductID ?? this.selectedProductID,

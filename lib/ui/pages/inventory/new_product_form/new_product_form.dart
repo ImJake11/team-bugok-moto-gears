@@ -17,7 +17,9 @@ import 'package:team_bugok_business/utils/provider/loading_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class NewProductForm extends StatefulWidget {
-  const NewProductForm({super.key});
+  final int? productId;
+
+  const NewProductForm({super.key, this.productId});
 
   @override
   State<NewProductForm> createState() => _NewProductFormState();
@@ -28,6 +30,18 @@ class _NewProductFormState extends State<NewProductForm> {
   final _costPriceController = TextEditingController();
 
   bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        context.read<ProductFormBloc>().add(
+          ProductFormLoadFetchedData(productId: widget.productId),
+        );
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -54,6 +68,8 @@ class _NewProductFormState extends State<NewProductForm> {
             selector: (state) =>
                 (state is ProductFormInitial) ? state.productData.id ?? 0 : 0,
             builder: (context, id) {
+              if (id == 0) return const SizedBox();
+
               return Text(
                 "Product ID: ${id}",
                 style: TextStyle(
@@ -119,6 +135,7 @@ class _NewProductFormState extends State<NewProductForm> {
                     CustomSnackBar(
                       context: context,
                       message: state.message,
+                      isError: true,
                     ).show();
                   }
 

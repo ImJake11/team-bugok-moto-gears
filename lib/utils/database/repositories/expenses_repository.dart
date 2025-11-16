@@ -1,21 +1,22 @@
-import 'package:drift/drift.dart';
-import 'package:team_bugok_business/utils/database/app_database.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:team_bugok_business/utils/helpers/print_clean_json.dart';
+import 'package:team_bugok_business/utils/model/expense_item_model_supabase.dart';
 import 'package:team_bugok_business/utils/model/expenses_model.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 
 class ExpensesRepository {
-  final db = appDatabase;
+  final supabase = Supabase.instance.client;
 
-  Future<List<EpxenseItemModel>> retriveExpensesItem(int expenseId) async =>
+  Future<List<ExpenseItemModel>> retriveExpensesItem(int expenseId) async =>
       _retriveExpensesItem(expenseId);
 
   Future<double> computExpensesTotal(ProductModel product) async =>
       _computeExpensesTotal(product);
 
-  Future<int> insertExpenses(ExpensesCompanion expenes) async =>
+  Future<int> insertExpenses(ExpensesModel expenes) async =>
       _insertExpenses(expenes);
 
-  Future<void> insertExpenseItem(ExpensesItemsCompanion item) async =>
+  Future<void> insertExpenseItem(ExpenseItemModelSupabase item) async =>
       _insertExpenseItem(item);
 
   Future<double> computeExpensesTotalOnProductUpdate(
@@ -36,22 +37,25 @@ class ExpensesRepository {
 
   // =========================== Private Functions ============================ //
 
-  Future<int> _insertExpenses(ExpensesCompanion expenes) async {
+  Future<int> _insertExpenses(ExpensesModel expenses) async {
     try {
-      final id = await db.into(db.expenses).insert(expenes);
-      return id;
+      final newEntry = await supabase
+          .from('expense')
+          .insert(expenses.toMap())
+          .select();
+
+      print("✅ New Expenses inserted, id: ${newEntry.first['id']}");
+      return newEntry.first['id'];
     } catch (e, st) {
-      print("🔥 [ExpensesRepository] _insertExpenses error: $e");
-      print("📜 Stack trace: $st");
+      print("_insertExpenses error: $e");
+      print("Stack trace: $st");
       rethrow;
     }
   }
 
-  Future<void> _insertExpenseItem(ExpensesItemsCompanion item) async {
+  Future<void> _insertExpenseItem(ExpenseItemModelSupabase item) async {
     try {
-      final id = await db.into(db.expensesItems).insert(item);
-      print(id);
-      print(item.expenseId);
+      await supabase.from('expense_item').insert(item.toMap());
     } catch (e, st) {
       print("🔥 [ExpensesRepository] _insertExpenseItem error: $e");
       print("📜 Stack trace: $st");
@@ -65,20 +69,39 @@ class ExpensesRepository {
       final costPrice = product.costPrice;
 
       for (final variant in product.variants) {
+        // check each sizes if existing or not
         for (final size in variant.sizes) {
+          // if id  is null means size is not yet existing
           if (size.id == null) {
             totalExpenses += (costPrice * size.stock);
           } else {
-            final currentData = await (db.select(
-              db.sizes,
-            )..where((tbl) => tbl.id.equals(size.id!))).getSingleOrNull();
+            final res = await supabase
+                .from('size')
+                .select('stock')
+                .eq(
+                  'id',
+                  size.id!,
+                );
 
-            if (currentData != null) {
-              final currentStock = currentData.stock;
-              final stockDifference = size.stock - currentStock;
+            // calculate the stock difference based on current stock stored in db
+            if (res.isNotEmpty) {
+              final stock = res.first['stock'];
+              final stockDifference = size.stock - stock;
+
+              /**
+               *[size.stock] is came from frontend which is the modified data by
+               user,
+              so deduct the current [stock] that is came from db to [size.stock]
+              so we can determine the stock difference that will be added to 
+              total expenses, this means user add stock
+               */
               if (stockDifference > 0) {
                 totalExpenses += stockDifference * costPrice;
               }
+            }
+            // or if result is empty just perform the normal operation
+            else {
+              totalExpenses += (costPrice * size.stock);
             }
           }
         }
@@ -99,16 +122,31 @@ class ExpensesRepository {
       double totalExpenses = 0.00;
       final costPrice = productData.costPrice;
 
+      // get sizes available on each variants
       for (final variant in productData.variants) {
+        // get sizes stock difference from previous
         for (final size in variant.sizes) {
+          // if size id is null means it is new
           final isExisting = size.id != null;
 
           if (isExisting) {
-            final currentData = await (db.select(
-              db.sizes,
-            )..where((tbl) => tbl.id.equals(size.id!))).getSingleOrNull();
+            // get current stock count
+            final result = await supabase
+                .from('size')
+                .select('stock')
+                .eq(
+                  'id',
+                  size.id!,
+                );
 
-            final stock = currentData?.stock ?? 0;
+            if (result.isEmpty) {
+              totalExpenses += (costPrice * size.stock);
+              continue;
+            }
+
+            final currentSize = result.first['stock'];
+
+            final stock = currentSize;
             final stockDifference = size.stock - stock;
 
             if (stockDifference > 0) {
@@ -123,9 +161,9 @@ class ExpensesRepository {
       return totalExpenses;
     } catch (e, st) {
       print(
-        "🔥 [ExpensesRepository] _computeExpensesTotalOnProductUpdate error: $e",
+        "[ExpensesRepository] _computeExpensesTotalOnProductUpdate error: $e",
       );
-      print("📜 Stack trace: $st");
+      print("Stack trace: $st");
       rethrow;
     }
   }
@@ -138,35 +176,35 @@ class ExpensesRepository {
   }) async {
     try {
       final now = referenceDate ?? DateTime.now();
-      final currentYear = year ?? now.year;
       final firstDay = DateTime(now.year, now.month, 1);
-      final lastDay = DateTime(now.year, now.month + 1, 0);
+      final lastDay = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+      final firstDayOfYear = DateTime(now.year, 1, 1);
+      final lastDayOfYear = DateTime(now.year, 12, 31);
 
-      final query = db.select(db.expenses)
-        ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)]);
+      var query = supabase.from('expense').select();
 
       if (isMonthlyOnly ?? false) {
-        query.where(
-          (tbl) =>
-              tbl.createdAt.isBiggerThanValue(firstDay) &
-              tbl.createdAt.isSmallerThanValue(lastDay),
-        );
+        query = query
+            .gt('created_at', firstDay.microsecondsSinceEpoch)
+            .lte("created_at", lastDay.millisecondsSinceEpoch);
       }
 
       if (isAnnualy ?? false) {
-        query.where((tbl) => tbl.createdAt.year.equals(currentYear));
+        query = query
+            .gt('created_at', firstDayOfYear.microsecondsSinceEpoch)
+            .lte("created_at", lastDayOfYear.millisecondsSinceEpoch);
       }
 
-      final results = await query.get();
+      final results = await query;
 
       return results
           .map(
             (result) => ExpensesModel(
-              category: result.category,
-              id: result.id,
-              note: result.note,
-              createdAt: result.createdAt,
-              total: result.total,
+              category: result['category'],
+              id: result['id'],
+              note: result['note'],
+              createdAt: result['created_at'],
+              total: result['total'],
             ),
           )
           .toList();
@@ -177,61 +215,34 @@ class ExpensesRepository {
     }
   }
 
-  Future<List<EpxenseItemModel>> _retriveExpensesItem(int expenseId) async {
+  Future<List<ExpenseItemModel>> _retriveExpensesItem(int expenseId) async {
     try {
-      final query = db.select(db.expensesItems)
-        ..where(
-          (tbl) => tbl.expenseId.equals(expenseId),
-        );
-
-      final rows = await query.get();
-
-      if (rows.isEmpty) return [];
-
-      List<EpxenseItemModel> items = [];
-
-      for (var row in rows) {
-        // the variant model and brand
-        final variantQuery = db.select(db.variants)
-          ..where(
-            (tbl) => tbl.id.equals(row.variantId),
+      final query = await supabase
+          .from('expense_item')
+          .select('''
+            *,
+            variant(
+             color,
+             product(
+                brand_id,
+                model_value
+              )
+            ),
+            size(size_value)
+            ''')
+          .eq(
+            'expense_id',
+            expenseId,
           );
 
-        final variant = await variantQuery.getSingleOrNull();
+      if (query.isEmpty) return [];
 
-        // skip current iteration if variant is null
-        if (variant == null) continue;
-
-        final productQuery = db.select(db.products)
-          ..where((tbl) => tbl.id.equals(variant.productId));
-
-        final product = await productQuery.getSingleOrNull();
-
-        // skip
-        if (product == null) continue;
-
-        //get the size value
-
-        final sizeQuery = db.select(db.sizes)
-          ..where(
-            (tbl) => tbl.id.equals(row.sizeId),
-          );
-
-        final size = await sizeQuery.getSingleOrNull();
-
-        if (size == null) continue;
-
-        items.add(
-          EpxenseItemModel(
-            brand: product.brand,
-            model: product.model,
-            color: variant.color,
-            size: size.sizeValues,
-            price: row.price,
-            quantity: row.quantity,
-          ),
-        );
-      }
+      List<ExpenseItemModel> items = query.map(
+        (e) {
+          prettyPrintJson(e);
+          return ExpenseItemModel.fromJson(e);
+        },
+      ).toList();
 
       return items;
     } catch (e, st) {

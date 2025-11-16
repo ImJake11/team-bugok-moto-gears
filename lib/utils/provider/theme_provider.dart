@@ -13,7 +13,6 @@ class MyThemeProvider extends ChangeNotifier {
   final List<ColorProp> _colorAccents = colorAccents;
 
   int _selectedIndex = 0;
-  bool _isWindowMaximized =false;
 
   Color _primaryColor = Color(0xFFE64A19);
   Color _secondaryColor = Color(0xFFF68B1F);
@@ -52,8 +51,6 @@ class MyThemeProvider extends ChangeNotifier {
 
   List<BoxShadow> get shadow => _shadow;
 
-  bool get isWindowMaximized => _isWindowMaximized;
-
   void updateThemeColor(int i) => _updateThemeColor(i);
 
   // ================== Functions ========================//
@@ -77,8 +74,4 @@ class MyThemeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeWindowValue(bool isMaximized){
-    _isWindowMaximized = isMaximized;
-    notifyListeners();
-  }
 }

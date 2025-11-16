@@ -5,6 +5,7 @@ sealed class ProductFormState {}
 
 final class ProductFormInitial extends ProductFormState {
   final ProductModel productData;
+
   ProductFormInitial({
     ProductModel? productData,
   }) : productData =
@@ -16,16 +17,13 @@ final class ProductFormInitial extends ProductFormState {
              costPrice: 0,
              sellingPrice: 0,
              isActive: 1,
-             createdAt: DateTime.now(),
+             createdAt: 0,
              variants: [],
-           );
+           ); 
 
   ProductFormInitial copyWith({
     ProductModel? productData,
-    List<(int, String)>? brands,
-    categories,
-    sizes,
-    colors,
+    bool? isLoading,
   }) {
     return ProductFormInitial(
       productData: productData ?? this.productData,
@@ -33,6 +31,7 @@ final class ProductFormInitial extends ProductFormState {
   }
 }
 
+class ProductFormLoadingState extends ProductFormState {}
 class ProductFormShowSnackbar extends ProductFormState {
   final String message;
   final Duration duration;
@@ -45,8 +44,6 @@ class ProductFormValidtionError extends ProductFormState {
 
   ProductFormValidtionError({required this.message});
 }
-
-class ProductFormLoadingState extends ProductFormState {}
 
 class ProductFormSaveProduct extends ProductFormState {
   final bool isSaveOnly;

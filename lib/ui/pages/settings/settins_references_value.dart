@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:team_bugok_business/ui/widgets/custom_button.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
-import 'package:team_bugok_business/ui/widgets/primary_button.dart';
 import 'package:team_bugok_business/ui/widgets/snackbar.dart';
 import 'package:team_bugok_business/ui/widgets/text_field.dart';
 import 'package:team_bugok_business/utils/database/repositories/store_setup_repository.dart';
 import 'package:team_bugok_business/utils/enums/reference_types.dart';
-import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/provider/settings_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
@@ -83,9 +82,7 @@ class _SettingsReferencesValueState extends State<SettingsReferencesValue> {
       setState(() => _isInitialized = false);
 
       await _setupRepository.saveReferenceValue(_references, widget.reference);
-      await Future.delayed(Duration(seconds: 1));
       await _fetchReferenceValue();
-      context.read<ReferencesValuesProviderCache>().fetchReferenceValues();
     } catch (e, st) {
       print("Failed to save values ${e}");
       print(st);

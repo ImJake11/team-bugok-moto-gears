@@ -6,11 +6,13 @@ class CustomSnackBar {
   final String message;
   final Duration duration;
   final BuildContext context;
+  final bool isError;
 
   CustomSnackBar({
     required this.context,
     required this.message,
     this.duration = const Duration(seconds: 3),
+    this.isError = false,
   });
 
   late final OverlayEntry _overlayEntry;
@@ -49,7 +51,7 @@ class CustomSnackBar {
                     maxWidth: 800,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: this.isError ? Colors.red : Colors.black,
                     border: Border.all(
                       color: context.watch<MyThemeProvider>().primary,
                     ),

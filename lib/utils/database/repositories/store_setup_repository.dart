@@ -1,9 +1,10 @@
-import 'package:drift/drift.dart';
-import 'package:team_bugok_business/utils/database/app_database.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:team_bugok_business/utils/enums/reference_types.dart';
 
 class StoreSetupRepository {
-  final db = appDatabase;
+  late final SupabaseClient supabase;
+
+  StoreSetupRepository() : supabase = Supabase.instance.client;
 
   Future<List<(int, String)>> getReferencesValues(
     ReferenceType referenceType,
@@ -19,23 +20,19 @@ class StoreSetupRepository {
     ReferenceType referenceType,
   ) async {
     try {
-      List<dynamic> results = [];
+      final table = getTableName(referenceType);
 
-      if (referenceType == ReferenceType.brands) {
-        results = await db.select(db.brands).get();
-      } else if (referenceType == ReferenceType.sizes) {
-        results = await db.select(db.availableSizes).get();
-      } else if (referenceType == ReferenceType.categories) {
-        results = await db.select(db.categories).get();
-      } else if (referenceType == ReferenceType.colors) {
-        results = await db.select(db.availableColors).get();
-      } else if (referenceType == ReferenceType.models) {
-        results = await db.select(db.models).get();
-      } else {
-        throw Exception("Unknown reference type: $referenceType");
-      }
+      List<dynamic> results = await supabase.from(table).select();
 
-      return [for (final result in results) (result.id, result.value)];
+      print("✅ Reference value of $referenceType fetched");
+
+      return [
+        for (final result in results)
+          (
+            result['id'],
+            result['value'],
+          ),
+      ];
     } catch (e, st) {
       print("Failed to get references value: $e");
       print(st);
@@ -67,34 +64,16 @@ class StoreSetupRepository {
     int id,
   ) async {
     try {
-      if (referenceType == ReferenceType.brands) {
-        await (db.update(db.brands)..where(
-              (tbl) => tbl.id.equals(id),
-            ))
-            .write(BrandsCompanion(value: Value(value)));
-      } else if (referenceType == ReferenceType.categories) {
-        await (db.update(db.categories)..where(
-              (tbl) => tbl.id.equals(id),
-            ))
-            .write(CategoriesCompanion(value: Value(value)));
-      } else if (referenceType == ReferenceType.sizes) {
-        await (db.update(db.availableSizes)..where(
-              (tbl) => tbl.id.equals(id),
-            ))
-            .write(AvailableSizesCompanion(value: Value(value)));
-      } else if (referenceType == ReferenceType.colors) {
-        await (db.update(db.availableColors)..where(
-              (tbl) => tbl.id.equals(id),
-            ))
-            .write(AvailableColorsCompanion(value: Value(value)));
-      } else if (referenceType == ReferenceType.models) {
-        await (db.update(db.models)..where(
-              (tbl) => tbl.id.equals(id),
-            ))
-            .write(ModelsCompanion(value: Value(value)));
-      } else {
-        throw Exception("Unknown reference type: $referenceType");
-      }
+      final table = getTableName(referenceType);
+
+      await supabase
+          .from(table)
+          .update({
+            "value": value,
+          })
+          .eq('id', id);
+
+      print('✅ $referenceType updated');
     } catch (e, st) {
       print("Failed to update reference value: $e");
       print(st);
@@ -107,43 +86,33 @@ class StoreSetupRepository {
     String value,
   ) async {
     try {
-      if (referenceType == ReferenceType.brands) {
-        await db
-            .into(db.brands)
-            .insert(
-              BrandsCompanion.insert(value: value),
-            );
-      } else if (referenceType == ReferenceType.categories) {
-        await db
-            .into(db.categories)
-            .insert(
-              CategoriesCompanion.insert(value: value),
-            );
-      } else if (referenceType == ReferenceType.sizes) {
-        await db
-            .into(db.availableSizes)
-            .insert(
-              AvailableSizesCompanion.insert(value: value),
-            );
-      } else if (referenceType == ReferenceType.colors) {
-        await db
-            .into(db.availableColors)
-            .insert(
-              AvailableColorsCompanion.insert(value: value),
-            );
-      } else if (referenceType == ReferenceType.models) {
-        await db
-            .into(db.models)
-            .insert(
-              ModelsCompanion.insert(value: value),
-            );
-      } else {
-        throw Exception("Unknown reference type: $referenceType");
-      }
+      final table = getTableName(referenceType);
+
+      await supabase.from(table).insert({
+        "value": value,
+      });
+
+      print('✅ New $referenceType inserted');
     } catch (e, st) {
       print("Failed to insert reference value: $e");
       print(st);
       rethrow;
     }
+  }
+}
+
+String getTableName(ReferenceType reference) {
+  switch (reference) {
+    case ReferenceType.brands:
+      return 'brand';
+    case ReferenceType.categories:
+      return "category";
+    case ReferenceType.colors:
+      return "available_color";
+    case ReferenceType.models:
+      return 'model';
+
+    default:
+      return 'available_size';
   }
 }

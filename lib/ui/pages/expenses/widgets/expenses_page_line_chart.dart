@@ -30,7 +30,7 @@ Widget expensesPageLineChart(
 
       // get the sales based on index
       final salesPerDay = expenses.where(
-        (element) => element.createdAt.month - 1 == index,
+        (element) => element.createdAt - 1 == index, // fix this later
       );
 
       final totalSales = salesPerDay.isEmpty

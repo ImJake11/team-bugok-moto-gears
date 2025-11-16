@@ -7,7 +7,7 @@ import 'package:team_bugok_business/ui/pages/sales/widget/sales_page_table_heade
 import 'package:team_bugok_business/ui/widgets/drop_down.dart';
 import 'package:team_bugok_business/ui/widgets/loading_widget.dart';
 import 'package:team_bugok_business/ui/widgets/padding_wrapper.dart';
-import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/ui/widgets/custom_button.dart';
 import 'package:team_bugok_business/utils/database/repositories/expenses_repository.dart';
 import 'package:team_bugok_business/utils/model/expenses_model.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
@@ -42,7 +42,6 @@ class _ExpensesPageState extends State<ExpensesPage> {
       }
 
       final result = await _expensesRepository.retriveAllExpenses(
-        isAnnualy: true,
         year: _selectedYear,
       );
 

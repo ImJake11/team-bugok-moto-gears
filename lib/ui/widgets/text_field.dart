@@ -9,6 +9,7 @@ class CustomTextfield extends StatefulWidget {
   final IconData? suffixIcon;
   final List<TextInputFormatter>? formatter;
   final ValueChanged<String>? onChange;
+  final void Function()? onSuffixClick;
   final TextEditingController? textEditingController;
   final bool? showShadow;
   final Color? fillColor;
@@ -16,8 +17,11 @@ class CustomTextfield extends StatefulWidget {
   final double? height;
   final int? maxLines;
   final TextAlign? textAlign;
+  final bool showSuffixIcon;
 
   const CustomTextfield({
+    this.onSuffixClick,
+    this.showSuffixIcon = false,
     super.key,
     this.width = 500,
     this.placeholder = "Search Product",
@@ -28,7 +32,7 @@ class CustomTextfield extends StatefulWidget {
     this.showShadow = true,
     this.fillColor = const Color(0xFF282828),
     this.maxLength = 10,
-    this.height = 50,
+    this.height = 40,
     this.maxLines = 1,
     this.textAlign,
   });
@@ -62,9 +66,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        boxShadow: widget.showShadow ?? false
-            ? theme.shadow
-            : [],
+        boxShadow: widget.showShadow ?? false ? theme.shadow : [],
       ),
       width: widget.width,
       height: widget.height,
@@ -97,6 +99,15 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           ),
           hintText: widget.placeholder,
           hintStyle: TextStyle(color: Colors.grey.shade700),
+          suffixIcon: widget.showSuffixIcon
+              ? GestureDetector(
+                  onTap: widget.onSuffixClick,
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 20,
+                  ),
+                )
+              : null,
           prefixIcon: widget.suffixIcon != null
               ? Icon(widget.suffixIcon, color: theme.primary, size: 20)
               : null,

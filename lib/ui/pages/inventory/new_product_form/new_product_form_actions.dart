@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/widgets/cancel_button.dart';
-import 'package:team_bugok_business/ui/widgets/primary_button.dart';
+import 'package:team_bugok_business/ui/widgets/custom_button.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 import 'package:team_bugok_business/utils/provider/loading_provider.dart';
 
@@ -23,8 +23,10 @@ class NewProductFormActions extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           spacing: 20,
           children: [
-            CancelButton(),
-            if (value?.id == 0)
+            CancelButton(
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            if (value?.id == null)
               CustomButton(
                 width: 200,
                 onTap: () {
@@ -41,7 +43,7 @@ class NewProductFormActions extends StatelessWidget {
             CustomButton(
               onTap: () {
                 context.read<LoadingProvider>().showLoading("Saving Product");
-                if (value?.id == 0) {
+                if (value?.id == null) {
                   context.read<ProductFormBloc>().add(
                     ProductFormInsertProduct(isSaveOnly: true),
                   );

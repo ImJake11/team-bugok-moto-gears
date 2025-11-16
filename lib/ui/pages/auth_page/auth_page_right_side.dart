@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:team_bugok_business/ui/pages/auth_page/widgets/auth_page_countdown_time.dart';
 import 'package:team_bugok_business/ui/pages/auth_page/widgets/auth_page_login_btn.dart';
 import 'package:team_bugok_business/ui/pages/auth_page/widgets/auth_page_message.dart';
-import 'package:team_bugok_business/ui/widgets/title_bar.dart';
 import 'package:team_bugok_business/utils/provider/auth_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
@@ -17,7 +15,6 @@ class AuthPageRightSide extends StatefulWidget {
 }
 
 class _AuthPageRightSideState extends State<AuthPageRightSide> {
-  bool _isLoginBtnHovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +90,6 @@ class _AuthPageRightSideState extends State<AuthPageRightSide> {
       height: size.height,
       child: Column(
         children: [
-          TitleBar(
-            showLogo: false,
-          ),
           Image.asset(
             'assets/images/moto-gears-icon-no-bg.png',
             width: 250,

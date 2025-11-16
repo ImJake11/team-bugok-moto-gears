@@ -13,9 +13,9 @@ class CustomButton extends StatefulWidget {
   const CustomButton({
     super.key,
     required this.child,
-    this.width = 150,
+    this.width = 140,
     this.onTap,
-    this.height = 50,
+    this.height = 40,
     this.borderRadius = 10,
     this.showShadow = true,
   });

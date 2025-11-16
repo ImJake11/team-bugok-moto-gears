@@ -31,6 +31,7 @@ GoRouter router = GoRouter(
         child: AuthPage(),
       ),
     ),
+
     ShellRoute(
       pageBuilder: (context, state, child) {
         return CustomTransitionPage(
@@ -57,36 +58,54 @@ GoRouter router = GoRouter(
         GoRoute(
           path: "/",
           name: "dashboard",
-          builder: (context, state) => const DashboardPage(),
+          pageBuilder: (context, state) =>
+              const MaterialPage(child: DashboardPage()),
         ),
         GoRoute(
           path: "/expenses_page",
           name: "expenses",
-          builder: (context, state) => const ExpensesPage(),
+          pageBuilder: (context, state) =>
+              MaterialPage(child: const ExpensesPage()),
         ),
         GoRoute(
           path: "/small_purchase",
           name: "small-purchase",
-          builder: (context, state) => const SmallPurchase(),
+          pageBuilder: (context, state) => MaterialPage(
+            child: const SmallPurchase(),
+          ),
         ),
         GoRoute(
           name: "inventory",
           path: "/inventory",
-          builder: (context, state) => const InventoryPage(),
+          pageBuilder: (context, state) => MaterialPage(
+            child: const InventoryPage(),
+          ),
           routes: [
-            GoRoute(
-              path: "new_product_form",
-              name: "new-product-form",
-              builder: (context, state) => const NewProductForm(),
-            ),
             GoRoute(
               path: "product_view",
               name: "product-view",
-              builder: (context, state) {
+              pageBuilder: (context, state) {
                 final productModel = state.extra as ProductModel;
 
-                return ProductView(
-                  productModel: productModel,
+                return MaterialPage(
+                  child: ProductView(
+                    productModel: productModel,
+                  ),
+                );
+              },
+            ),
+            GoRoute(
+              path: "new_product_form",
+              name: "new-product-form",
+              pageBuilder: (context, state) {
+                String? productId = state.uri.queryParameters['id'];
+
+                return MaterialPage(
+                  child: NewProductForm(
+                    productId: productId != null
+                        ? int.tryParse(productId)
+                        : null,
+                  ),
                 );
               },
             ),
@@ -95,17 +114,19 @@ GoRouter router = GoRouter(
         GoRoute(
           path: "/pos_page",
           name: "pos",
-          builder: (context, state) => const PosPage(),
+          pageBuilder: (context, state) => MaterialPage(child: const PosPage()),
         ),
         GoRoute(
           path: "/sales_page",
           name: "sales",
-          builder: (context, state) => const SalesPage(),
+          pageBuilder: (context, state) =>
+              MaterialPage(child: const SalesPage()),
         ),
         GoRoute(
           path: "/settings_page",
           name: "settings",
-          builder: (context, state) => const SettingsPage(),
+          pageBuilder: (context, state) =>
+              MaterialPage(child: const SettingsPage()),
         ),
       ],
     ),

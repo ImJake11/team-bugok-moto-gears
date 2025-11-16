@@ -181,30 +181,37 @@ class _PosPageSelectedProductVariantsState
                 children: List.generate(
                   availableSizes.length,
                   (index) {
-                    final sizeId = availableSizes[index].sizeValue;
+                    final size = availableSizes[index].sizeValue;
 
                     // get the value of the size value of available sizes
                     final sizeLabel = referencesGetValueByID(
                       context,
                       ReferenceType.sizes,
-                      sizeId,
+                      size,
                     );
                     final isInActive = availableSizes[index].isActive == 0;
 
+                    // check if current size is on low stock
+                    bool isOnLowStock = availableSizes[index].stock <= 0;
+
                     return ProductViewSizeButton(
                       isInActive: isInActive,
-                      onTap: () => context.read<PosBloc>().add(
-                        PosAddProductCart(
-                          cartModel: CartModel(
-                            color: _selectedVariantColor,
-                            size: sizeId,
-                            id: availableSizes[index].id!,
-                            price: widget.productModel.sellingPrice,
-                            model: widget.productModel.model,
-                            brand: widget.productModel.brand,
+                      onTap: () {
+                        if (isOnLowStock) return;
+
+                        context.read<PosBloc>().add(
+                          PosAddProductCart(
+                            cartModel: CartModel(
+                              sizeId: availableSizes[index].id!,
+                              color: _selectedVariantColor,
+                              size: size,
+                              price: widget.productModel.sellingPrice,
+                              model: widget.productModel.model,
+                              brand: widget.productModel.brand,
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                       showHoverAnimation: true,
                       label: sizeLabel,
                       isAvailable: true,

@@ -27,7 +27,7 @@ class NewProductFormName extends StatefulWidget {
 }
 
 class _NewProductFormNameState extends State<NewProductFormName> {
-  late List<String> _usedModels;
+  List<String> _usedModels = [];
   Timer? _debounce;
   bool _isError = false;
 
@@ -49,7 +49,9 @@ class _NewProductFormNameState extends State<NewProductFormName> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _retriveUsedModels();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _retriveUsedModels(),
+    );
   }
 
   Future<void> _retriveUsedModels() async {

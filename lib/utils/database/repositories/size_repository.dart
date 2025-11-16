@@ -1,11 +1,15 @@
-import 'package:drift/drift.dart';
-import 'package:team_bugok_business/utils/database/app_database.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:team_bugok_business/utils/database/repositories/expenses_repository.dart';
+import 'package:team_bugok_business/utils/model/expense_item_model_supabase.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
 
 class SizeRepository {
-  final ExpensesRepository expensesRepository = ExpensesRepository();
-  final db = appDatabase;
+  final ExpensesRepository expensesRepository;
+  final SupabaseClient supabase;
+
+  SizeRepository()
+    : expensesRepository = ExpensesRepository(),
+      supabase = Supabase.instance.client;
 
   Future<void> upsertSize(
     List<VariantSizeModel> sizes,
@@ -15,10 +19,8 @@ class SizeRepository {
     double costPrice,
   ) async => _upsertSize(sizes, variantId, productId, expenseId, costPrice);
 
-  Future<VariantSizeModel> querySize(int id) async => _querySize(id);
-
-  Future<void> updateStock(int id, int quantity) async =>
-      _updateStock(id, quantity);
+  Future<VariantSizeModel?> getCurrentSizeStock(int id) async =>
+      _getCurrentSizeStock(id);
 
   Future<List<VariantSizeModel>> retrieveAllSizes() async =>
       _retrieveAllSizes();
@@ -33,29 +35,35 @@ class SizeRepository {
     VariantSizeModel size,
   ) async {
     try {
-      final sizeId = await db
-          .into(db.sizes)
-          .insert(
-            SizesCompanion.insert(
-              productId: productId,
-              variantId: variantId,
-              stock: size.stock,
-              sizeValues: size.sizeValue,
-            ),
-          );
+      final newSizeEntry = VariantSizeModel(
+        sizeValue: size.sizeValue,
+        stock: size.stock,
+        isActive: 1,
+        productId: productId,
+        variantId: variantId,
+      );
+      final result = await supabase
+          .from('size')
+          .insert(newSizeEntry.toMap())
+          .select();
+
+      if (result.isEmpty) return;
+
+      final sizeId = result.first['id'];
 
       await expensesRepository.insertExpenseItem(
-        ExpensesItemsCompanion.insert(
+        ExpenseItemModelSupabase(
           expenseId: expenseId,
-          variantId: variantId,
-          sizeId: sizeId,
           price: costPrice,
           quantity: size.stock,
+          variantId: variantId,
+          sizeId: sizeId,
         ),
       );
+      print('✅ New size inserted');
     } catch (e, st) {
       print(
-        "🔥 [SizeRepository._insertSize] Failed to insert size for variantId=$variantId",
+        "[SizeRepository] _insertSize Failed to insert size for variantId=$variantId",
       );
       print("Error: $e");
       print("Stack Trace:\n$st");
@@ -71,37 +79,53 @@ class SizeRepository {
     double costPrice,
   ) async {
     try {
-      // Fetch current data to calculate stock difference
-      final currentData = await (db.select(
-        db.sizes,
-      )..where((tbl) => tbl.id.equals(size.id!))).getSingleOrNull();
+      // if expense id is 0 means now expenses added
+      // so we will just update the size
+      if (expenseId <= 0 && size.id != null) {
+        await supabase.from('size').update(size.toMap()).eq('id', size.id!);
+        return;
+      }
 
-      if (currentData != null) {
-        final currentStock = currentData.stock;
-        final stockDifference = size.stock - currentStock;
+      // Fetch current data to calculate stock difference
+      final result = await supabase
+          .from('size')
+          .select('stock')
+          .eq(
+            'id',
+            size.id!,
+          );
+
+      if (result.isNotEmpty) {
+        final currentSize = result.first;
+        final currentStock = currentSize['stock'];
+
+        //get the stock difference based on current and updated stock
+        int stockDifference = (size.stock - currentStock) as int;
 
         if (stockDifference > 0) {
-          await expensesRepository.insertExpenseItem(
-            ExpensesItemsCompanion.insert(
-              expenseId: expenseId,
-              variantId: variantId,
-              sizeId: size.id!,
-              price: costPrice,
-              quantity: stockDifference,
-            ),
-          );
+          final newExpense = ExpenseItemModelSupabase(
+            expenseId: expenseId,
+            price: costPrice,
+            quantity: stockDifference,
+            variantId: variantId,
+            sizeId: size.id!,
+          ).toMap();
+
+          // add to expenses when current stock is modified
+          await supabase.from('expense_item').insert(newExpense);
         }
       }
 
-      await (db.update(
-        db.sizes,
-      )..where((tbl) => tbl.id.equals(size.id!))).write(
-        SizesCompanion(
-          isActive: Value(size.isActive),
-          sizeValues: Value(size.sizeValue),
-          stock: Value(size.stock),
-        ),
-      );
+      // update size
+      await supabase
+          .from('size')
+          .update(size.toMap())
+          .eq(
+            'id',
+            size.id!,
+          );
+
+      print('✅ Size Updated Successfully');
     } catch (e, st) {
       print(
         "🔥 [SizeRepository._updateSize] Failed to update size id=${size.id}",
@@ -121,19 +145,20 @@ class SizeRepository {
   ) async {
     try {
       for (final s in sizes) {
-        final existing = await (db.select(
-          db.sizes,
-        )..where((tbl) => tbl.id.equals(s.id ?? 0))).getSingleOrNull();
+        // check if size is existing
+        final isExisting = s.id != null;
 
-        if (existing == null) {
-          await _insertSize(variantId, productId, expenseId, costPrice, s);
-        } else {
+        if (isExisting) {
           await _updateSize(s, variantId, productId, expenseId, costPrice);
+        } else {
+          await _insertSize(variantId, productId, expenseId, costPrice, s);
         }
       }
+
+      print("✅ Sizes Updated");
     } catch (e, st) {
       print(
-        "🔥 [SizeRepository._upsertSize] Failed to upsert sizes for variantId=$variantId",
+        "🔥 [SizeRepository] _upsertSize Failed to upsert sizes for variantId=$variantId",
       );
       print("Error: $e");
       print("Stack Trace:\n$st");
@@ -141,36 +166,15 @@ class SizeRepository {
     }
   }
 
-  Future<VariantSizeModel> _querySize(int id) async {
+  Future<VariantSizeModel?> _getCurrentSizeStock(int id) async {
     try {
-      final result = await (db.select(
-        db.sizes,
-      )..where((tbl) => tbl.id.equals(id))).getSingle();
+      final res = await supabase.from('size').select('stock').eq('id', id);
 
-      return VariantSizeModel(
-        id: result.id,
-        variantId: result.variantId,
-        isActive: result.isActive,
-        sizeValue: result.sizeValues,
-        stock: result.stock,
-      );
-    } catch (e, st) {
-      print("🔥 [SizeRepository._querySize] Failed to query size id=$id");
-      print("Error: $e");
-      print("Stack Trace:\n$st");
-      rethrow;
-    }
-  }
+      if (res.isEmpty) return null;
 
-  Future<void> _updateStock(int id, int quantity) async {
-    try {
-      await (db.update(db.sizes)..where((tbl) => tbl.id.equals(id))).write(
-        SizesCompanion.custom(stock: db.sizes.stock - Constant(quantity)),
-      );
+      return VariantSizeModel.fromJson(res.first);
     } catch (e, st) {
-      print(
-        "🔥 [SizeRepository._updateStock] Failed to update stock for size id=$id",
-      );
+      print("[SizeRepository] getCurrentSizeStock Failed to query size id=$id");
       print("Error: $e");
       print("Stack Trace:\n$st");
       rethrow;
@@ -179,19 +183,9 @@ class SizeRepository {
 
   Future<List<VariantSizeModel>> _retrieveAllSizes() async {
     try {
-      final result = await db.select(db.sizes).get();
+      final result = await supabase.from('size').select();
 
-      return [
-        for (final size in result)
-          VariantSizeModel(
-            id: size.id,
-            productId: size.productId,
-            variantId: size.variantId,
-            sizeValue: size.sizeValues,
-            stock: size.stock,
-            isActive: size.isActive,
-          ),
-      ];
+      return [for (final size in result) VariantSizeModel.fromJson(size)];
     } catch (e, st) {
       print("🔥 [SizeRepository._retrieveAllSizes] Failed to retrieve sizes");
       print("Error: $e");

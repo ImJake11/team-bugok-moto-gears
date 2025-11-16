@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:team_bugok_business/bloc/dashboard_bloc/dashboard_bloc.dart';
-import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/references_get_value_by_id.dart';
 import 'package:team_bugok_business/utils/model/low_stock_product_model.dart';
-import 'package:team_bugok_business/utils/provider/references_values_cache_provider.dart';
 import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class DashbardPageNoStock extends StatelessWidget {
@@ -14,10 +12,7 @@ class DashbardPageNoStock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.read<ReferencesValuesProviderCache>();
-
-    final brands = provider.brands;
-
+ 
     return SizedBox(
       width: double.infinity,
 
@@ -107,12 +102,12 @@ class DashbardPageNoStock extends StatelessWidget {
                             const Spacer(),
                             GestureDetector(
                               onTap: () {
-                                context.read<ProductFormBloc>().add(
-                                  ProductFormUpdateExistingProduct(
-                                    productId: product.id,
-                                  ),
+                                context.goNamed(
+                                  "new-product-form",
+                                  queryParameters: {
+                                    'id': product.id.toString(),
+                                  },
                                 );
-                                context.goNamed("new-product-form");
                               },
                               child: Container(
                                 height: 30,

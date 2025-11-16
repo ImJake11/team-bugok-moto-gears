@@ -32,8 +32,7 @@ class DashboardPageNoTransactions extends StatelessWidget {
               final todaySales = state.sales
                   .where(
                     (e) =>
-                        e.createdAt.isAfter(startOfDay) &&
-                        e.createdAt.isBefore(endOfDay),
+                        false
                   )
                   .toList();
               return todaySales.length;

@@ -66,12 +66,6 @@ class ProductFormUpdateSize extends ProductFormEvent {
   });
 }
 
-class ProductFormUpdateExistingProduct extends ProductFormEvent {
-  final int productId;
-
-  ProductFormUpdateExistingProduct({required this.productId});
-}
-
 class ProductFormSaveUpdateProduct extends ProductFormEvent {
   final ProductModel productModel;
 
@@ -79,3 +73,9 @@ class ProductFormSaveUpdateProduct extends ProductFormEvent {
 }
 
 class ProductFormResetForm extends ProductFormEvent {}
+
+class ProductFormLoadFetchedData extends ProductFormEvent {
+  final int? productId;
+
+  ProductFormLoadFetchedData({required this.productId});
+}

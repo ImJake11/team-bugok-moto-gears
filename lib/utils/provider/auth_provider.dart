@@ -52,13 +52,12 @@ class AuthProvider extends ChangeNotifier {
       final result = await cacheRepository.checkUserSession();
       final password = await cacheRepository.getPassword();
 
-      final (isLoggedIn, isRememberedPin) = result;
+      final isLoggedIn = result;
 
-      if (isLoggedIn == 1) {
+      if (isLoggedIn) {
         _password = password;
 
         _isLoggedIn = true;
-        _isPinRemember = isRememberedPin == 1;
       } else {
         _isLoggedIn = false;
         _isPinRemember = false;

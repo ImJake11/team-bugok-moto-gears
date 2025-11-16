@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:team_bugok_business/constants/product_form_keys.dart';
 import 'package:team_bugok_business/utils/database/repositories/product_repository.dart';
-import 'package:team_bugok_business/utils/database/repositories/variant_repository.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
 import 'package:team_bugok_business/utils/model/variant_model.dart';
 
@@ -13,7 +12,11 @@ part 'product_form_event.dart';
 part 'product_form_state.dart';
 
 class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
+  late final ProductRepository productRepository;
+
   ProductFormBloc() : super(ProductFormInitial()) {
+    productRepository = ProductRepository();
+
     on<ProductFormUpdateData>(_productFormUpdate);
     on<ProductFormInsertProduct>(_productFormInsertProduct);
     on<ProductFormCreateVariant>(_productFormCreateVariant);
@@ -22,9 +25,9 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     on<ProductFormCreateSize>(_productFormCreateSize);
     on<ProductFormDeleteSize>(_productFormDeleteSize);
     on<ProductFormUpdateSize>(_productFormUpdateSize);
-    on<ProductFormUpdateExistingProduct>(_productFormUpdateExistingProduct);
     on<ProductFormSaveUpdateProduct>(_productFormSaveUpdateProduct);
     on<ProductFormResetForm>(_productFormResetForm);
+    on<ProductFormLoadFetchedData>(_productFormLoadFetchedData);
   }
 
   void _productFormUpdate(
@@ -114,72 +117,84 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
   ) async {
     if (state is! ProductFormInitial) return;
     final s = state as ProductFormInitial;
+    final currentProductData = s.productData;
 
-    final category = s.productData.category;
-    final brand = s.productData.brand;
-    final model = s.productData.model;
-    final sellingPrice = s.productData.sellingPrice;
-    final costPrice = s.productData.costPrice;
-    final variants = s.productData.variants;
-
-    emit(ProductFormLoadingState());
-
-    if (category < 0 ||
-        brand <= 0 ||
-        model.isEmpty ||
-        sellingPrice <= 0 ||
-        costPrice <= 0 ||
-        variants.isEmpty) {
+    try {
+      // show loading ui
       emit(
-        ProductFormValidtionError(message: "Required fields cannot be empty"),
+        s.copyWith(
+          isLoading: true,
+        ),
       );
-      emit(ProductFormInitial(productData: s.productData));
-      return;
-    }
 
-    final errorVariants = s.productData.variants.any(
-      (element) =>
-          element.color < 0 ||
-          element.sizes.isEmpty ||
-          element.sizes.any(
-            (size) => size.stock <= 0 || size.sizeValue < 0,
+      final category = s.productData.category;
+      final brand = s.productData.brand;
+      final model = s.productData.model;
+      final sellingPrice = s.productData.sellingPrice;
+      final costPrice = s.productData.costPrice;
+      final variants = s.productData.variants;
+
+      if (category < 0 ||
+          brand <= 0 ||
+          model.isEmpty ||
+          sellingPrice <= 0 ||
+          costPrice <= 0 ||
+          variants.isEmpty) {
+        emit(
+          ProductFormValidtionError(message: "Required fields cannot be empty"),
+        );
+        emit(ProductFormInitial(productData: s.productData));
+        return;
+      }
+
+      final errorVariants = s.productData.variants.any(
+        (element) =>
+            element.color < 0 ||
+            element.sizes.isEmpty ||
+            element.sizes.any(
+              (size) => size.stock <= 0 || size.sizeValue < 0,
+            ),
+      );
+
+      if (errorVariants) {
+        emit(
+          ProductFormValidtionError(
+            message:
+                "Please complete all fields for each variant before saving.",
           ),
-    );
+        );
 
-    if (errorVariants) {
+        emit(ProductFormInitial(productData: s.productData));
+        return;
+      }
+
+      final isModelExisting = (await productRepository.retrieveProductModel())
+          .any((e) => e == model);
+
+      if (isModelExisting) {
+        emit(
+          ProductFormValidtionError(
+            message: "Product model is already existing",
+          ),
+        );
+
+        emit(ProductFormInitial(productData: s.productData));
+        return;
+      }
+
+      await productRepository.insertProduct(s.productData);
+      // call success state
       emit(
-        ProductFormValidtionError(
-          message: "Please complete all fields for each variant before saving.",
+        ProductFormSaveProduct(
+          isSaveOnly: event.isSaveOnly,
+          message: "Product Saved Successfull",
         ),
       );
-
-      emit(ProductFormInitial(productData: s.productData));
-      return;
+      emit(ProductFormInitial());
+    } catch (e) {
+      emit(ProductFormErrorState(message: "Failed to save new product"));
+      emit(ProductFormInitial(productData: currentProductData));
     }
-
-    final isModelExisting = (await ProductRepository().retrieveProductModel())
-        .any((e) => e == model);
-
-    if (isModelExisting) {
-      emit(
-        ProductFormValidtionError(
-          message: "Product model is already existing",
-        ),
-      );
-
-      emit(ProductFormInitial(productData: s.productData));
-      return;
-    }
-
-    await ProductRepository().insertProduct(s.productData);
-    // call success state
-    emit(
-      ProductFormSaveProduct(
-        isSaveOnly: event.isSaveOnly,
-        message: "Product Saved Successfull",
-      ),
-    );
-    emit(ProductFormInitial());
   }
 
   void _productFormDeleteVariant(
@@ -211,22 +226,11 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
         variant.isActive = 0;
       }
 
+      print("💀 Variant Delete function clicked ${variant.isActive}");
+
       // Update the local list with the modified variant
       List<VariantModel> updatedVariantList = List.from(s.productData.variants)
         ..[i] = s.productData.variants[i].copyWith(isActive: variant.isActive);
-
-      // Persist the updated variant to the database
-      await VariantRepository().updateVariant(variant, variant.id!);
-
-      // If the variant was deactivated, show a snackbar notification
-      if (variant.isActive == 0) {
-        emit(
-          ProductFormShowSnackbar(
-            message: "Variant ${variant.color} is tagged as inactive",
-            duration: Duration(seconds: 10),
-          ),
-        );
-      }
 
       // Emit the updated state with the modified variants list
       emit(
@@ -403,29 +407,6 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     );
   }
 
-  void _productFormUpdateExistingProduct(
-    ProductFormUpdateExistingProduct event,
-    Emitter<ProductFormState> emit,
-  ) async {
-    try {
-      emit(ProductFormLoadingState());
-      final productModel = await ProductRepository().fetchSingleProduct(
-        event.productId,
-      );
-
-      await Future.delayed(Duration(seconds: 1));
-      emit(
-        ProductFormInitial(
-          productData: productModel,
-        ),
-      );
-    } catch (e, st) {
-      print("Error fetching product ${e}");
-      print(st);
-      emit(ProductFormErrorState(message: "Failed to fetched product"));
-    }
-  }
-
   void _productFormResetForm(
     ProductFormResetForm event,
     Emitter<ProductFormState> emit,
@@ -442,7 +423,7 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     final s = state as ProductFormInitial;
 
     try {
-      await ProductRepository().updateProduct(event.productModel);
+      await productRepository.updateProduct(event.productModel);
       emit(
         ProductFormSaveProduct(
           isSaveOnly: true,
@@ -457,6 +438,35 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     } catch (e) {
       emit(ProductFormErrorState(message: "Failed to update product"));
       emit(s.copyWith());
+    }
+  }
+
+  void _productFormLoadFetchedData(
+    ProductFormLoadFetchedData event,
+    Emitter<ProductFormState> emit,
+  ) async {
+    try {
+      emit(ProductFormLoadingState());
+
+      final productId = event.productId;
+
+      if (productId == null) {
+        // if no id just emit the state w/o data
+        emit(ProductFormInitial());
+        return;
+      }
+      // fetch the product data
+      final product = await productRepository.fetchSingleProduct(productId);
+
+      if (product == null) {
+        emit(ProductFormInitial());
+        return;
+      }
+
+      emit(ProductFormInitial(productData: product));
+    } catch (e) {
+      emit(ProductFormErrorState(message: "Failed to get product data"));
+      emit(ProductFormInitial());
     }
   }
 }

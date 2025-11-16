@@ -123,13 +123,13 @@ class PosCartTile extends StatelessWidget {
                       quantityController(
                         onAdd: () => context.read<PosBloc>().add(
                           PosQuantityAction(
-                            id: cartModel.id,
+                            id: cartModel.sizeId,
                             isAdd: true,
                           ),
                         ),
                         onRemove: () => context.read<PosBloc>().add(
                           PosQuantityAction(
-                            id: cartModel.id,
+                            id: cartModel.sizeId,
                             isAdd: false,
                           ),
                         ),
@@ -144,7 +144,7 @@ class PosCartTile extends StatelessWidget {
         IconButton(
           tooltip: "Remove Item",
           onPressed: () => context.read<PosBloc>().add(
-            PosDeleteCartItem(id: cartModel.id),
+            PosDeleteCartItem(id: cartModel.sizeId),
           ),
           icon: Icon(
             Icons.delete_rounded,

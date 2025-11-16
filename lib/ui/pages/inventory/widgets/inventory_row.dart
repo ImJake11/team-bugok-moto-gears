@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:team_bugok_business/bloc/product_form_bloc/product_form_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/widgets/inventory_stock_status_icon.dart';
 import 'package:team_bugok_business/utils/enums/reference_types.dart';
 import 'package:team_bugok_business/utils/helpers/compute_product_stock.dart';
@@ -32,8 +31,6 @@ class _InventoryRowState extends State<InventoryRow> {
     final theme = context.watch<MyThemeProvider>();
 
     final product = widget.productModel;
-
-    final id = product.id;
     final brand = referencesGetValueByID(
       context,
       ReferenceType.brands,
@@ -50,7 +47,7 @@ class _InventoryRowState extends State<InventoryRow> {
     final variants = product.variants.length;
     final stock = computeProductStock(product.variants);
 
-    final isLow = stock <= 3;
+    final isLow = stock <= 2;
     final isActive = product.isActive == 1;
 
     Widget tableCell(
@@ -100,8 +97,8 @@ class _InventoryRowState extends State<InventoryRow> {
               tableCell(2, brand),
               tableCell(2, model),
               tableCell(2, category),
-              tableCell(2, sellingPrice),
               tableCell(2, costPrice),
+              tableCell(2, sellingPrice),
               tableCell(2, variants),
               tableCell(1, stock),
               Flexible(
@@ -117,14 +114,9 @@ class _InventoryRowState extends State<InventoryRow> {
                 child: Center(
                   child: IconButton(
                     onPressed: () {
-                      context.read<ProductFormBloc>().add(
-                        ProductFormUpdateExistingProduct(
-                          productId: widget.productModel.id!,
-                        ),
-                      );
                       GoRouter.of(context).goNamed(
                         'new-product-form',
-                        extra: widget.productModel,
+                        queryParameters: {'id': product.id.toString()},
                       );
                     },
                     icon: Icon(

@@ -1,11 +1,11 @@
-import 'package:drift/drift.dart';
-import 'package:team_bugok_business/utils/database/app_database.dart';
-import 'package:team_bugok_business/utils/database/repositories/size_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:team_bugok_business/utils/model/cart_model.dart';
 import 'package:team_bugok_business/utils/model/sales_model.dart';
 
 class SalesRepository {
-  final db = appDatabase;
+  late final SupabaseClient supabase;
+
+  SalesRepository() : supabase = Supabase.instance.client;
 
   Future<void> insertSale(List<CartModel> cart) async => _insertSale(cart);
 
@@ -22,8 +22,6 @@ class SalesRepository {
   // ========================== PRIVATE FUNCTIONS ========================== //
 
   Future<void> _insertSale(List<CartModel> cart) async {
-    final SizeRepository sizeRepository = SizeRepository();
-
     try {
       // Compute cart total
       final double cartTotal = cart.fold<double>(
@@ -33,40 +31,48 @@ class SalesRepository {
       );
 
       // Insert the sale
-      final int saleId = await db
-          .into(db.sales)
-          .insert(
-            SalesCompanion.insert(total: cartTotal),
-          );
+
+      final newSaleEntry = SalesModel(
+        createdAt: DateTime.now().millisecond,
+        total: cartTotal,
+        items: [],
+      ).toMap();
+
+      newSaleEntry.remove('items');
+
+      final res = await supabase.from('sale').insert(newSaleEntry).select('id');
+
+      if (res.isEmpty) return;
+      print('✅ Sale entry inserted');
+
+      final saleId = res.first['id'];
 
       // Insert sale items and update stock
-      for (final item in cart) {
-        try {
-          await db
-              .into(db.saleItems)
-              .insert(
-                SaleItemsCompanion.insert(
-                  saleId: saleId,
-                  price: item.price,
-                  quantity: item.quantity,
-                  brand: item.brand,
-                  model: item.model,
-                  size: item.size,
-                  color: item.color,
-                  productId: item.id,
-                ),
-              );
+      await supabase.from('sale_item').insert([
+        for (var item in cart)
+          CartModel(
+            saleId: saleId,
+            price: item.price,
+            quantity: item.quantity,
+            brand: item.brand,
+            model: item.model,
+            size: item.size,
+            color: item.color,
+            sizeId: item.sizeId,
+          ).toMap(),
+      ]);
 
-          await sizeRepository.updateStock(item.id, item.quantity);
-        } catch (itemError, itemSt) {
-          print(
-            "🔥 [SalesRepository._insertSale] Failed inserting sale item for productId=${item.id}",
-          );
-          print("Error: $itemError");
-          print("Stack Trace:\n$itemSt");
-          rethrow;
-        }
+      for (var c in cart) {
+        await supabase.rpc(
+          'stock_decrement',
+          params: {
+            'pid': c.sizeId,
+            'qty': c.quantity,
+          },
+        );
       }
+
+      print("✅ Sale items inserted");
     } catch (e, st) {
       print("🔥 [SalesRepository._insertSale] Failed to insert sale");
       print("Error: $e");
@@ -76,8 +82,8 @@ class SalesRepository {
   }
 
   Future<List<SalesModel>> _retrieveSales({
-    final bool? isFilterInCurrentWeek,
-    final bool? isFilterInCurrentMonth,
+    final bool? isFilterInCurrentWeek = true,
+    final bool? isFilterInCurrentMonth = true,
     final DateTime? referenceDate,
   }) async {
     try {
@@ -96,60 +102,30 @@ class SalesRepository {
         999,
       );
 
-      final query = db.select(db.sales).join([
-        leftOuterJoin(db.saleItems, db.saleItems.saleId.equalsExp(db.sales.id)),
-      ])..orderBy([OrderingTerm.desc(db.sales.createdAt)]);
+      var query = supabase.from('sale').select('''
+      *,
+      sale_item (*)
+      ''');
 
       if (isFilterInCurrentWeek ?? false) {
-        query.where(
-          db.sales.createdAt.isBiggerThanValue(startOfWeek) &
-              db.sales.createdAt.isSmallerThanValue(endOfWeek),
-        );
+        query = query
+            .gt('created_at', startOfWeek.microsecondsSinceEpoch)
+            .lt('created_at', endOfWeek.microsecondsSinceEpoch);
       }
 
       if (isFilterInCurrentMonth ?? false) {
-        query.where(
-          db.sales.createdAt.isBiggerThanValue(startOfMonth) &
-              db.sales.createdAt.isSmallerThanValue(endOfMonth),
-        );
+        query = query
+            .gt('created_at', startOfMonth.millisecondsSinceEpoch)
+            .lt('created_at', endOfMonth.millisecondsSinceEpoch);
       }
 
-      final result = await query.get();
+      final results = await query;
 
-      // Group sale items by sale ID
-      final Map<int, SalesModel> groupedSales = {};
+      List<SalesModel> sales = [
+        for (var result in results) SalesModel.fromJson(result),
+      ];
 
-      for (final row in result) {
-        final sale = row.readTable(db.sales);
-        final item = row.readTableOrNull(db.saleItems);
-        
-        groupedSales.putIfAbsent(
-          sale.id,
-          () => SalesModel(
-            id: sale.id,
-            createdAt: sale.createdAt,
-            total: sale.total,
-            items: [],
-          ),
-        );
-
-        if (item != null) {
-          groupedSales[sale.id]!.items.add(
-            CartModel(
-              saleId: item.saleId,
-              quantity: item.quantity,
-              id: item.id,
-              price: item.price,
-              model: item.model,
-              size: item.size,
-              color: item.color,
-              brand: item.brand,
-            ),
-          );
-        }
-      }
-
-      return groupedSales.values.toList();
+      return sales;
     } catch (e, st) {
       print("🔥 [SalesRepository._retrieveSales] Failed to retrieve sales");
       print("Error: $e");

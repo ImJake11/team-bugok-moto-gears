@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:team_bugok_business/ui/pages/inventory/widgets/inventory_row.dart';
 import 'package:team_bugok_business/utils/model/product_model.dart';
-import 'package:team_bugok_business/utils/provider/theme_provider.dart';
 
 class InventoryTable extends StatefulWidget {
   final List<ProductModel> products;

@@ -28,6 +28,7 @@ class PosPage extends StatelessWidget {
             if (state is PosErrorState) {
               CustomSnackBar(
                 context: context,
+                isError: true,
                 message: state.message,
               ).show();
             }
@@ -36,12 +37,6 @@ class PosPage extends StatelessWidget {
             if (s is PosLoadingState) {
               return Center(
                 child: LoadingWidget(),
-              );
-            }
-
-            if (s is PosErrorState) {
-              return Center(
-                child: Text('Something went wrong'),
               );
             }
 

@@ -82,9 +82,9 @@ class _SalesPageTableRowState extends State<SalesPageTableRow> {
                 direction: Axis.horizontal,
                 children: [
                   _cell(widget.sale.id),
-                  _cell(convertDateStringToDate(widget.sale.createdAt)),
-                  _cell(extractTime(widget.sale.createdAt)),
-                  _cell(widget.sale.items.length),
+                  _cell(convertDateStringToDate(DateTime.now())),
+                  _cell(extractTime(DateTime.now())),
+                  _cell(widget.sale.items?.length ?? 0),
                   _cell(currencyFormatter(widget.sale.total)),
                   viewBtn,
                 ],

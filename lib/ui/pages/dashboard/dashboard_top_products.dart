@@ -47,7 +47,7 @@ class DashboardTopProducts extends StatelessWidget {
                           )
                         : topProducts.add(
                             TopProductsMdodel(
-                              id: item.id,
+                              id: item.sizeId,
                               brand: item.brand,
                               model: item.model,
                               sales: item.quantity,

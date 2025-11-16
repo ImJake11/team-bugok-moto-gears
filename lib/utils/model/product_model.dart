@@ -8,12 +8,11 @@ class ProductModel {
   final double costPrice;
   final double sellingPrice;
   final int isActive;
-  final DateTime createdAt;
+  int createdAt;
   final List<VariantModel> variants;
 
   ProductModel({
     this.variants = const [],
-    this.id = 0,
     required this.brand,
     required this.category,
     required this.model,
@@ -21,6 +20,7 @@ class ProductModel {
     required this.sellingPrice,
     required this.isActive,
     required this.createdAt,
+    this.id,
   });
 
   ProductModel copyWith({
@@ -32,7 +32,7 @@ class ProductModel {
     double? costPrice,
     double? sellingPrice,
     int? isActive,
-    DateTime? createdAt,
+    int? createdAt,
     List<VariantModel>? variants,
   }) {
     return ProductModel(
@@ -48,16 +48,34 @@ class ProductModel {
     );
   }
 
+  // convert json to map object
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
+      id: json['id'],
+      brand: json['brand_id'],
+      category: json['category_id'],
+      model: json['model_value'] ?? '',
+      costPrice: (json['cost_price'] as num).toDouble(),
+      sellingPrice: (json['selling_price'] as num).toDouble(),
+      isActive: json['is_active'] ?? 0,
+      createdAt: json['created_at'],
+      variants: (json['variant'] as List<dynamic>? ?? [])
+          .map((e) => VariantModel.fromJson(e))
+          .toList(),
+    );
+  }
+
   // convert to map object
   Map<String, Object?> toMap() {
     return {
-      'brand': brand,
-      'category': category,
-      'model': model,
+      if (id != null) 'id': id,
+      'brand_id': brand,
+      'category_id': category,
+      'model_value': model,
       'cost_price': costPrice,
       'selling_price': sellingPrice,
       'is_active': isActive,
-      'created_at': createdAt,
+      'created_at': DateTime.now().millisecondsSinceEpoch,
     };
   }
 

@@ -14,6 +14,17 @@ class PosPageProducts extends StatefulWidget {
 
 class _PosPageProductsState extends State<PosPageProducts> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        context.read<PosBloc>().add(PosLoadProducts());
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     Widget tableHeader(String label) {
       return Flexible(
@@ -55,24 +66,30 @@ class _PosPageProductsState extends State<PosPageProducts> {
 
                   final displayList = query.isEmpty ? products : searchResults;
 
-                  if (state.products.isEmpty) {
+                  if (displayList.isEmpty) {
                     return Center(
                       child: Text('No products found'),
                     );
                   }
 
-                  return SingleChildScrollView(
-                    child: Column(
-                      spacing: isSelectedProduct ? 15 : 5,
-                      children: List.generate(
-                        displayList.length,
-                        (index) => PosPageTableRow(
-                          index: index,
-                          productModel: displayList[index],
-                        ),
-                      ),
-                    ),
-                  );
+                  final isSearching = state.isSearching;
+
+                  return isSearching
+                      ? LoadingWidget(
+                          message: "Searching...",
+                        )
+                      : SingleChildScrollView(
+                          child: Column(
+                            spacing: isSelectedProduct ? 15 : 5,
+                            children: List.generate(
+                              displayList.length,
+                              (index) => PosPageTableRow(
+                                index: index,
+                                productModel: displayList[index],
+                              ),
+                            ),
+                          ),
+                        );
                 }
 
                 return Center(
